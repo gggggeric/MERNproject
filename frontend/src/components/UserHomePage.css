@@ -1,0 +1,38 @@
+/* src/components/UserHomePage.css */
+
+.user-home-page {
+    padding: 20px;
+    background-color: #ffffff; /* White background */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow */
+}
+
+.user-home-page h1 {
+    color: #8e44ad; /* Title color */
+    text-align: center; /* Center the title */
+}
+
+.user-home-page h2 {
+    text-align: center; /* Center the email */
+}
+
+.user-actions {
+    display: flex;
+    justify-content: center; /* Center actions */
+    gap: 20px; /* Space between buttons */
+    margin-top: 20px; /* Space above actions */
+}
+
+.action-btn {
+    padding: 10px 20px;
+    background-color: #8e44ad; /* Button color */
+    color: white; /* Text color */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer on hover */
+    transition: background-color 0.3s;
+}
+
+.action-btn:hover {
+    background-color: #732d91; /* Darker purple on hover */
+}

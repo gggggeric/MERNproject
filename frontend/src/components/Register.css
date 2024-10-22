@@ -1,0 +1,64 @@
+/* src/components/Register.css */
+.page-container {
+    display: flex; /* Use flexbox to center the content */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    height: 100vh; /* Full viewport height */
+    background-color: #f4f4f4; /* Light background */
+}
+
+.form-container {
+    max-width: 400px; /* Set a max width for the form */
+    width: 100%; /* Full width up to the max width */
+    padding: 2rem; /* Padding around the form */
+    border: 1px solid #8e44ad; /* Border with purple color */
+    border-radius: 10px; /* Rounded corners */
+    background-color: #ffffff; /* White background */
+    box-shadow: 0 4px 10px rgba(142, 68, 173, 0.5); /* Darker purple shadow */
+}
+
+.form-container h2 {
+    text-align: center; /* Center the title */
+    margin-bottom: 1.5rem; /* Space below the title */
+    color: #8e44ad; /* Title color */
+}
+
+.form-group {
+    margin-bottom: 1rem; /* Space between form groups */
+}
+
+.form-group label {
+    display: block; /* Block display for labels */
+    margin-bottom: 0.5rem; /* Space below labels */
+    color: #8e44ad; /* Label color */
+}
+
+.form-group input {
+    width: 100%; /* Full width input */
+    padding: 0.5rem; /* Padding inside input */
+    border: 1px solid #8e44ad; /* Border color */
+    border-radius: 5px; /* Rounded corners */
+}
+
+.submit-btn {
+    width: 100%; /* Full width button */
+    padding: 0.5rem; /* Padding inside button */
+    background-color: #8e44ad; /* Button color */
+    color: white; /* Text color */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 1rem; /* Font size */
+    cursor: pointer; /* Pointer on hover */
+}
+
+.submit-btn:hover {
+    background-color: #732d91; /* Darker purple on hover */
+}
+
+.error-message {
+    color: red;
+    margin-top: 10px;
+    font-size: 14px;
+    text-align: center;
+}
+

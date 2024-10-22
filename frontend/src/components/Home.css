@@ -1,0 +1,35 @@
+/* src/components/Home.css */
+.home-container {
+    text-align: center; /* Center the text */
+    padding: 2rem; /* Add padding */
+}
+
+.sofa-list {
+    display: flex; /* Use flexbox for layout */
+    flex-wrap: wrap; /* Allow wrapping of cards */
+    justify-content: center; /* Center items horizontally */
+    gap: 2rem; /* Space between cards */
+}
+
+.sofa-card {
+    border: 1px solid #ccc; /* Border for sofa card */
+    border-radius: 8px; /* Rounded corners */
+    padding: 1rem; /* Padding inside the card */
+    width: 250px; /* Fixed width */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Shadow effect */
+    transition: transform 0.3s; /* Smooth scaling on hover */
+}
+
+.sofa-card:hover {
+    transform: scale(1.05); /* Scale up on hover */
+}
+
+.sofa-card img {
+    max-width: 100%; /* Make image responsive */
+    border-radius: 8px; /* Round image corners */
+}
+
+.price {
+    font-weight: bold; /* Bold price text */
+    color: #8e44ad; /* Purple color for price */
+}

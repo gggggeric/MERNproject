@@ -1,0 +1,28 @@
+/* SellerHomePage.css */
+.seller-home-container {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.seller-dashboard {
+    margin-top: 20px;
+}
+
+.seller-dashboard ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.seller-dashboard ul li {
+    margin-bottom: 10px;
+}
+
+.seller-dashboard ul li a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+}
+
+.seller-dashboard ul li a:hover {
+    color: #007bff;
+}

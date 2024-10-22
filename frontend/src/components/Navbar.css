@@ -1,0 +1,95 @@
+/* src/components/Navbar.css */
+
+/* Define a common font style for the entire navbar */
+.navbar {
+    display: flex; /* Use flexbox for layout */
+    justify-content: space-between; /* Space out items */
+    align-items: center; /* Center items vertically */
+    background-color: #ffffff; /* White background for a clean look */
+    padding: 1rem 2rem; /* Padding for the navbar */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Shadow effect */
+    border-radius: 10px; /* Rounded corners */
+    margin: 1rem; /* Margin around the navbar */
+    font-family: Arial, sans-serif; /* Set a uniform font family */
+    font-size: 1rem; /* Base font size */
+}
+
+.left-content {
+    flex: 1; /* Allow left content to take up available space */
+}
+
+.right-content {
+    display: flex; /* Use flexbox for right content */
+    align-items: center; /* Center items vertically */
+}
+
+.nav-title {
+    display: flex; /* Flex for title and links */
+    align-items: center; /* Center items vertically */
+}
+
+/* Style for navigation links */
+.nav-links {
+    display: flex; /* Use flexbox for nav links */
+    list-style-type: none; /* Remove default bullet points */
+    padding: 0; /* Remove default padding */
+    margin: 0; /* Remove default margin */
+}
+
+.nav-links a {
+    display: inline-block; /* Make links behave like buttons */
+    color: white; /* White text color */
+    background-color: #8e44ad; /* Purple background for buttons */
+    text-decoration: none; /* Remove underline from links */
+    margin-left: 1rem; /* Space between links */
+    padding: 0.5rem 1.5rem; /* Padding for the buttons */
+    border-radius: 5px; /* Rounded corners */
+    transition: background-color 0.3s ease; /* Smooth transition */
+    font-weight: 600; /* Bold text for links */
+}
+
+.nav-links a:hover {
+    background-color: #5e3370; /* Darker purple on hover */
+}
+
+/* Style for logged in user's email */
+.user-email {
+    font-size: 1.5rem; /* Adjust font size for the email */
+    color: #8e44ad; /* Same color as the navbar */
+    font-weight: 600; /* Bold text */
+    margin-left: 2rem; /* Space before email */
+}
+
+/* Style for the logout button */
+.logout-btn {
+    margin-left: 2rem; /* Space between the email display and logout button */
+    padding: 0.5rem 1.5rem; /* Padding for the button */
+    background-color: #e74c3c; /* Red background for logout button */
+    color: white; /* White text color */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    font-weight: 600; /* Bold text */
+    cursor: pointer; /* Pointer on hover */
+    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.logout-btn:hover {
+    background-color: #c0392b; /* Darker red on hover */
+}
+
+/* Additional styles for the edit profile link */
+.edit-profile-link {
+    display: inline-block; /* Make link behave like a button */
+    color: white; /* White text color */
+    background-color: #8e44ad; /* Purple background for the edit profile link */
+    text-decoration: none; /* Remove underline */
+    margin-left: 1rem; /* Space between edit profile link and other links */
+    padding: 0.5rem 1.5rem; /* Padding for the button */
+    border-radius: 5px; /* Rounded corners */
+    transition: background-color 0.3s ease; /* Smooth transition */
+    font-weight: 600; /* Bold text for the edit profile link */
+}
+
+.edit-profile-link:hover {
+    background-color: #5e3370; /* Darker purple on hover */
+}
