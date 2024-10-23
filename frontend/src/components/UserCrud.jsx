@@ -140,6 +140,7 @@ const UserCrud = () => {
                     <option value="user">User</option>
                     <option value="seller">Seller</option>
                     <option value="admin">Admin</option>
+                    <option value="manufacturer">Manufacturer</option>
                 </select>
                 <button type="submit" className="create-btn">Create User</button>
             </form>
@@ -198,6 +199,7 @@ const UserCrud = () => {
                                 <option value="user">User</option>
                                 <option value="seller">Seller</option>
                                 <option value="admin">Admin</option>
+                                <option value="manufacturer">Manufacturer</option>
                             </select>
                             <label>Status:</label>
                             <select 

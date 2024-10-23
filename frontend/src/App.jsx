@@ -10,6 +10,7 @@ import Home from './components/Home'; // Assuming you have a home page
 import Navbar from './components/Navbar'
 import UserCrud from './components/UserCrud';
 import Register from './components/Register'
+import ManufacturerHomePage from './components/ManufacturerHomePage';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 
@@ -55,6 +56,15 @@ const App = () => {
                             <ProtectedRoute 
                                 element={<UserCrud />} 
                                 allowedRoles={['admin']} // Only admins can access
+                            />
+                        } 
+                    />
+                     <Route 
+                        path="/manufacturerHomePage" 
+                        element={
+                            <ProtectedRoute 
+                                element={<ManufacturerHomePage />} 
+                                allowedRoles={['manufacturer']} // Only manufacturers can access
                             />
                         } 
                     />

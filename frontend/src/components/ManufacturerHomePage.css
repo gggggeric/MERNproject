@@ -1,0 +1,17 @@
+/* src/components/UserHomePage.css */
+
+.manufacturer-home-page {
+    padding: 20px;
+    background-color: #ffffff; /* White background */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow */
+}
+
+.manufacturer-home-page h1 {
+    color: #8e44ad; /* Title color */
+    text-align: center; /* Center the title */
+}
+
+.manufacturer-home-page h2 {
+    text-align: center; /* Center the email */
+}

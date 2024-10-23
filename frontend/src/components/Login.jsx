@@ -27,10 +27,14 @@ const Login = () => {
             if (user.userType === 'admin') {
                 window.location.href = '/adminHomePage'; // Redirect to admin home page
             } else if (user.userType === 'seller') {
-                window.location.href = '/sellerHomePage'; // Redirect to seller home page
+                window.location.href = '/sellerHomePage'; // Redirect to seller home page 
+            } else if (user.userType === 'manufacturer') {   
+                window.location.href = '/manufacturerHomePage';
             } else {
                 window.location.href = '/userHomePage'; // Redirect to user home page
             }
+
+
             alert('Logged in successfully!'); // Notify user after redirection
         } catch (err) {
             // Check if the error response status is 403
