@@ -10,6 +10,8 @@ import Home from './components/Home'; // Assuming you have a home page
 import Navbar from './components/Navbar'
 import UserCrud from './components/UserCrud';
 import Register from './components/Register'
+import UserEditProfile from './components/UserEditProfile';
+
 
 const App = () => {
     return (
@@ -53,6 +55,15 @@ const App = () => {
                             <ProtectedRoute 
                                 element={<UserCrud />} 
                                 allowedRoles={['admin']} // Only admins can access
+                            />
+                        } 
+                    />
+                      <Route 
+                        path="/userEditProfile" 
+                        element={
+                            <ProtectedRoute 
+                                element={<UserEditProfile />} 
+                                allowedRoles={['user']} // Only admins can access
                             />
                         } 
                     />

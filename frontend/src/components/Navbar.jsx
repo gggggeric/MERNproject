@@ -23,8 +23,8 @@ const Navbar = () => {
                 )}
             </div>
             <div className="right-content">
-                {userEmail && userType && (
-                    <Link to={`/${userType}/editProfile`} className="edit-profile-link">Edit Profile</Link>
+                {userEmail && userType === 'user' && (
+                    <Link to="/UserEditProfile" className="edit-profile-link">Edit Profile</Link>
                 )}
                 {userEmail && (
                     <button className="logout-btn" onClick={handleLogout}>Logout</button>

@@ -59,3 +59,13 @@
 .settings {
     background-color: #e67e22; /* Orange background for settings */
 }
+.chart-container {
+    margin-top: 20px; /* Margin above the chart */
+    max-width: 600px; /* Limit max width */
+    width: 100%; /* Full width within the max limit */
+    padding: 20px; /* Padding around the chart */
+    background-color: white; /* White background for contrast */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+

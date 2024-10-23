@@ -62,3 +62,16 @@
     text-align: center;
 }
 
+.success-message {
+    color: #28a745; /* Green color for success */
+    text-align: center; /* Center the message */
+    margin-top: 15px; /* Space above the message */
+}
+
+.error-message {
+    color: red; /* Red color for errors */
+    margin-top: 10px; /* Space above the error message */
+    font-size: 14px; /* Font size for error messages */
+    text-align: center; /* Center the error message */
+}
+

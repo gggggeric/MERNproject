@@ -69,7 +69,7 @@ const sendConfirmationEmail = async (to, token) => {
                 </head>
                 <body>
                     <div class="container">
-                        <h1>Welcome to Your App!</h1>
+                        <h1>Welcome to SofaStore!</h1>
                         <p>Thank you for registering with us. Please confirm your email address to complete your registration.</p>
                         <p>Click the button below to confirm your email:</p>
                         <a href="${url}">Confirm Email</a>
