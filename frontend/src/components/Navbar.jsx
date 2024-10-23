@@ -27,6 +27,8 @@ const Navbar = () => {
             return "http://localhost:3000/sellerHomePage";
         } else if (userType === 'user') { // Assuming 'user' represents a customer
             return "http://localhost:3000/UserHomePage";
+        } else if (userType === 'manufacturer') { // Assuming 'user' represents a customer
+            return "http://localhost:3000/ManufacturerHomePage";
         }
         return "#"; // Fallback if userType is not recognized
     };
