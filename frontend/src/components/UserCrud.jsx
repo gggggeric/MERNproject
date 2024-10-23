@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import './UserCrud.css';
 
 const UserCrud = () => {
@@ -10,6 +11,8 @@ const UserCrud = () => {
     const [editingUser, setEditingUser] = useState(null); // Store the user being edited
     const [editForm, setEditForm] = useState({ userType: '', status: '' }); // State for the edit form
     const [showEditModal, setShowEditModal] = useState(false); // To toggle the floating modal
+
+    const navigate = useNavigate(); // Initialize the navigate function
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -63,7 +66,6 @@ const UserCrud = () => {
         }
     };
 
-    // Trigger editing mode and populate the edit form with the selected user's data
     const handleEdit = (user) => {
         setEditingUser(user._id); // Set the editing user
         setEditForm({ userType: user.userType, status: user.status }); // Populate form
@@ -97,11 +99,6 @@ const UserCrud = () => {
             console.error('Error updating user:', err);
         }
     };
-    
-    
-    
-    
-    
 
     const handleCancelEdit = () => {
         setShowEditModal(false);
@@ -109,8 +106,15 @@ const UserCrud = () => {
         setEditForm({ userType: '', status: '' });
     };
 
+    // Handle back button to navigate to the admin home page
+    const handleBack = () => {
+        navigate('/adminHomePage'); // Replace with the route you want to navigate to
+    };
+
     return (
         <div className="user-crud-container">
+            <button className="back-button" onClick={handleBack}>Back to Admin Home</button> {/* Back button */}
+
             <div className="user-crud-header">
                 <h2>User Management</h2>
             </div>

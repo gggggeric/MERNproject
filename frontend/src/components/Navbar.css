@@ -16,6 +16,23 @@
 
 .left-content {
     flex: 1; /* Allow left content to take up available space */
+    display: flex; /* Flexbox for logo and name */
+    align-items: center; /* Center items vertically */
+}
+
+.logo {
+    width: 50px; /* Set a fixed width */
+    height: 50px; /* Set a fixed height */
+    margin-right: 10px; /* Space between logo and store name */
+    border-radius: 50%; /* Make the logo circular */
+    object-fit: cover; /* Ensure the image covers the area without distortion */
+}
+
+.store-name {
+    font-size: 1.5rem; /* Font size for store name */
+    color: #8e44ad; /* Store name color */
+    font-family: cursive; /* Cursive font for the store name */
+    text-decoration: none; /* Remove underline */
 }
 
 .right-content {
@@ -36,34 +53,47 @@
     margin: 0; /* Remove default margin */
 }
 
-.nav-links a {
-    display: inline-block; /* Make links behave like buttons */
-    color: white; /* White text color */
-    background-color: #8e44ad; /* Purple background for buttons */
+/* Update styles for home and edit profile links */
+.home-link,
+.edit-profile-link {
+    display: inline-block; /* Make links behave like inline elements */
+    color: #8e44ad; /* Purple text color */
     text-decoration: none; /* Remove underline from links */
     margin-left: 1rem; /* Space between links */
-    padding: 0.5rem 1.5rem; /* Padding for the buttons */
-    border-radius: 5px; /* Rounded corners */
-    transition: background-color 0.3s ease; /* Smooth transition */
-    font-weight: 600; /* Bold text for links */
+    font-weight: 600; /* Bold text */
 }
 
-.nav-links a:hover {
-    background-color: #5e3370; /* Darker purple on hover */
+.home-link:hover,
+.edit-profile-link:hover {
+    color: #5e3370; /* Darker purple on hover */
 }
 
 /* Style for logged in user's email */
+.user-email-container {
+    position: relative; /* Position relative for dropdown */
+    cursor: pointer; /* Pointer cursor for clickable */
+}
+
 .user-email {
-    font-size: 1.5rem; /* Adjust font size for the email */
+    font-size: 0.9rem; /* Smaller font size for the email */
     color: #8e44ad; /* Same color as the navbar */
     font-weight: 600; /* Bold text */
     margin-left: 2rem; /* Space before email */
 }
 
-/* Style for the logout button */
+/* Dropdown styles */
+.dropdown {
+    position: absolute; /* Position dropdown below the email */
+    top: 30px; /* Adjust top position */
+    right: 0; /* Align to the right */
+    background-color: white; /* White background for dropdown */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* Shadow for dropdown */
+    border-radius: 5px; /* Rounded corners */
+    z-index: 100; /* Ensure dropdown is above other elements */
+}
+
 .logout-btn {
-    margin-left: 2rem; /* Space between the email display and logout button */
-    padding: 0.5rem 1.5rem; /* Padding for the button */
+    padding: 0.5rem 1rem; /* Padding for the button */
     background-color: #e74c3c; /* Red background for logout button */
     color: white; /* White text color */
     border: none; /* No border */
@@ -71,25 +101,9 @@
     font-weight: 600; /* Bold text */
     cursor: pointer; /* Pointer on hover */
     transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+    margin: 5px; /* Margin for spacing */
 }
 
 .logout-btn:hover {
     background-color: #c0392b; /* Darker red on hover */
-}
-
-/* Additional styles for the edit profile link */
-.edit-profile-link {
-    display: inline-block; /* Make link behave like a button */
-    color: white; /* White text color */
-    background-color: #8e44ad; /* Purple background for the edit profile link */
-    text-decoration: none; /* Remove underline */
-    margin-left: 1rem; /* Space between edit profile link and other links */
-    padding: 0.5rem 1.5rem; /* Padding for the button */
-    border-radius: 5px; /* Rounded corners */
-    transition: background-color 0.3s ease; /* Smooth transition */
-    font-weight: 600; /* Bold text for the edit profile link */
-}
-
-.edit-profile-link:hover {
-    background-color: #5e3370; /* Darker purple on hover */
 }

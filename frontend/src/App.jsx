@@ -10,6 +10,8 @@ import Home from './components/Home'; // Assuming you have a home page
 import Navbar from './components/Navbar'
 import UserCrud from './components/UserCrud';
 import Register from './components/Register'
+import 'bootstrap-icons/font/bootstrap-icons.css';
+
 
 const App = () => {
     return (

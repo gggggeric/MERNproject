@@ -1,7 +1,7 @@
 /* General styles */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4; /* Light background */
+    background-color: #f4f4f4;
     margin: 0;
 }
 
@@ -10,10 +10,23 @@ body {
     max-width: 800px;
     margin: 20px auto;
     padding: 20px;
-    background-color: #ffffff; /* White background */
-    border: 1px solid #8e44ad; /* Border with purple color */
-    border-radius: 8px; /* Rounded corners */
-    box-shadow: 0 4px 10px rgba(142, 68, 173, 0.5); /* Darker purple shadow */
+    background-color: #ffffff;
+    border: 1px solid #8e44ad;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(142, 68, 173, 0.5);
+    animation: fadeIn 1s ease-in-out;
+}
+
+/* Fade-in animation for the main container */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 /* Heading styles */
@@ -24,7 +37,20 @@ body {
 
 .user-crud-header h2 {
     font-size: 2rem;
-    color: #8e44ad; /* Title color */
+    color: #8e44ad;
+    animation: slideInDown 0.5s ease-in-out;
+}
+
+/* Slide-down animation for header */
+@keyframes slideInDown {
+    from {
+        transform: translateY(-50%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 /* Form styles */
@@ -38,21 +64,43 @@ body {
 .user-crud-form button {
     margin-bottom: 15px;
     padding: 10px;
-    border: 1px solid #8e44ad; /* Border color */
-    border-radius: 5px; /* Rounded corners */
+    border: 1px solid #8e44ad;
+    border-radius: 5px;
+    transition: transform 0.3s ease-in-out;
 }
 
-/* Button styles */
-.user-crud-form button {
-    background-color: #8e44ad; /* Button color */
-    color: #fff; /* Text color */
-    border: none; /* No border */
-    cursor: pointer; /* Pointer on hover */
-    transition: background-color 0.3s;
+/* Button styles (applies to all buttons) */
+button, .edit-button, .delete-button, .save-btn, .cancel-btn, .back-btn {
+    background-color: #8e44ad;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
-.user-crud-form button:hover {
-    background-color: #732d91; /* Darker purple on hover */
+/* Hover and focus effect for all buttons */
+button:hover, .edit-button:hover, .delete-button:hover, .save-btn:hover, .cancel-btn:hover, .back-btn:hover {
+    background-color: #732d91;
+    transform: scale(1.05);
+}
+
+/* Specific delete button styling */
+.delete-button {
+    background-color: #e74c3c; /* Red for delete */
+}
+
+.delete-button:hover {
+    background-color: #c0392b; /* Darker red on hover */
+}
+
+/* Input and button hover animation */
+.user-crud-form input:hover,
+.user-crud-form select:hover,
+button:hover {
+    transform: scale(1.05); /* Slight zoom on hover */
 }
 
 /* Table styles */
@@ -60,6 +108,7 @@ body {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
+    animation: fadeIn 0.8s ease-in-out;
 }
 
 .user-crud-table th,
@@ -70,40 +119,14 @@ body {
 }
 
 .user-crud-table th {
-    background-color: #f4f4f4; /* Light gray for header */
-    color: #8e44ad; /* Header text color */
+    background-color: #f4f4f4;
+    color: #8e44ad;
 }
 
 /* Action buttons in table */
 .action-buttons {
     display: flex;
     gap: 10px;
-}
-
-.edit-button,
-.delete-button {
-    padding: 5px 10px;
-    border: none;
-    border-radius: 5px; /* Rounded corners */
-    cursor: pointer;
-}
-
-.edit-button {
-    background-color: #8e44ad; /* Matching purple theme */
-    color: #fff; /* White text */
-}
-
-.delete-button {
-    background-color: #dc3545; /* Red for delete button remains */
-    color: #fff; /* White text */
-}
-
-.edit-button:hover {
-    background-color: #732d91; /* Darker purple on hover */
-}
-
-.delete-button:hover {
-    background-color: #c82333; /* Darker red on hover */
 }
 
 /* Error message style */
@@ -126,6 +149,7 @@ body {
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    animation: fadeIn 0.5s ease-in-out;
 }
 
 .edit-modal-content {
@@ -134,13 +158,22 @@ body {
     border-radius: 8px;
     width: 400px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    animation: slideInUp 0.5s ease-in-out;
 }
 
-.edit-modal-content h3 {
-    margin-bottom: 20px;
-    color: #8e44ad; /* Purple heading */
+/* Slide-up animation for the modal */
+@keyframes slideInUp {
+    from {
+        transform: translateY(50%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
+/* Form in modal */
 .edit-modal-content form {
     display: flex;
     flex-direction: column;
@@ -149,7 +182,7 @@ body {
 .edit-modal-content label {
     margin-bottom: 8px;
     font-weight: bold;
-    color: #8e44ad; /* Purple for labels */
+    color: #8e44ad;
 }
 
 .edit-modal-content select, 
@@ -157,21 +190,45 @@ body {
     margin-bottom: 15px;
     padding: 8px;
     font-size: 14px;
-    border: 1px solid #8e44ad; /* Matching border color */
-    border-radius: 10px; /* Rounded corners */
+    border: 1px solid #8e44ad;
+    border-radius: 10px;
+    transition: transform 0.3s ease-in-out;
 }
 
+.edit-modal-content select:hover, 
+.edit-modal-content input:hover {
+    transform: scale(1.05);
+}
+
+/* Save and cancel buttons specific styles */
 .save-btn {
-    background-color: #8e44ad; /* Save button in purple */
-    color: white;
-    border: none;
-    cursor: pointer;
+    background-color: #27ae60; /* Green for save */
+}
+
+.save-btn:hover {
+    background-color: #229954;
 }
 
 .cancel-btn {
-    background-color: #732d91; /* Darker purple for cancel button */
+    background-color: #e74c3c; /* Red for cancel */
+}
+
+.cancel-btn:hover {
+    background-color: #c0392b;
+}
+
+/* Back button styling */
+.back-btn {
+    margin-bottom: 15px;
+    background-color: #8e44ad;
     color: white;
     border: none;
-    margin-left: 10px;
+    padding: 10px 15px;
+    border-radius: 5px;
     cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.back-btn:hover {
+    background-color: #732d91;
 }
