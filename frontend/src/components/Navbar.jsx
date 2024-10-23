@@ -63,8 +63,12 @@ const Navbar = () => {
                 {!userEmail && (
                     <div className="nav-title">
                         <div className="nav-links">
-                            <Link to="/login">Login</Link>
-                            <Link to="/register">Register</Link>
+                            <button className="nav-btn login-btn">
+                                <Link to="/login">Login</Link>
+                            </button>
+                            <button className="nav-btn register-btn">
+                                <Link to="/register">Register</Link>
+                            </button>
                         </div>
                     </div>
                 )}
