@@ -15,7 +15,7 @@ import ManufacturerEditPassword from './components/ManufacturerEditPassword';
 import UserEditPassword from './components/UserEditPassword';
 import SellerEditPassword from './components/SellerEditPassword';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-
+import "slick-carousel/slick/slick-theme.css"; 
 
 const App = () => {
     return (

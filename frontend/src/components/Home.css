@@ -1,35 +1,47 @@
 /* src/components/Home.css */
 .home-container {
     text-align: center; /* Center the text */
-    padding: 2rem; /* Add padding */
+    padding: 2rem 0; /* Add vertical padding */
+    max-width: 100%; /* Set to 100% to cover full width */
+    margin: 1rem; /* Match the navbar margin */
 }
 
-.sofa-list {
-    display: flex; /* Use flexbox for layout */
-    flex-wrap: wrap; /* Allow wrapping of cards */
-    justify-content: center; /* Center items horizontally */
-    gap: 2rem; /* Space between cards */
+.carousel-image {
+    display: flex; /* Use flexbox to center the image */
+    justify-content: center; /* Center the image horizontally */
 }
 
-.sofa-card {
-    border: 1px solid #ccc; /* Border for sofa card */
-    border-radius: 8px; /* Rounded corners */
-    padding: 1rem; /* Padding inside the card */
-    width: 250px; /* Fixed width */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Shadow effect */
-    transition: transform 0.3s; /* Smooth scaling on hover */
+.carousel-image img {
+    width: 100%; /* Ensure image covers full width of the container */
+    height: auto; /* Maintain aspect ratio */
+    max-height: 400px; /* Set a maximum height for images */
+    object-fit: cover; /* Ensure the image covers the space without distortion */
 }
 
-.sofa-card:hover {
-    transform: scale(1.05); /* Scale up on hover */
+.slick-slide {
+    display: flex; /* Align items properly */
+    justify-content: center; /* Center the items */
+    width: 100%; /* Ensure slides take full width */
 }
 
-.sofa-card img {
-    max-width: 100%; /* Make image responsive */
-    border-radius: 8px; /* Round image corners */
+/* Styling for carousel images */
+.slick-slide img {
+    width: 100%; /* Make image responsive */
+    height: auto; /* Maintain aspect ratio */
 }
 
-.price {
-    font-weight: bold; /* Bold price text */
-    color: #8e44ad; /* Purple color for price */
+/* Adjust carousel size */
+.slick-list {
+    margin: 0 auto; /* Center the carousel */
+    width: 100%; /* Set width to 100% for the carousel */
+}
+
+.slick-prev, .slick-next {
+    z-index: 1; /* Ensure navigation buttons are on top */
+    color: #8e44ad; /* Color for navigation arrows */
+}
+
+/* Optional: Add some styling for the dots */
+.slick-dots li button:before {
+    color: #8e44ad; /* Color for dots */
 }
