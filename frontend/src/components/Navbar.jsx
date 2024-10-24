@@ -27,10 +27,24 @@ const Navbar = () => {
             return "http://localhost:3000/sellerHomePage";
         } else if (userType === 'user') { // Assuming 'user' represents a customer
             return "http://localhost:3000/UserHomePage";
-        } else if (userType === 'manufacturer') { // Assuming 'user' represents a customer
+        } else if (userType === 'manufacturer') {
             return "http://localhost:3000/ManufacturerHomePage";
         }
         return "#"; // Fallback if userType is not recognized
+    };
+
+    // Determine the profile link based on user type
+    const getProfileLink = () => {
+        if (userType === 'admin') {
+            return "/admin/editProfile"; // Admin profile link
+        } else if (userType === 'seller') {
+            return "/seller/editProfile"; // Seller profile link
+        } else if (userType === 'user') {
+            return "/userEditProfile"; // User profile link
+        } else if (userType === 'manufacturer') {
+            return "/manufacturer/editProfile"; // Manufacturer profile link
+        }
+        return "#"; // Fallback if no valid userType
     };
 
     return (
@@ -48,7 +62,7 @@ const Navbar = () => {
                     </Link>
                 )}
                 {userEmail && userType && (
-                    <Link to={`/${userType}/editProfile`} className="edit-profile-link">
+                    <Link to={getProfileLink()} className="edit-profile-link">
                         <i className="bi bi-person-bounding-box"></i> Profile
                     </Link>
                 )}

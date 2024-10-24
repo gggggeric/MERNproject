@@ -11,6 +11,7 @@ import Navbar from './components/Navbar'
 import UserCrud from './components/UserCrud';
 import Register from './components/Register'
 import ManufacturerHomePage from './components/ManufacturerHomePage';
+import UserEditProfile from './components/UserEditProfile';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 
@@ -65,6 +66,15 @@ const App = () => {
                             <ProtectedRoute 
                                 element={<ManufacturerHomePage />} 
                                 allowedRoles={['manufacturer']} // Only manufacturers can access
+                            />
+                        } 
+                    />
+                    <Route 
+                        path="/userEditProfile" 
+                        element={
+                            <ProtectedRoute 
+                                element={<UserEditProfile />} 
+                                allowedRoles={['user']}
                             />
                         } 
                     />
