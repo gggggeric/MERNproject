@@ -1,17 +1,50 @@
-/* src/components/UserHomePage.css */
+/* ManufacturerHomePage.css */
 
-.manufacturer-home-page {
-    padding: 20px;
+.manufacturer-dashboard-container {
+    max-width: 600px; /* Max width of the dashboard */
+    margin: 50px auto; /* Center the dashboard */
+    padding: 20px; /* Padding around the container */
     background-color: #ffffff; /* White background */
     border-radius: 8px; /* Rounded corners */
+    border: 1px solid #8e44ad; /* Purple border surrounding the container */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    text-align: center; /* Center text in the container */
 }
 
-.manufacturer-home-page h1 {
-    color: #8e44ad; /* Title color */
-    text-align: center; /* Center the title */
+.dashboard-card {
+    background-color: #fff; /* White background for the card */
+    padding: 20px; /* Padding inside the card */
+    border-radius: 8px; /* Rounded corners for the card */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for the card */
+    margin-top: 20px; /* Space above the card */
 }
 
-.manufacturer-home-page h2 {
-    text-align: center; /* Center the email */
+h2 {
+    color: #8e44ad; /* Dark text color for the heading */
+    margin-bottom: 20px; /* Space below the heading */
+}
+
+h3 {
+    color: #8e44ad; /* Color for the card title */
+    margin-bottom: 15px; /* Space below the card title */
+}
+
+.button-container {
+    display: flex; /* Flex layout for button container */
+    flex-direction: column; /* Stack buttons vertically */
+    gap: 15px; /* Space between buttons */
+}
+
+.action-btn {
+    padding: 10px; /* Padding inside the button */
+    background-color: #8e44ad; /* Button background color */
+    color: white; /* Text color for the button */
+    border: none; /* No border */
+    border-radius: 4px; /* Rounded corners for the button */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s; /* Transition for hover effect */
+}
+
+.action-btn:hover {
+    background-color: #5e3370; /* Darker background color on hover */
 }
