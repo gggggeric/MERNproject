@@ -1,183 +1,191 @@
-/* Define a common font style for the entire navbar */
+/* Navbar.css */
 .navbar {
-    display: flex; /* Use flexbox for layout */
-    justify-content: space-between; /* Space out items */
-    align-items: center; /* Center items vertically */
-    background-color: #ffffff; /* White background for a clean look */
-    padding: 1rem 2rem; /* Padding for the navbar */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Shadow effect */
-    border-radius: 10px; /* Rounded corners */
-    margin: 1rem; /* Margin around the navbar */
-    font-family: Arial, sans-serif; /* Set a uniform font family */
-    font-size: 1rem; /* Base font size */
+    display: flex; 
+    justify-content: space-between;
+    align-items: center;
+    background-color: #ffffff; 
+    padding: 1rem 2rem; 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
+    border-radius: 10px; 
+    margin: 1rem; 
+    font-family: Arial, sans-serif; 
+    font-size: 1rem; 
 }
 
 .left-content {
-    flex: 1; /* Flex to give the left content some space */
-    display: flex; /* Flexbox for logo and name */
-    align-items: center; /* Center items vertically */
-    justify-content: flex-start; /* Ensure left-alignment for the content */
+    flex: 1; 
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; 
 }
 
 .logo {
-    width: 50px; /* Set a fixed width */
-    height: 50px; /* Set a fixed height */
-    margin-right: 10px; /* Space between logo and store name */
-    border-radius: 50%; /* Make the logo circular */
-    object-fit: cover; /* Ensure the image covers the area without distortion */
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+    border-radius: 50%; 
+    object-fit: cover; 
 }
 
 .store-name {
-    font-size: 1.5rem; /* Font size for store name */
-    color: #8e44ad; /* Store name color */
-    font-family: cursive; /* Cursive font for the store name */
-    text-decoration: none; /* Remove underline */
+    font-size: 1.5rem;
+    color: #8e44ad;
+    font-family: cursive;
+    text-decoration: none;
 }
 
-/* Adjust the positioning of the logo and store name slightly to the left */
 .logo-link {
     display: flex;
     align-items: center;
-    justify-content: flex-start; /* Align to the left */
+    justify-content: flex-start;
 }
 
 .right-content {
-    display: flex; /* Use flexbox for right content */
-    align-items: center; /* Center items vertically */
-    justify-content: flex-end; /* Align the right content to the far right */
-    flex: 1; /* Flex to give the right content space */
+    display: flex; 
+    align-items: center;
+    justify-content: flex-end;
+    flex: 1; 
 }
 
 .nav-title {
-    display: flex; /* Flex for title and links */
-    align-items: center; /* Center items vertically */
+    display: flex;
+    align-items: center;
 }
 
 .nav-links {
-    display: flex; /* Use flexbox for nav links */
-    list-style-type: none; /* Remove default bullet points */
-    padding: 0; /* Remove default padding */
-    margin: 0; /* Remove default margin */
+    display: flex; 
+    list-style-type: none; 
+    padding: 0;
+    margin: 0; 
 }
 
 .home-link,
 .edit-profile-link {
-    display: inline-block; /* Make links behave like inline elements */
-    color: #8e44ad; /* Purple text color */
-    text-decoration: none; /* Remove underline from links */
-    margin-left: 1rem; /* Space between links */
-    font-weight: 600; /* Bold text */
+    display: inline-block;
+    color: #8e44ad; 
+    text-decoration: none; 
+    margin-left: 1rem; 
+    font-weight: 600; 
 }
 
 .home-link:hover,
 .edit-profile-link:hover {
-    color: #5e3370; /* Darker purple on hover */
+    color: #5e3370;
 }
 
-/* Style for login and register buttons */
+/* Button styling */
 .nav-btn {
-    padding: 0.5rem 1rem; /* Padding inside the buttons */
-    margin: 0 0.5rem; /* Margin around buttons */
-    border: none; /* No border */
-    border-radius: 5px; /* Rounded corners */
-    font-weight: 600; /* Bold text */
-    cursor: pointer; /* Pointer cursor */
-    background-color: #8e44ad; /* Purple background */
-    color: #ffffff !important; /* Ensure white text color */
-    transition: background-color 0.3s ease; /* Smooth background transition */
+    padding: 0.7rem 1.5rem;
+    margin: 0 0.5rem;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold; /* Ensures bold text */
+    font-size: 1.1rem; /* Increases the text size */
+    cursor: pointer;
+    background-color: #8e44ad;
+    color: #ffffff !important;
+    display: flex;
+    align-items: center; /* Aligns icon and text vertically */
+    justify-content: center; /* Centers text and icon horizontally */
+    transition: background-color 0.3s ease;
+    text-align: center; /* Centers the text */
 }
 
 .nav-btn:hover {
-    background-color: #5e3370; /* Darker purple on hover */
+    background-color: #5e3370; 
 }
 
-/* Button specific styles */
-.login-btn,
-.register-btn {
-    background-color: #8e44ad; /* Use the same purple background for both login and register */
-    color: #ffffff !important; /* Force white text color */
+.nav-btn .icon {
+    font-size: 1.3rem; /* Larger icon */
+    margin-right: 0.8rem; /* Adjusts spacing between icon and text */
 }
 
-.login-btn:hover,
-.register-btn:hover {
-    background-color: #5e3370; /* Darker purple on hover for both buttons */
+/* Login and Register button styling */
+.icon-btn {
+    text-decoration: none; 
+    background-color: #8e44ad;
+    color: #ffffff !important;
+    font-weight: bold; /* Bold text */
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Centers text and icon */
+    padding: 0.7rem 2rem; /* Adds balanced padding */
+    border-radius: 5px;
+    margin-right: 1rem; /* Adds separation between buttons */
+    transition: background-color 0.3s ease;
 }
 
-/* Style for logged in user's email */
+.icon-btn:hover {
+    background-color: #5e3370;
+}
+
+/* User email and dropdown */
 .user-email-container {
-    display: flex; /* Use flexbox for alignment */
-    align-items: center; /* Center items vertically */
-    position: relative; /* Position relative for dropdown */
-    cursor: pointer; /* Pointer cursor for clickable */
-    white-space: nowrap; /* Prevent the email from wrapping */
+    display: flex;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+    white-space: nowrap;
 }
 
-/* Style for the email text */
 .user-email {
-    font-size: 1.1rem; /* Increased font size for the email */
-    color: #8e44ad; /* Same color as the navbar */
-    font-weight: 600; /* Bold text */
-    margin-left: 0.5rem; /* Space before email */
-    overflow: hidden; /* Hide overflow */
-    text-overflow: ellipsis; /* Add ellipsis for overflowed text */
-    max-width: 180px; /* Set a max width for the email display */
-    display: inline-block; /* Allow proper text handling */
+    font-size: 1.1rem;
+    color: #8e44ad;
+    font-weight: 600;
+    margin-left: 0.5rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px;
+    display: inline-block;
 }
 
-/* Dropdown styles */
 .dropdown {
-    position: absolute; /* Position dropdown below the email */
-    top: 30px; /* Adjust top position */
-    right: 0; /* Align to the right */
-    background-color: white; /* White background for dropdown */
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* Shadow for dropdown */
-    border-radius: 5px; /* Rounded corners */
-    z-index: 100; /* Ensure dropdown is above other elements */
-    padding: 0; /* Remove padding for the dropdown */
-    min-width: 200px; /* Increase the minimum width for better visibility */
+    position: absolute;
+    top: 30px;
+    right: 0;
+    background-color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    z-index: 100;
+    padding: 0;
+    min-width: 200px;
 }
 
-/* Dropdown item styles */
 .dropdown-item {
-    display: flex; /* Use flexbox for dropdown items */
-    align-items: center; /* Center items vertically */
-    padding: 0.75rem 1rem; /* Padding for items */
-    color: #8e44ad; /* Link color */
-    text-decoration: none; /* Remove underline */
-    transition: background-color 0.2s; /* Smooth background transition */
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    color: #8e44ad;
+    text-decoration: none;
+    transition: background-color 0.2s;
 }
 
-/* Hover effect for dropdown items */
 .dropdown-item:hover {
-    background-color: #f2f2f2; /* Light gray on hover */
+    background-color: #f2f2f2;
 }
 
-/* Icon styles for dropdown items */
 .dropdown-item .icon {
-    margin-right: 0.5rem; /* Space between icon and text */
+    margin-right: 0.5rem;
 }
 
-/* Logout button style */
 .logout-btn {
-    padding: 0.75rem 1rem; /* Padding for the button */
-    background-color: #e74c3c; /* Red background for logout button */
-    color: white; /* White text color */
-    border: none; /* No border */
-    border-radius: 5px; /* Rounded corners */
-    font-weight: 600; /* Bold text */
-    cursor: pointer; /* Pointer on hover */
-    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
-    text-align: left; /* Align text to the left */
-    margin-top: 0; /* Remove top margin to eliminate gap */
+    padding: 0.75rem 1rem;
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-align: left;
+    margin-top: 0;
 }
 
-/* Logout button hover effect */
 .logout-btn:hover {
-    background-color: #c0392b; /* Darker red on hover */
+    background-color: #c0392b;
 }
 
-/* Profile container styles */
 .profile-container {
-    position: relative; /* Set relative positioning for dropdown */
-    cursor: pointer; /* Pointer cursor for clickable */
+    position: relative;
+    cursor: pointer;
 }

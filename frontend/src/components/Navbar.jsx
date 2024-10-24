@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import './Navbar.css';
 import logo from '../photos/logo.png'; // Ensure this path is correct
-import { BiEdit, BiLogOut } from 'react-icons/bi'; // Importing icons from react-icons or your preferred icon library
+import { BiEdit, BiLogOut, BiLogIn, BiUserPlus } from 'react-icons/bi'; // Importing icons
 
 const Navbar = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -91,12 +91,12 @@ const Navbar = () => {
                 {!userEmail && (
                     <div className="nav-title">
                         <div className="nav-links">
-                            <button className="nav-btn login-btn">
-                                <Link to="/login">Login</Link>
-                            </button>
-                            <button className="nav-btn register-btn">
-                                <Link to="/register">Register</Link>
-                            </button>
+                            <Link to="/login" className="icon-btn">
+                                <BiLogIn className="icon" title="Login" /> Login
+                            </Link>
+                            <Link to="/register" className="icon-btn">
+                                <BiUserPlus className="icon" title="Register" /> Register
+                            </Link>
                         </div>
                     </div>
                 )}
