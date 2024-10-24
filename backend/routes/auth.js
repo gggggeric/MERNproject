@@ -64,6 +64,28 @@ router.post('/manufacturerProfile', authenticateUser, async (req, res) => {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 });
+router.get('/manufacturerProfile', authenticateUser, async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id).populate('manufacturerProfile'); // Ensure you are fetching the user correctly and populate if necessary
+
+        // Check if user is a manufacturer
+        if (user.userType !== 'manufacturer') {
+            return res.status(403).json({ message: 'Unauthorized: Only manufacturers can access this profile' });
+        }
+
+        // Find the manufacturer profile
+        const profile = await ManufacturerProfile.findOne({ user: user._id });
+
+        if (!profile) {
+            return res.status(404).json({ message: 'Manufacturer profile not found' });
+        }
+
+        res.status(200).json(profile);
+    } catch (error) {
+        console.error('Error retrieving manufacturer profile:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
 
 
 

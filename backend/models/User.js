@@ -5,11 +5,12 @@ const UserSchema = new mongoose.Schema({
     password: { type: String, required: true },
     userType: { 
         type: String, 
-        enum: ['user', 'admin', 'seller','manufacturer'], // Declaring manufacturer as a possible user type
+        enum: ['user', 'admin', 'seller', 'manufacturer'], // Declaring manufacturer as a possible user type
         default: 'user' 
     },
     status: { type: Boolean, default: false }, // Indicates if the user is confirmed
     confirmationToken: { type: String }, // Token for email confirmation
+    manufacturerProfile: { type: mongoose.Schema.Types.ObjectId, ref: 'ManufacturerProfile' } // Add this line
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', UserSchema);
