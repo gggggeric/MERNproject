@@ -1,7 +1,8 @@
-import React, { useState } from 'react'; 
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Navbar.css';
 import logo from '../photos/logo.png'; // Ensure this path is correct
+import { BiEdit, BiLogOut } from 'react-icons/bi'; // Importing icons from react-icons or your preferred icon library
 
 const Navbar = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -47,6 +48,13 @@ const Navbar = () => {
         return "#"; // Fallback if no valid userType
     };
 
+    // Extract the username from the email
+    const getUsernameFromEmail = (email) => {
+        return email ? email.split('@')[0] : ''; // Get the part before the @ symbol
+    };
+
+    const username = getUsernameFromEmail(userEmail); // Extracted username
+
     return (
         <nav className="navbar">
             <div className="left-content">
@@ -56,22 +64,27 @@ const Navbar = () => {
                 </Link>
             </div>
             <div className="right-content">
-                {userEmail && ( // Only show the Home link if the user is logged in
+                {userEmail && (
                     <Link to={getHomePageLink()} className="home-link">
                         <i className="bi bi-house-fill"></i> Home
                     </Link>
                 )}
                 {userEmail && userType && (
-                    <Link to={getProfileLink()} className="edit-profile-link">
-                        <i className="bi bi-person-bounding-box"></i> Profile
-                    </Link>
-                )}
-                {userEmail && (
-                    <div className="user-email-container" onClick={toggleDropdown}>
-                        <span className="user-email">Logged in as: {userEmail}</span>
+                    <div className="profile-container" onClick={toggleDropdown}>
+                        <span className="edit-profile-link">
+                            <i className="bi bi-person-bounding-box"></i> Profile
+                        </span>
                         {dropdownOpen && (
                             <div className="dropdown">
-                                <button className="logout-btn" onClick={handleLogout}>Logout</button>
+                                <div className="user-email-container">
+                                    <span className="user-email">Logged in as: {username}</span> {/* Display the username here */}
+                                </div>
+                                <Link to={getProfileLink()} className="dropdown-item">
+                                    <BiEdit className="icon" /> Edit Password
+                                </Link>
+                                <Link to="#" className="dropdown-item logout-btn" onClick={handleLogout}>
+                                    <BiLogOut className="icon" /> Logout
+                                </Link>
                             </div>
                         )}
                     </div>

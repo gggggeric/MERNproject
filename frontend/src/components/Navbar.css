@@ -39,7 +39,6 @@
     display: flex;
     align-items: center;
     justify-content: flex-start; /* Align to the left */
-    margin-left: 0; /* Remove any centering margin */
 }
 
 .right-content {
@@ -106,15 +105,23 @@
 
 /* Style for logged in user's email */
 .user-email-container {
+    display: flex; /* Use flexbox for alignment */
+    align-items: center; /* Center items vertically */
     position: relative; /* Position relative for dropdown */
     cursor: pointer; /* Pointer cursor for clickable */
+    white-space: nowrap; /* Prevent the email from wrapping */
 }
 
+/* Style for the email text */
 .user-email {
-    font-size: 0.9rem; /* Smaller font size for the email */
+    font-size: 1.1rem; /* Increased font size for the email */
     color: #8e44ad; /* Same color as the navbar */
     font-weight: 600; /* Bold text */
-    margin-left: 2rem; /* Space before email */
+    margin-left: 0.5rem; /* Space before email */
+    overflow: hidden; /* Hide overflow */
+    text-overflow: ellipsis; /* Add ellipsis for overflowed text */
+    max-width: 180px; /* Set a max width for the email display */
+    display: inline-block; /* Allow proper text handling */
 }
 
 /* Dropdown styles */
@@ -126,10 +133,33 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* Shadow for dropdown */
     border-radius: 5px; /* Rounded corners */
     z-index: 100; /* Ensure dropdown is above other elements */
+    padding: 0; /* Remove padding for the dropdown */
+    min-width: 200px; /* Increase the minimum width for better visibility */
 }
 
+/* Dropdown item styles */
+.dropdown-item {
+    display: flex; /* Use flexbox for dropdown items */
+    align-items: center; /* Center items vertically */
+    padding: 0.75rem 1rem; /* Padding for items */
+    color: #8e44ad; /* Link color */
+    text-decoration: none; /* Remove underline */
+    transition: background-color 0.2s; /* Smooth background transition */
+}
+
+/* Hover effect for dropdown items */
+.dropdown-item:hover {
+    background-color: #f2f2f2; /* Light gray on hover */
+}
+
+/* Icon styles for dropdown items */
+.dropdown-item .icon {
+    margin-right: 0.5rem; /* Space between icon and text */
+}
+
+/* Logout button style */
 .logout-btn {
-    padding: 0.5rem 1rem; /* Padding for the button */
+    padding: 0.75rem 1rem; /* Padding for the button */
     background-color: #e74c3c; /* Red background for logout button */
     color: white; /* White text color */
     border: none; /* No border */
@@ -137,9 +167,17 @@
     font-weight: 600; /* Bold text */
     cursor: pointer; /* Pointer on hover */
     transition: background-color 0.3s ease; /* Smooth transition for hover effect */
-    margin: 5px; /* Margin for spacing */
+    text-align: left; /* Align text to the left */
+    margin-top: 0; /* Remove top margin to eliminate gap */
 }
 
+/* Logout button hover effect */
 .logout-btn:hover {
     background-color: #c0392b; /* Darker red on hover */
+}
+
+/* Profile container styles */
+.profile-container {
+    position: relative; /* Set relative positioning for dropdown */
+    cursor: pointer; /* Pointer cursor for clickable */
 }
