@@ -1,0 +1,57 @@
+/* src/Manufacturer.css */
+
+.seller-home-container {
+    display: flex; /* Use flexbox to structure content */
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Center items horizontally */
+    padding: 1rem 2rem; /* Padding around the content */
+    background: linear-gradient(to right, #8e44ad, #3498db); /* Gradient background */
+    color: white; /* White text color */
+    height: 100vh; /* Full viewport height */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Optional: shadow for container */
+    border-radius: 10px; /* Optional: rounded corners */
+}
+
+.seller-dashboard {
+    margin-top: 2rem; /* Space between the title and the dashboard */
+    text-align: center; /* Center the text */
+}
+
+.dashboard-links {
+    list-style-type: none; /* Remove bullet points */
+    padding: 0; /* Remove default padding */
+    margin: 0; /* Remove default margin */
+}
+
+.link-container {
+    display: flex; /* Flex to align icon and text */
+    align-items: center; /* Center icon and text vertically */
+    margin: 1rem 0; /* Vertical margin between links */
+    padding: 1rem; /* Padding for links */
+    border-radius: 5px; /* Rounded corners for links */
+    text-decoration: none; /* Remove underline from links */
+    color: white; /* Text color for links */
+    transition: background-color 0.3s; /* Smooth background change */
+}
+
+.link-container:hover {
+    opacity: 0.8; /* Slightly fade on hover */
+}
+
+/* Example styles for colored links */
+.green {
+    background-color: #2ecc71; /* Green background */
+}
+
+.blue {
+    background-color: #3498db; /* Blue background */
+}
+
+.orange {
+    background-color: #e67e22; /* Orange background */
+}
+
+.icon {
+    margin-right: 0.5rem; /* Space between icon and text */
+    font-size: 1.2rem; /* Increase icon size */
+}

@@ -42,7 +42,7 @@ const Navbar = () => {
         } else if (userType === 'user') {
             return "/userEditProfile"; // User profile link
         } else if (userType === 'manufacturer') {
-            return "/manufacturer/editProfile"; // Manufacturer profile link
+            return "/manufacturerEditProfile"; // Manufacturer profile link
         }
         return "#"; // Fallback if no valid userType
     };

@@ -104,6 +104,41 @@ router.put('/seller/password', authenticateUser, async (req, res) => {
     }
 });
 
+//update password for manufacturer
+router.put('/manufacturer/password', authenticateUser, async (req, res) => {
+    console.log('Updating password for manufacturer:', req.user._id); // req.user is populated by middleware
+    try {
+        const { oldPassword, password } = req.body;
+
+        // Find user by ID
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Check if the userType is seller
+        if (user.userType !== 'manufacturer') {
+            return res.status(403).json({ message: 'Unauthorized: Only sellers can update their password' });
+        }
+
+        // Check if the old password matches the one in the database
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Incorrect old password' });
+        }
+
+        // Hash the new password before saving
+        const hashedPassword = await bcrypt.hash(password, 10);
+        user.password = hashedPassword;
+
+        await user.save();
+        res.json({ message: 'Password updated successfully!' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 
 
 

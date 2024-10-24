@@ -13,6 +13,7 @@ import Register from './components/Register'
 import ManufacturerHomePage from './components/ManufacturerHomePage';
 import UserEditProfile from './components/UserEditProfile';
 import SellerEditProfile from './components/SellerEditProfile';
+import ManufacturerEditProfile from './components/ManufacturerEditProfile';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 
@@ -85,6 +86,15 @@ const App = () => {
                             <ProtectedRoute 
                                 element={<SellerEditProfile />} 
                                 allowedRoles={['seller']}
+                            />
+                        } 
+                    />
+                     <Route 
+                        path="/manufacturerEditProfile" 
+                        element={
+                            <ProtectedRoute 
+                                element={<ManufacturerEditProfile />} 
+                                allowedRoles={['manufacturer']}
                             />
                         } 
                     />
