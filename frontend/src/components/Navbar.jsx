@@ -6,7 +6,6 @@ import { BiEdit, BiLogOut } from 'react-icons/bi'; // Importing icons from react
 
 const Navbar = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
-    const navigate = useNavigate(); // Initialize the useNavigate hook
     const userEmail = localStorage.getItem('user-email'); // Retrieve the user's email from local storage
     const userType = localStorage.getItem('user-type'); // Retrieve the user type from local storage
 
@@ -15,7 +14,7 @@ const Navbar = () => {
         localStorage.removeItem('user-email'); // Remove the user email
         localStorage.removeItem('user-type'); // Remove the user type
         alert('Logged out successfully!'); // Optional: notify user
-        navigate('/login'); // Redirect to the login page
+        window.location.href = '/'; // Redirect to the login page and reload
     };
 
     const toggleDropdown = () => setDropdownOpen(!dropdownOpen); // Toggle dropdown visibility
