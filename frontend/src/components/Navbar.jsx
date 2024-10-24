@@ -26,7 +26,7 @@ const Navbar = () => {
         } else if (userType === 'seller') {
             return "http://localhost:3000/sellerHomePage";
         } else if (userType === 'user') { // Assuming 'user' represents a customer
-            return "http://localhost:3000/UserHomePage";
+            return "http://localhost:3000/userHomePage";
         } else if (userType === 'manufacturer') {
             return "http://localhost:3000/ManufacturerHomePage";
         }

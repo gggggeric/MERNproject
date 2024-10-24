@@ -67,7 +67,7 @@ const App = () => {
                         element={
                             <ProtectedRoute 
                                 element={<ManufacturerHomePage />} 
-                                allowedRoles={['manufacturer']} // Only manufacturers can access
+                                allowedRoles={['manufacturer', 'admin']} // Only manufacturers can access
                             />
                         } 
                     />

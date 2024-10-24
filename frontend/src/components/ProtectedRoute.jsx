@@ -10,7 +10,16 @@ const ProtectedRoute = ({ element, allowedRoles }) => {
         return element; // Render the element if allowed
     }
 
-    // Redirect to home if not authorized
+    // Redirect to respective homepages based on user role
+    if (userRole === 'seller') {
+        return <Navigate to="/sellerHomePage" replace />; // Redirect to seller homepage
+    } else if (userRole === 'manufacturer') {
+        return <Navigate to="/manufacturerHomePage" replace />; // Redirect to manufacturer homepage
+    } else if (userRole === 'user') {
+        return <Navigate to="/userHomePage" replace />; // Redirect to user homepage
+    }
+
+    // Redirect to home if user role is not recognized
     return <Navigate to="/" replace />;
 };
 
