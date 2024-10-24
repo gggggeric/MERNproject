@@ -5,7 +5,7 @@ const UserSchema = new mongoose.Schema({
     password: { type: String, required: true },
     userType: { 
         type: String, 
-        enum: ['user', 'admin', 'manufacturer'], // Declaring manufacturer as a possible user type
+        enum: ['user', 'admin', 'seller','manufacturer'], // Declaring manufacturer as a possible user type
         default: 'user' 
     },
     status: { type: Boolean, default: false }, // Indicates if the user is confirmed

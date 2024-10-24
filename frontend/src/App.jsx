@@ -12,6 +12,7 @@ import UserCrud from './components/UserCrud';
 import Register from './components/Register'
 import ManufacturerHomePage from './components/ManufacturerHomePage';
 import UserEditProfile from './components/UserEditProfile';
+import SellerEditProfile from './components/SellerEditProfile';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 
@@ -75,6 +76,15 @@ const App = () => {
                             <ProtectedRoute 
                                 element={<UserEditProfile />} 
                                 allowedRoles={['user']}
+                            />
+                        } 
+                    />
+                      <Route 
+                        path="/sellerEditProfile" 
+                        element={
+                            <ProtectedRoute 
+                                element={<SellerEditProfile />} 
+                                allowedRoles={['seller']}
                             />
                         } 
                     />

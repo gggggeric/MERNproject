@@ -68,6 +68,45 @@ router.put('/user/password', authenticateUser, async (req, res) => {
 });
 
 
+
+// Update password route for seller
+router.put('/seller/password', authenticateUser, async (req, res) => {
+    console.log('Updating password for seller:', req.user._id); // req.user is populated by middleware
+    try {
+        const { oldPassword, password } = req.body;
+
+        // Find user by ID
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Check if the userType is seller
+        if (user.userType !== 'seller') {
+            return res.status(403).json({ message: 'Unauthorized: Only sellers can update their password' });
+        }
+
+        // Check if the old password matches the one in the database
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Incorrect old password' });
+        }
+
+        // Hash the new password before saving
+        const hashedPassword = await bcrypt.hash(password, 10);
+        user.password = hashedPassword;
+
+        await user.save();
+        res.json({ message: 'Password updated successfully!' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+
+
+
 // Email confirmation route
 router.get('/confirm/:token', async (req, res) => {
     const { token } = req.params;
