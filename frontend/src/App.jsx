@@ -13,6 +13,7 @@ import Register from './components/Register'
 import ManufacturerHomePage from './components/ManufacturerHomePage';
 import ManufacturerEditPassword from './components/ManufacturerEditPassword';
 import UserEditPassword from './components/UserEditPassword';
+import ManufacturerProfile from './components/ManufacturerProfile';
 import SellerEditPassword from './components/SellerEditPassword';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import "slick-carousel/slick/slick-theme.css"; 
@@ -94,6 +95,15 @@ const App = () => {
                         element={
                             <ProtectedRoute 
                                 element={<ManufacturerEditPassword />} 
+                                allowedRoles={['manufacturer']}
+                            />
+                        } 
+                    />
+                     <Route 
+                        path="/manufacturerProfile" 
+                        element={
+                            <ProtectedRoute 
+                                element={<ManufacturerProfile />} 
                                 allowedRoles={['manufacturer']}
                             />
                         } 

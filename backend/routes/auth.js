@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { sendConfirmationEmail } = require('../utils/emailService'); // Import the email service
 const { authenticateUser } = require('../middleware/auth');
+const ManufacturerProfile = require('../models/ManufacturerProfile'); // Adjust the path as needed
 
 router.post('/register', async (req, res) => {
     const { email, password, userType = 'user' } = req.body;
@@ -37,6 +38,35 @@ router.post('/register', async (req, res) => {
         res.status(500).json({ message: 'Registration failed!', error: error.message });
     }
 });
+
+router.post('/manufacturerProfile', authenticateUser, async (req, res) => {
+    try {
+        const { companyName, address, contactNumber } = req.body;
+        const user = await User.findById(req.user._id); // Ensure you are fetching the user correctly
+
+        // Check if user is a manufacturer
+        if (user.userType !== 'manufacturer') {
+            return res.status(403).json({ message: 'Unauthorized: Only manufacturers can create a profile' });
+        }
+
+        // Create a new manufacturer profile
+        const newProfile = new ManufacturerProfile({
+            user: user._id,
+            companyName,
+            address,
+            contactNumber,
+        });
+
+        await newProfile.save();
+        res.status(201).json({ message: 'Profile created successfully!' });
+    } catch (error) {
+        console.error('Error creating manufacturer profile:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
+
+
+
 // Update password route
 router.put('/user/password', authenticateUser, async (req, res) => {
     console.log('Updating password for user:', req.user._id); // req.user is populated by middleware

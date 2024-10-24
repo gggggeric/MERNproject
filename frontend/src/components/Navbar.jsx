@@ -33,16 +33,29 @@ const Navbar = () => {
         return "#"; // Fallback if userType is not recognized
     };
 
-    // Determine the profile link based on user type
+    // Determine the profile and password edit links based on user type
     const getProfileLink = () => {
         if (userType === 'admin') {
             return "/admin/editProfile"; // Admin profile link
         } else if (userType === 'seller') {
-            return "/sellerEditPassword"; // Seller profile link
+            return "/seller/editProfile"; // Seller profile link
         } else if (userType === 'user') {
-            return "/userEditPassword"; // User profile link
+            return "/user/editProfile"; // User profile link
         } else if (userType === 'manufacturer') {
-            return "/manufacturerEditPassword"; // Manufacturer profile link
+            return "/manufacturerProfile"; // Manufacturer profile link
+        }
+        return "#"; // Fallback if no valid userType
+    };
+
+    const getPasswordEditLink = () => {
+        if (userType === 'admin') {
+            return "/adminEditPassword"; // Admin password edit link
+        } else if (userType === 'seller') {
+            return "/sellerEditPassword"; // Seller password edit link
+        } else if (userType === 'user') {
+            return "/userEditPassword"; // User password edit link
+        } else if (userType === 'manufacturer') {
+            return "/manufacturerEditPassword"; // Manufacturer password edit link
         }
         return "#"; // Fallback if no valid userType
     };
@@ -78,7 +91,12 @@ const Navbar = () => {
                                 <div className="user-email-container">
                                     <span className="user-email">Logged in as: {username}</span> {/* Display the username here */}
                                 </div>
+                                {/* Add Edit Profile link */}
                                 <Link to={getProfileLink()} className="dropdown-item">
+                                    <BiEdit className="icon" /> Edit Profile
+                                </Link>
+                                {/* Add Edit Password link */}
+                                <Link to={getPasswordEditLink()} className="dropdown-item">
                                     <BiEdit className="icon" /> Edit Password
                                 </Link>
                                 <Link to="#" className="dropdown-item logout-btn" onClick={handleLogout}>
