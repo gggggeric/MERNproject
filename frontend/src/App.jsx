@@ -11,9 +11,9 @@ import Navbar from './components/Navbar'
 import UserCrud from './components/UserCrud';
 import Register from './components/Register'
 import ManufacturerHomePage from './components/ManufacturerHomePage';
-import UserEditProfile from './components/UserEditProfile';
-import SellerEditProfile from './components/SellerEditProfile';
-import ManufacturerEditProfile from './components/ManufacturerEditProfile';
+import ManufacturerEditPassword from './components/ManufacturerEditPassword';
+import UserEditPassword from './components/UserEditPassword';
+import SellerEditPassword from './components/SellerEditPassword';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 
@@ -72,28 +72,28 @@ const App = () => {
                         } 
                     />
                     <Route 
-                        path="/userEditProfile" 
+                        path="/userEditPassword" 
                         element={
                             <ProtectedRoute 
-                                element={<UserEditProfile />} 
+                                element={<UserEditPassword />} 
                                 allowedRoles={['user']}
                             />
                         } 
                     />
                       <Route 
-                        path="/sellerEditProfile" 
+                        path="/sellerEditPassword" 
                         element={
                             <ProtectedRoute 
-                                element={<SellerEditProfile />} 
+                                element={<SellerEditPassword />} 
                                 allowedRoles={['seller']}
                             />
                         } 
                     />
                      <Route 
-                        path="/manufacturerEditProfile" 
+                        path="/manufacturerEditPassword" 
                         element={
                             <ProtectedRoute 
-                                element={<ManufacturerEditProfile />} 
+                                element={<ManufacturerEditPassword />} 
                                 allowedRoles={['manufacturer']}
                             />
                         } 

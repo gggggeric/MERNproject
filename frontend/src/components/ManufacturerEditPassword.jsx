@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const SellerEditProfile = () => {
+const ManufacturerEditPassword = () => {
     const [oldPassword, setOldPassword] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -26,7 +26,7 @@ const SellerEditProfile = () => {
 
         try {
             const res = await axios.put(
-                'http://localhost:5001/api/auth/seller/password',
+                'http://localhost:5001/api/auth/manufacturer/password',
                 { oldPassword, password }, // Sending old and new password
                 {
                     headers: {
@@ -84,4 +84,4 @@ const SellerEditProfile = () => {
     );
 };
 
-export default SellerEditProfile;
+export default ManufacturerEditPassword;

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const UserEditProfile = () => {
+const UserEditPassword = () => {
     const [oldPassword, setOldPassword] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -78,4 +78,4 @@ const UserEditProfile = () => {
     );
 };
 
-export default UserEditProfile;
+export default UserEditPassword;

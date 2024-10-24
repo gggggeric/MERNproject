@@ -38,11 +38,11 @@ const Navbar = () => {
         if (userType === 'admin') {
             return "/admin/editProfile"; // Admin profile link
         } else if (userType === 'seller') {
-            return "/sellerEditProfile"; // Seller profile link
+            return "/sellerEditPassword"; // Seller profile link
         } else if (userType === 'user') {
-            return "/userEditProfile"; // User profile link
+            return "/userEditPassword"; // User profile link
         } else if (userType === 'manufacturer') {
-            return "/manufacturerEditProfile"; // Manufacturer profile link
+            return "/manufacturerEditPassword"; // Manufacturer profile link
         }
         return "#"; // Fallback if no valid userType
     };
