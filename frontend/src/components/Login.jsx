@@ -1,4 +1,3 @@
-// src/components/Login.js
 import { jwtDecode } from 'jwt-decode'; // Correct the default import
 import React, { useState } from 'react';
 import axios from 'axios';
@@ -17,6 +16,7 @@ const Login = () => {
             // Store the JWT token in localStorage
             const token = res.data.token;
             localStorage.setItem('auth-token', token);
+            console.log('Token stored:', token); // Debugging line
 
             // Decode the token to get user information
             const user = jwtDecode(token); // Decode JWT to access user info (userType)
@@ -34,7 +34,6 @@ const Login = () => {
                 window.location.href = '/userHomePage'; // Redirect to user home page
             }
 
-
             alert('Logged in successfully!'); // Notify user after redirection
         } catch (err) {
             // Check if the error response status is 403
@@ -49,7 +48,7 @@ const Login = () => {
 
     return (
         <div className="page-container"> {/* Using the class for centering */} 
-            <div className="form-container"> {/* Form container for styling */}
+            <div className="form-container"> {/* Form container for styling */} 
                 <h2>Login</h2>
                 <form onSubmit={handleLogin}>
                     <div className="form-group">

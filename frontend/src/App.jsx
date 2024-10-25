@@ -15,6 +15,7 @@ import ManufacturerEditPassword from './components/ManufacturerEditPassword';
 import UserEditPassword from './components/UserEditPassword';
 import ManufacturerProfile from './components/ManufacturerProfile';
 import SellerEditPassword from './components/SellerEditPassword';
+import ManufacturerCreateProduct from './components/ManufacturerCreateProduct';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import "slick-carousel/slick/slick-theme.css"; 
 
@@ -104,6 +105,15 @@ const App = () => {
                         element={
                             <ProtectedRoute 
                                 element={<ManufacturerProfile />} 
+                                allowedRoles={['manufacturer']}
+                            />
+                        } 
+                    />
+                     <Route 
+                        path="/createProduct" 
+                        element={
+                            <ProtectedRoute 
+                                element={<ManufacturerCreateProduct />} 
                                 allowedRoles={['manufacturer']}
                             />
                         } 

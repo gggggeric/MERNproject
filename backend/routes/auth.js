@@ -5,6 +5,20 @@ const jwt = require('jsonwebtoken');
 const { sendConfirmationEmail } = require('../utils/emailService'); // Import the email service
 const { authenticateUser } = require('../middleware/auth');
 const ManufacturerProfile = require('../models/ManufacturerProfile'); // Adjust the path as needed
+const Product = require('../models/Product'); // Adjust path to your Product model
+const multer = require('multer');
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/'); // Specify the directory to save the uploaded files
+    },
+    filename: (req, file, cb) => {
+        cb(null, `${Date.now()}-${file.originalname}`); // Create a unique filename
+    },
+});
+
+
+const upload = multer({ storage });
 
 router.post('/register', async (req, res) => {
     const { email, password, userType = 'user' } = req.body;
@@ -38,6 +52,93 @@ router.post('/register', async (req, res) => {
         res.status(500).json({ message: 'Registration failed!', error: error.message });
     }
 });
+
+router.get('/manufacturer-profile/me', authenticateUser, async (req, res) => {
+    try {
+        const manufacturerProfile = await ManufacturerProfile.findOne({ user: req.user._id }); // Change to _id if necessary
+        if (!manufacturerProfile) {
+            return res.status(404).json({ msg: 'Manufacturer profile not found' });
+        }
+        return res.status(200).json(manufacturerProfile);
+    } catch (error) {
+        console.error('Error retrieving manufacturer profile:', error.message);
+        return res.status(500).json({ msg: 'Server Error', error: error.message });
+    }
+});
+
+
+router.get('/test-auth', authenticateUser, (req, res) => {
+    re.json({ authenticatedUser: req.user });
+});
+
+router.post('/product/create', authenticateUser, upload.single('image'), async (req, res) => {
+    const { name, description, price, stock } = req.body;
+    const userId = req.user._id; // Get user ID from authenticated request
+
+    console.log('Request Body:', req.body);
+    console.log('Authenticated User ID:', userId);
+
+    try {
+        // Fetch the user's manufacturer profile
+        const user = await User.findById(userId).populate('manufacturerProfile');
+
+        // Ensure user exists
+        if (!user) {
+            return res.status(404).json({ msg: 'User not found' });
+        }
+
+        console.log('User Type:', user.userType);
+        // Check if the user type is 'manufacturer'
+        if (user.userType !== 'manufacturer') {
+            return res.status(403).json({ msg: 'Forbidden: Only manufacturers can create products' });
+        }
+
+        // Check if manufacturer profile exists
+        if (!user.manufacturerProfile) {
+            return res.status(403).json({ msg: 'User is not associated with a manufacturer profile' });
+        }
+
+        const manufacturerId = user.manufacturerProfile._id; // Get the manufacturer ID
+
+        // Check if the manufacturer exists
+        const manufacturer = await ManufacturerProfile.findById(manufacturerId);
+        if (!manufacturer) {
+            return res.status(404).json({ msg: 'Manufacturer not found' });
+        }
+
+        // Validate product data
+        if (!name || !description || !price || !stock) {
+            return res.status(400).json({ msg: 'All fields are required' });
+        }
+
+        // Create new product
+        const newProduct = new Product({
+            name,
+            description,
+            price,
+            stock,
+            manufacturer: manufacturerId,
+            image: req.file ? req.file.path : null, // Save the image path from multer, if provided
+        });
+
+        // Save product to database
+        const product = await newProduct.save();
+
+        // Respond with the created product
+        return res.status(201).json({
+            success: true,
+            product,
+        });
+    } catch (error) {
+        console.error('Error creating product:', error);
+        return res.status(500).json({ msg: 'Server error', error: error.message });
+    }
+});
+
+
+
+
+
 
 router.post('/manufacturerProfile', authenticateUser, async (req, res) => {
     try {
