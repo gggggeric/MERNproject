@@ -71,6 +71,7 @@ router.get('/test-auth', authenticateUser, (req, res) => {
     re.json({ authenticatedUser: req.user });
 });
 
+//products
 router.post('/product/create', authenticateUser, upload.single('image'), async (req, res) => {
     const { name, description, price, stock } = req.body;
     const userId = req.user._id; // Get user ID from authenticated request
@@ -79,8 +80,8 @@ router.post('/product/create', authenticateUser, upload.single('image'), async (
     console.log('Authenticated User ID:', userId);
 
     try {
-        // Fetch the user's manufacturer profile
-        const user = await User.findById(userId).populate('manufacturerProfile');
+        // Fetch the user
+        const user = await User.findById(userId);
 
         // Ensure user exists
         if (!user) {
@@ -88,22 +89,10 @@ router.post('/product/create', authenticateUser, upload.single('image'), async (
         }
 
         console.log('User Type:', user.userType);
+
         // Check if the user type is 'manufacturer'
         if (user.userType !== 'manufacturer') {
             return res.status(403).json({ msg: 'Forbidden: Only manufacturers can create products' });
-        }
-
-        // Check if manufacturer profile exists
-        if (!user.manufacturerProfile) {
-            return res.status(403).json({ msg: 'User is not associated with a manufacturer profile' });
-        }
-
-        const manufacturerId = user.manufacturerProfile._id; // Get the manufacturer ID
-
-        // Check if the manufacturer exists
-        const manufacturer = await ManufacturerProfile.findById(manufacturerId);
-        if (!manufacturer) {
-            return res.status(404).json({ msg: 'Manufacturer not found' });
         }
 
         // Validate product data
@@ -117,7 +106,7 @@ router.post('/product/create', authenticateUser, upload.single('image'), async (
             description,
             price,
             stock,
-            manufacturer: manufacturerId,
+            user: userId, // Connect the product to the user
             image: req.file ? req.file.path : null, // Save the image path from multer, if provided
         });
 
@@ -135,10 +124,7 @@ router.post('/product/create', authenticateUser, upload.single('image'), async (
     }
 });
 
-
-
-
-
+//products
 
 router.post('/manufacturerProfile', authenticateUser, async (req, res) => {
     try {

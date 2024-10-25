@@ -17,9 +17,9 @@ const ProductSchema = new mongoose.Schema({
         type: Number,
         required: true,
     },
-    manufacturer: {
+    user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'ManufacturerProfile', // Reference to ManufacturerProfile model
+        ref: 'User', // Reference to User model
         required: true,
     },
     image: {
