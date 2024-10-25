@@ -1,0 +1,5 @@
+create a modal for products - also make the delete button work
+
+
+
+profile for: admin, user, seller 
