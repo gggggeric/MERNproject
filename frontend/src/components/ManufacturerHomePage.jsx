@@ -7,7 +7,7 @@ const ManufacturerHomePage = () => {
     const navigate = useNavigate();
 
     const handlePostProductClick = () => {
-        navigate('/createProduct'); // Redirects to the product creation page
+        navigate('/manufacturers/product/CRUD'); // Redirects to the product creation page
     };
 
     return (

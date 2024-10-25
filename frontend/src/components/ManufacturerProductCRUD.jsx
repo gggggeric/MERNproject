@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
-import './ManufacturerCreateProduct.css';
+import './ManufacturerProductCRUD.css';
 
-const ManufacturerCreateProduct = () => {
+const ManufacturerProductCRUD = () => {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [price, setPrice] = useState('');
@@ -277,4 +277,4 @@ const ManufacturerCreateProduct = () => {
     );
 };
 
-export default ManufacturerCreateProduct;
+export default ManufacturerProductCRUD;
