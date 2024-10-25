@@ -124,6 +124,71 @@ router.post('/product/create', authenticateUser, upload.single('image'), async (
     }
 });
 
+router.get('/product', authenticateUser, async (req, res) => {
+    try {
+        // Check if the user type is 'manufacturer'
+        if (req.user.userType !== 'manufacturer') {
+            return res.status(403).json({ message: 'You do not have permission to view products.' });
+        }
+
+        // Fetch products created by the manufacturer
+        const products = await Product.find({ createdBy: req.user.id }); // Ensure this matches your Product schema
+        return res.status(200).json({ products });
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        return res.status(500).json({ message: 'Server error' });
+    }
+});
+router.get('/product/:id', authenticateUser, async (req, res) => {
+    try {
+        const productId = req.params.id;
+        const product = await Product.findById(productId);
+
+        if (!product) {
+            return res.status(404).json({ msg: 'Product not found' });
+        }
+
+        res.json({ product });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ msg: 'Server error' });
+    }
+});
+router.put('/product/edit/:id', authenticateUser, upload.single('image'), async (req, res) => {
+    try {
+        const { name, description, price, stock } = req.body;
+        const productId = req.params.id;
+
+        console.log('Incoming data:', req.body);
+        console.log('Updating product ID:', productId);
+
+        // Prepare the update object
+        const updateData = { name, description, price, stock };
+
+        // If there's an image, include it in the update
+        if (req.file) {
+            updateData.image = req.file.path; // Store the path or filename as needed
+        }
+
+        // Find and update the product
+        const updatedProduct = await Product.findByIdAndUpdate(
+            productId,
+            updateData,
+            { new: true } // This option returns the updated document
+        );
+
+        // Check if product was found and updated
+        if (!updatedProduct) {
+            return res.status(404).json({ msg: 'Product not found' });
+        }
+
+        console.log('Updated Product:', updatedProduct);
+        res.json({ msg: 'Product updated successfully!', product: updatedProduct });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ msg: 'Server error' });
+    }
+});
 //products
 
 router.post('/manufacturerProfile', authenticateUser, async (req, res) => {
