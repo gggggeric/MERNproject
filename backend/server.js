@@ -12,7 +12,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Import authentication routes
+// Import authentication  - DONT TOUCH THIS
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
 

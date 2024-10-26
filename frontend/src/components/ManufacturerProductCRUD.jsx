@@ -18,22 +18,32 @@ const ManufacturerProductCRUD = () => {
 
     // Fetch products
     const fetchProducts = async () => {
-        const token = localStorage.getItem('auth-token');
-        if (!token) return;
+        const token = localStorage.getItem('auth-token'); // Adjust based on your token storage
+
+        if (!token) {
+            setError('No authorization token found');
+            return;
+        }
 
         try {
-            const response = await axios.get('http://localhost:5001/api/auth/product', {
+            const response = await axios.get('http://localhost:5001/api/auth/products', {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            setProducts(response.data.products);
+
+            console.log('Response Data:', response.data); // Log the response data
+
+            if (response.data.length === 0) {
+                setError('No products found');
+            } else {
+                setProducts(response.data); // Store fetched products in state
+            }
         } catch (err) {
             console.error('Error fetching products:', err);
-            setError('Failed to load products');
+            setError(err.response?.data?.msg || 'Server error');
         }
     };
-
     useEffect(() => {
         fetchProducts();
     }, []);
@@ -42,44 +52,43 @@ const ManufacturerProductCRUD = () => {
         e.preventDefault();
         setError('');
         setSuccess('');
-
+    
         if (!name || !description || !price || !stock || (!image && !isEditing)) {
             setError('All fields are required');
             return;
         }
-
+    
         if (price <= 0 || stock < 0) {
             setError('Price must be greater than 0 and stock cannot be negative.');
             return;
         }
-
+    
         const token = localStorage.getItem('auth-token');
         if (!token) {
             setError('No authorization token found');
             return;
         }
-
+    
         const decodedToken = jwtDecode(token);
         const userType = decodedToken.userType;
-
+    
         if (userType !== 'manufacturer') {
             setError('You do not have permission to create products.');
             return;
         }
-
+    
         const formData = new FormData();
         formData.append('name', name);
         formData.append('description', description);
         formData.append('price', price);
         formData.append('stock', stock);
         if (image) formData.append('image', image);
-
+    
         try {
             setLoading(true);
-            let response;
-
+    
             if (isEditing) {
-                response = await axios.put(`http://localhost:5001/api/auth/product/edit/${currentProductId}`, formData, {
+                await axios.put(`http://localhost:5001/api/auth/product/edit/${currentProductId}`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                         Authorization: `Bearer ${token}`,
@@ -87,7 +96,7 @@ const ManufacturerProductCRUD = () => {
                 });
                 setSuccess('Product updated successfully!');
             } else {
-                response = await axios.post('http://localhost:5001/api/auth/product/create', formData, {
+                await axios.post('http://localhost:5001/api/auth/product/create', formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                         Authorization: `Bearer ${token}`,
@@ -95,7 +104,7 @@ const ManufacturerProductCRUD = () => {
                 });
                 setSuccess('Product created successfully!');
             }
-
+    
             fetchProducts(); // Refresh product list
             resetForm(); // Reset the form
         } catch (err) {
@@ -106,7 +115,6 @@ const ManufacturerProductCRUD = () => {
             setLoading(false);
         }
     };
-
     const resetForm = () => {
         setName('');
         setDescription('');
@@ -146,26 +154,41 @@ const ManufacturerProductCRUD = () => {
     };
 
     const handleDelete = async (productId) => {
+        console.log("Deleting product ID:", productId); // Log the product ID
+    
+        // Validate the product ID
+        if (!productId) {
+            setError('Invalid product ID');
+            return;
+        }
+    
         const token = localStorage.getItem('auth-token');
         if (!token) {
             setError('No authorization token found');
             return;
         }
-
+    
         try {
-            await axios.delete(`http://localhost:5001/api/auth/product/${productId}`, {
+            const response = await axios.delete(`http://localhost:5001/api/auth/product/${productId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            setSuccess('Product deleted successfully!');
-            fetchProducts(); // Refresh list after deletion
+    
+            // Optionally check the response
+            if (response.status === 200) {
+                setSuccess('Product deleted successfully!');
+                fetchProducts(); // Refresh list after deletion
+            } else {
+                setError('Failed to delete product');
+            }
         } catch (err) {
             console.error('Error deleting product:', err);
-            const message = err.response?.data?.msg || 'Server error';
+            const message = err.response?.data?.message || 'Server error';
             setError(message);
         }
     };
+    
 
     return (
         <div className="container">

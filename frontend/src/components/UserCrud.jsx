@@ -76,7 +76,7 @@ const UserCrud = () => {
         e.preventDefault();
     
         try {
-            const response = await axios.put(
+          await axios.put(
                 `http://localhost:5001/api/auth/users/${editingUser}`,
                 {
                     userType: editForm.userType,

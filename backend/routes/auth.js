@@ -7,8 +7,7 @@ const { authenticateUser } = require('../middleware/auth');
 const ManufacturerProfile = require('../models/ManufacturerProfile'); // Adjust the path as needed
 const Product = require('../models/Product'); // Adjust path to your Product model
 const multer = require('multer');
-const { BrowserRouter: Router, Route, Routes } = require('react-router-dom');
-
+const { isValidObjectId } = require('mongoose');
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -67,24 +66,64 @@ router.get('/manufacturer-profile/me', authenticateUser, async (req, res) => {
         return res.status(500).json({ msg: 'Server Error', error: error.message });
     }
 });
-// Add this route to your routes/auth.js
 router.get('/products', authenticateUser, async (req, res) => {
+    const userId = req.user._id; // Get the authenticated user's ID
+
+    console.log('Authenticated User ID:', userId); // Log the user ID
+
     try {
-        // Fetch all products from the database
-        const products = await Product.find(); // Fetch all products
-        return res.status(200).json({ products });
+        const products = await Product.find({ user: userId }); // Fetch products by user ID
+        console.log('Fetched Products:', products); // Log fetched products
+
+        if (products.length === 0) {
+            return res.status(404).json({ msg: 'No products found' });
+        }
+
+        res.status(200).json(products); // Return the products
     } catch (error) {
         console.error('Error fetching products:', error);
-        return res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ msg: 'Server error', error: error.message });
     }
 });
+
 
 
 router.get('/test-auth', authenticateUser, (req, res) => {
     re.json({ authenticatedUser: req.user });
 });
 
-//products
+router.delete('/product/:id', authenticateUser, async (req, res) => {
+    // Log the incoming request details
+    console.log('DELETE Request Received');
+    console.log('Attempting to delete product ID:', req.params.id);
+    console.log('Current user ID:', req.user.id); // Log the current user ID
+
+    // Check if the user is a manufacturer
+    if (req.user.userType !== 'manufacturer') {
+        console.log('Unauthorized attempt by user ID:', req.user.id); // Log unauthorized access
+        return res.status(403).json({ message: 'Unauthorized! Only manufacturers can delete products.' });
+    }
+
+    try {
+        // Attempt to find and delete the product
+        const product = await Product.findOneAndDelete({ _id: req.params.id, user: req.user.id });
+        
+        // Log the product details or absence
+        if (!product) {
+            console.log('Product not found or not owned by user:', req.params.id);
+            return res.status(404).json({ message: 'Product not found' });
+        } else {
+            console.log('Product deleted successfully:', product);
+        }
+
+        // Respond with success
+        res.json({ message: 'Product deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting product:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 router.post('/product/create', authenticateUser, upload.single('image'), async (req, res) => {
     const { name, description, price, stock } = req.body;
     const userId = req.user._id; // Get user ID from authenticated request
@@ -136,20 +175,23 @@ router.post('/product/create', authenticateUser, upload.single('image'), async (
         return res.status(500).json({ msg: 'Server error', error: error.message });
     }
 });
+router.get('/products', authenticateUser, async (req, res) => {
+    const userId = req.user._id; // Get the authenticated user's ID
 
-router.get('/product', authenticateUser, async (req, res) => {
+    console.log('Authenticated User ID:', userId); // Log the user ID
+
     try {
-        // Check if the user type is 'manufacturer'
-        if (req.user.userType !== 'manufacturer') {
-            return res.status(403).json({ message: 'You do not have permission to view products.' });
+        const products = await Product.find({ user: userId }); // Fetch products by user ID
+        console.log('Fetched Products:', products); // Log fetched products
+
+        if (products.length === 0) {
+            return res.status(404).json({ msg: 'No products found' });
         }
 
-        // Fetch products created by the manufacturer
-        const products = await Product.find({ createdBy: req.user.id }); // Ensure this matches your Product schema
-        return res.status(200).json({ products });
+        res.status(200).json(products); // Return the products
     } catch (error) {
         console.error('Error fetching products:', error);
-        return res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ msg: 'Server error', error: error.message });
     }
 });
 router.get('/product/:id', authenticateUser, async (req, res) => {
@@ -202,6 +244,7 @@ router.put('/product/edit/:id', authenticateUser, upload.single('image'), async 
         res.status(500).json({ msg: 'Server error' });
     }
 });
+
 //products
 
 router.post('/manufacturerProfile', authenticateUser, async (req, res) => {
