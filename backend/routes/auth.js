@@ -8,6 +8,7 @@ const ManufacturerProfile = require('../models/ManufacturerProfile'); // Adjust 
 const Product = require('../models/Product'); // Adjust path to your Product model
 const multer = require('multer');
 const SellerProfile = require('../models/SellerProfile'); // Adjust path if necessary
+
 // POST Create Seller Profile
 router.post('/sellerProfile', authenticateUser, async (req, res) => {
     try {
