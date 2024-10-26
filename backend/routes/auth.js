@@ -91,38 +91,35 @@ router.get('/products', authenticateUser, async (req, res) => {
 router.get('/test-auth', authenticateUser, (req, res) => {
     re.json({ authenticatedUser: req.user });
 });
-
 router.delete('/product/:id', authenticateUser, async (req, res) => {
-    // Log the incoming request details
-    console.log('DELETE Request Received');
-    console.log('Attempting to delete product ID:', req.params.id);
-    console.log('Current user ID:', req.user.id); // Log the current user ID
-
-    // Check if the user is a manufacturer
-    if (req.user.userType !== 'manufacturer') {
-        console.log('Unauthorized attempt by user ID:', req.user.id); // Log unauthorized access
-        return res.status(403).json({ message: 'Unauthorized! Only manufacturers can delete products.' });
-    }
-
+    const productId = req.params.id; // Get the product ID from the route parameter
+    const userId = req.user._id; // Get user ID from authenticated request
+    console.log('Product ID:', productId);
+    console.log('User ID:', userId);
     try {
-        // Attempt to find and delete the product
-        const product = await Product.findOneAndDelete({ _id: req.params.id, user: req.user.id });
-        
-        // Log the product details or absence
+        // Fetch the product from the database
+        const product = await Product.findById(productId);
+
+        // Ensure product exists
         if (!product) {
-            console.log('Product not found or not owned by user:', req.params.id);
-            return res.status(404).json({ message: 'Product not found' });
-        } else {
-            console.log('Product deleted successfully:', product);
+            return res.status(404).json({ msg: 'Product not found' });
         }
 
-        // Respond with success
-        res.json({ message: 'Product deleted successfully' });
+        // Check if the authenticated user is the owner of the product
+        if (product.user.toString() !== userId.toString()) {
+            return res.status(403).json({ msg: 'Forbidden: You are not allowed to delete this product' });
+        }
+
+        // Delete the product
+        await Product.findByIdAndDelete(productId);
+
+        return res.status(200).json({ msg: 'Product deleted successfully!' });
     } catch (error) {
         console.error('Error deleting product:', error);
-        res.status(500).json({ message: 'Server error' });
+        return res.status(500).json({ msg: 'Server error', error: error.message });
     }
 });
+
 
 router.post('/product/create', authenticateUser, upload.single('image'), async (req, res) => {
     const { name, description, price, stock } = req.body;
