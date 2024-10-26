@@ -2,16 +2,7 @@ import React from 'react';
 import './SellerHomePage.css'; // Import styles
 import { FaBox, FaClipboardList, FaChartBar } from 'react-icons/fa';
 import { FaChevronRight } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
-
 const SellerHomePage = () => {
-
-    const navigate = useNavigate();
-
-    const handleResellLink = () => {
-        navigate('/seller/products'); // Redirects to the product creation page
-    };
-
     return (
         <div className="py-lg-14 bg-light pt-8 pb-8">
             {/* Container */}
