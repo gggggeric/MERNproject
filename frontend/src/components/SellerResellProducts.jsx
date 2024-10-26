@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import './ResellProducts.css'; // Import the CSS file for styling
+import './SellerResellProducts.css'; // Import the CSS file for styling
 
-const ResellProducts = () => {
+const SellerResellProducts = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -63,4 +63,4 @@ const handleAddToCart = (product) => {
     // Add logic for adding to cart
 };
 
-export default ResellProducts;
+export default SellerResellProducts;

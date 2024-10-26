@@ -38,7 +38,7 @@ const Navbar = () => {
         if (userType === 'admin') {
             return "/admin/editProfile"; // Admin profile link
         } else if (userType === 'seller') {
-            return "/seller/editProfile"; // Seller profile link
+            return "/sellerProfile"; // Seller profile link
         } else if (userType === 'user') {
             return "/user/editProfile"; // User profile link
         } else if (userType === 'manufacturer') {

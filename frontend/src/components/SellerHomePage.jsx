@@ -2,8 +2,16 @@ import React from 'react';
 import './SellerHomePage.css'; // Import styles
 import { FaBox, FaClipboardList, FaChartBar } from 'react-icons/fa';
 import { FaChevronRight } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 const SellerHomePage = () => {
+
+    const navigate = useNavigate();
+
+    const handleResellLink = () => {
+        navigate('/seller/products'); // Redirects to the product creation page
+    };
+
     return (
         <div className="py-lg-14 bg-light pt-8 pb-8">
             {/* Container */}
@@ -83,12 +91,12 @@ const SellerHomePage = () => {
                                 <div className="icon-shape icon-lg rounded-circle bg-light mb-3 card-icon">
                                     <FaBox size={24} />
                                 </div>
-                                <div className="d-flex align-items-center justify-content-between">
+                                <div className="d-flex align-items-center justify-content-between" >
                                     <div>
                                         <h4 className="mb-0">Resell Product</h4>
                                         <p className="mb-0">List your products for resale</p>
                                     </div>
-                                    <a href="/resell-products" className="text-inherit">
+                                    <a href="/seller/products" className="text-inherit">
                                         <FaChevronRight size={16} />
                                     </a>
                                 </div>

@@ -2,7 +2,6 @@
 const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product'); // Adjust path to your Product model
-const { BrowserRouter: Router, Route, Routes } = require('react-router-dom');
 
 // GET all products
 router.get('/products', async (req, res) => {

@@ -1,0 +1,62 @@
+.seller-profile-container {
+    max-width: 500px; /* Maximum width for the profile container */
+    margin: 0 auto; /* Center horizontally on the page */
+    padding: 30px; /* Padding around the content */
+    background-color: #ffffff; /* White background for the container */
+    border-radius: 8px; /* Rounded corners */
+    border: 1px solid #8e44ad; /* Purple border surrounding the container */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Shadow effect */
+}
+
+h1 {
+    text-align: center; /* Center the header text */
+    color: #8e44ad; /* Purple color to match the button and border */
+}
+
+.seller-profile-form {
+    width: 100%; /* Ensure the form uses full width */
+    display: flex; /* Flexbox for centering */
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Center items horizontally */
+}
+
+.form-group {
+    margin-bottom: 15px; /* Spacing between inputs */
+    width: 100%; /* Full width for input groups */
+}
+
+label {
+    display: block; /* Labels display */
+    margin-bottom: 5px; /* Space below labels */
+    font-weight: 600; /* Bold labels */
+    color: #333; /* Dark color for labels */
+}
+
+input {
+    width: 100%; /* Full width inputs */
+    padding: 8px; /* Padding inside input fields */
+    border-radius: 4px; /* Rounded corners for inputs */
+    border: 1px solid #ccc; /* Light border for inputs */
+    box-sizing: border-box; /* Ensures padding is included in width */
+}
+
+button {
+    width: 100%; /* Full width button */
+    padding: 10px; /* Padding inside button */
+    background-color: #8e44ad; /* Button background color */
+    color: white; /* Button text color */
+    border: none; /* No border for button */
+    border-radius: 4px; /* Rounded corners for button */
+    cursor: pointer; /* Pointer cursor on hover */
+}
+
+button:hover {
+    background-color: #5e3370; /* Darker background on hover */
+}
+
+.message {
+    text-align: center; /* Centered message text */
+    margin-top: 10px; /* Space above message */
+    font-weight: bold; /* Bold message text */
+    color: red; /* Color for error message */
+}

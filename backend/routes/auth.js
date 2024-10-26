@@ -7,7 +7,63 @@ const { authenticateUser } = require('../middleware/auth');
 const ManufacturerProfile = require('../models/ManufacturerProfile'); // Adjust the path as needed
 const Product = require('../models/Product'); // Adjust path to your Product model
 const multer = require('multer');
-const { isValidObjectId } = require('mongoose');
+const SellerProfile = require('../models/SellerProfile'); // Adjust path if necessary
+// POST Create Seller Profile
+router.post('/sellerProfile', authenticateUser, async (req, res) => {
+    try {
+        const { storeName, address, contactNo } = req.body;
+        const user = await User.findById(req.user._id); // Fetch the authenticated user
+
+        // Check if user is a seller
+        if (user.userType !== 'seller') {
+            return res.status(403).json({ message: 'Unauthorized: Only sellers can create a profile' });
+        }
+
+        // Check if the seller profile already exists
+        const existingProfile = await SellerProfile.findOne({ user: user._id });
+        if (existingProfile) {
+            return res.status(400).json({ message: 'Profile already exists' });
+        }
+
+        // Create a new seller profile
+        const newProfile = new SellerProfile({
+            user: user._id,
+            storeName,
+            address,
+            contactNo,
+        });
+
+        await newProfile.save();
+        res.status(201).json({ message: 'Profile created successfully!', profile: newProfile });
+    } catch (error) {
+        console.error('Error creating seller profile:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
+
+// GET Seller Profile
+router.get('/sellerProfile', authenticateUser, async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id); // Fetch the authenticated user
+
+        // Check if user is a seller
+        if (user.userType !== 'seller') {
+            return res.status(403).json({ message: 'Unauthorized: Only sellers can access this profile' });
+        }
+
+        // Find the seller profile associated with this user and populate the user data
+        const profile = await SellerProfile.findOne({ user: user._id }).populate('user');
+
+        if (!profile) {
+            return res.status(404).json({ message: 'Seller profile not found' });
+        }
+
+        res.status(200).json(profile);
+    } catch (error) {
+        console.error('Error retrieving seller profile:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
