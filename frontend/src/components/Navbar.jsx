@@ -72,8 +72,8 @@ const Navbar = () => {
             <div className="left-content">
                 <Link to="/" className="logo-link">
                     <img src={logo} alt="SofaSphere Logo" className="logo" />
-                    <a href="#" class="store-name">SofaSphere</a> 
-                    </Link>
+                    <span className="store-name">SofaSphere</span> {/* Changed from <a> to <span> */}
+                </Link>
             </div>
             <div className="right-content">
                 {userEmail && (
