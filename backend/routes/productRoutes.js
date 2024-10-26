@@ -1,21 +1,50 @@
-// routes/productRoutes.js
 const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product'); // Adjust path to your Product model
-const ResellProduct  = require('../models/ResellProducts');
+const ResellProduct = require('../models/ResellProducts');
 const SellerProfile = require('../models/SellerProfile'); // Adjust path to your SellerProfile model
 const { authenticateUser } = require('../middleware/auth'); // Ensure you have an authentication middleware
+const ManufacturerProfile = require('../models/ManufacturerProfile'); // Adjust the path as necessary
 
-// GET all products
-router.get('/products', async (req, res) => {
+router.get('/resold-products', authenticateUser, async (req, res) => {
     try {
-        const products = await Product.find(); // Fetches all products from MongoDB
-        res.json(products);
+        const baseUrl = 'http://localhost:5001/uploads/'; // Adjust this based on your production setup
+        const resoldProducts = await ResellProduct.find();
+
+        // Map through products to include the image path
+        const responseProducts = resoldProducts.map(product => ({
+            id: product._id,
+            sellerProfile: product.sellerProfile,
+            name: product.name,
+            description: product.description,
+            price: product.price,
+            quantity: product.quantity,
+            image: product.image ? baseUrl + product.image.replace(/\\/g, '/') : `${baseUrl}default.jpg`, // Handle image paths
+            createdAt: product.createdAt,
+        }));
+
+        console.log('Fetched Resold Products:', responseProducts);
+        res.json(responseProducts);
     } catch (error) {
-        console.error(error); // Log the error for debugging
+        console.error('Error fetching resold products:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });
+
+
+router.get('/products', authenticateUser, async (req, res) => {
+    try {
+        const products = await Product.find();
+        res.json(products);
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+
+
+
 // POST to re-sell a product
 router.post('/resellProducts', authenticateUser, async (req, res) => {
     const { productId, quantity } = req.body;
@@ -45,6 +74,7 @@ router.post('/resellProducts', authenticateUser, async (req, res) => {
             description: product.description,
             price: product.price,
             quantity, // Quantity from the modal
+            image: product.image // Copy the image from the original product
         });
 
         // Save the new resell product

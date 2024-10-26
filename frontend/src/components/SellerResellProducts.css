@@ -68,3 +68,26 @@
 .add-to-cart-button:hover {
     background-color: #218838; /* Darker shade on hover */
 }
+.pagination {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.page-button {
+    margin: 0 5px;
+    padding: 10px 15px;
+    border: none;
+    background-color: #f0f0f0;
+    cursor: pointer;
+}
+
+.page-button.active {
+    background-color: #007bff;
+    color: white;
+}
+
+.page-button:hover {
+    background-color: #ddd;
+}
+

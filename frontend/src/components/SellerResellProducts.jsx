@@ -9,26 +9,27 @@ const SellerResellProducts = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [quantity, setQuantity] = useState(1); // Default quantity for re-selling
+    const [currentPage, setCurrentPage] = useState(1);
+    const productsPerPage = 5; // Set the number of products to display per page
 
     const fetchProducts = async () => {
-        setLoading(true); // Set loading to true when fetching products
+        setLoading(true);
         try {
-            // Retrieve the token from localStorage
             const token = localStorage.getItem('auth-token');
-
-            // Make the API request with the token in the headers
             const response = await axios.get('http://localhost:5001/api/products', {
                 headers: {
-                    'Authorization': `Bearer ${token}` // Include the token in the Authorization header
+                    'Authorization': `Bearer ${token}`
                 }
             });
-            setProducts(response.data);
+            console.log('API Response:', response.data); // Check if this logs an array
+            setProducts(Array.isArray(response.data) ? response.data : []); // Ensure it's set to an array
         } catch (err) {
             setError('Failed to fetch products');
         } finally {
             setLoading(false);
         }
     };
+    
 
     useEffect(() => {
         fetchProducts();
@@ -59,7 +60,7 @@ const SellerResellProducts = () => {
             });
             fetchProducts(); // Refetch products to update stock
             setModalOpen(false); // Close the modal
-            alert('Ordered successfully!'); // Optional: noy usertif
+            alert('Ordered successfully!'); // Optional: notify user
         } catch (err) {
             console.error('Error during re-sell:', err);
             setError(err.response?.data?.message || 'Failed to re-sell product'); // More informative error message
@@ -72,6 +73,14 @@ const SellerResellProducts = () => {
         setQuantity(1); // Reset quantity to default
     };
 
+    // Calculate the current products to display
+    const indexOfLastProduct = currentPage * productsPerPage;
+    const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+    const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
+
+    // Change page
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
     if (loading) return <div className="loading">Loading products...</div>;
     if (error) return <div className="error">{error}</div>;
     if (!products.length) return <div>No products available.</div>;
@@ -80,21 +89,36 @@ const SellerResellProducts = () => {
         <div>
             <h1>Resell Products</h1>
             <div className="product-container">
-                {products.map(product => (
-                    <div key={product._id} className="product-card">
-                        {product.image && (
-                            <img 
-                                src={`http://localhost:5001/${product.image.replace(/\\/g, '/')}`} 
-                                alt={product.name} 
-                                className="product-image" 
-                            />
-                        )}
-                        <h2 className="product-name">{product.name}</h2>
-                        <p className="product-description">{product.description}</p>
-                        <p className="product-price">Price: ₱{product.price}</p>
-                        <p className="product-quantity">Quantity: {product.stock || 'N/A'}</p>
-                        <button onClick={() => handleResell(product)} className="button resell-button">Re-Sell</button>
-                    </div>
+            {currentProducts.map((product, index) => (
+    <div key={product._id || `product-${index}`} className="product-card"> {/* Add fallback key */}
+        {product.image && (
+            <img 
+                src={`http://localhost:5001/${product.image.replace(/\\/g, '/')}`} 
+                alt={product.name} 
+                className="product-image" 
+            />
+        )}
+        <h2 className="product-name">{product.name}</h2>
+        <p className="product-company">Company: {product.companyName || 'Unknown'}</p> {/* Display company name */}
+        <p className="product-description">{product.description}</p>
+        <p className="product-price">Price: ₱{product.price}</p>
+        <p className="product-quantity">Quantity: {product.stock || 'N/A'}</p>
+        <button onClick={() => handleResell(product)} className="button resell-button">Re-Sell</button>
+    </div>
+))}
+
+            </div>
+
+            {/* Pagination Controls */}
+            <div className="pagination">
+                {Array.from({ length: Math.ceil(products.length / productsPerPage) }, (_, index) => (
+                    <button 
+                        key={index + 1} 
+                        onClick={() => paginate(index + 1)} 
+                        className={`page-button ${currentPage === index + 1 ? 'active' : ''}`}
+                    >
+                        {index + 1}
+                    </button>
                 ))}
             </div>
 

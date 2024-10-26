@@ -29,7 +29,7 @@ const SellerHomePage = () => {
                                         <h4 className="mb-0">Manage Products</h4>
                                         <p className="mb-0">Add, edit, or delete products</p>
                                     </div>
-                                    <a href="/manage-products" className="text-inherit">
+                                    <a href="sellerManageProducts" className="text-inherit">
                                         <FaChevronRight size={16} />
                                     </a>
                                 </div>

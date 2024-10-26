@@ -18,6 +18,7 @@ import SellerEditPassword from './components/SellerEditPassword';
 import ManufacturerProductCRUD from './components/ManufacturerProductCRUD';
 import SellerResellProducts from './components/SellerResellProducts';
 import SellerProfile from './components/SellerProfile';
+import SellerManageProducts from './components/SellerManageProducts';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import "slick-carousel/slick/slick-theme.css"; 
 
@@ -134,6 +135,15 @@ const App = () => {
                         element={
                             <ProtectedRoute 
                                 element={<SellerProfile />} 
+                                allowedRoles={['seller', 'admin']} // Update roles if necessary
+                            />
+                        } 
+                    />
+                        <Route 
+                        path="/sellerManageProducts" 
+                        element={
+                            <ProtectedRoute 
+                                element={<SellerManageProducts />} 
                                 allowedRoles={['seller', 'admin']} // Update roles if necessary
                             />
                         } 

@@ -177,7 +177,6 @@ router.delete('/product/:id', authenticateUser, async (req, res) => {
     }
 });
 
-
 router.post('/product/create', authenticateUser, upload.single('image'), async (req, res) => {
     const { name, description, price, stock } = req.body;
     const userId = req.user._id; // Get user ID from authenticated request
@@ -206,6 +205,18 @@ router.post('/product/create', authenticateUser, upload.single('image'), async (
             return res.status(400).json({ msg: 'All fields are required' });
         }
 
+        // Fetch the manufacturer profile to get the company name
+        const manufacturerProfile = await ManufacturerProfile.findOne({ user: userId });
+
+        // Ensure manufacturer profile exists
+        if (!manufacturerProfile) {
+            return res.status(404).json({ msg: 'Manufacturer profile not found' });
+        }
+
+        // Log the company name being stored
+        const companyName = manufacturerProfile.companyName;
+        console.log('Company Name:', companyName);
+
         // Create new product
         const newProduct = new Product({
             name,
@@ -213,22 +224,37 @@ router.post('/product/create', authenticateUser, upload.single('image'), async (
             price,
             stock,
             user: userId, // Connect the product to the user
+            companyName, // Store company name in the product
             image: req.file ? req.file.path : null, // Save the image path from multer, if provided
+        });
+
+        // Log the product details being saved
+        console.log('Saving Product:', {
+            name,
+            description,
+            price,
+            stock,
+            user: userId,
+            companyName, // Log company name being saved with the product
+            image: newProduct.image,
         });
 
         // Save product to database
         const product = await newProduct.save();
 
-        // Respond with the created product
+        // Respond with the created product and company name
         return res.status(201).json({
             success: true,
             product,
+            companyName, // Include company name in the response
         });
     } catch (error) {
         console.error('Error creating product:', error);
         return res.status(500).json({ msg: 'Server error', error: error.message });
     }
 });
+
+
 router.get('/products', authenticateUser, async (req, res) => {
     const userId = req.user._id; // Get the authenticated user's ID
 

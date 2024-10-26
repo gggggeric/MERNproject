@@ -23,10 +23,15 @@ const ProductSchema = new mongoose.Schema({
         ref: 'User', // Reference to User model
         required: true,
     },
+    companyName: {  // Add companyName field
+        type: String, // Type String for company name
+        required: true, // Make it required if necessary
+    },
     image: {
         type: String, // This will store the image URL or file path
         required: true,
     },
+    
     createdAt: {
         type: Date,
         default: Date.now,

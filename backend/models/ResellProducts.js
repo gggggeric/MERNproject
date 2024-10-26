@@ -6,6 +6,7 @@ const ResellProductSchema = new mongoose.Schema({
     description: { type: String, required: true },
     price: { type: Number, required: true },
     quantity: { type: Number, required: true },
+    image: { type: String }, // Add this line to include the image field
     createdAt: { type: Date, default: Date.now }, // Optional: to track when the product was added
 });
 
