@@ -15,7 +15,6 @@ const ManufacturerProductCRUD = () => {
     const [products, setProducts] = useState([]);
     const [isEditing, setIsEditing] = useState(false);
     const [currentProductId, setCurrentProductId] = useState(null);
-    const [modalVisible, setModalVisible] = useState(false);
 
     // Fetch products
     const fetchProducts = async () => {
@@ -44,7 +43,6 @@ const ManufacturerProductCRUD = () => {
         setError('');
         setSuccess('');
 
-        // Validate form fields
         if (!name || !description || !price || !stock || (!image && !isEditing)) {
             setError('All fields are required');
             return;
@@ -81,7 +79,6 @@ const ManufacturerProductCRUD = () => {
             let response;
 
             if (isEditing) {
-                // Check if the form data is being set correctly before updating
                 response = await axios.put(`http://localhost:5001/api/auth/product/edit/${currentProductId}`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
@@ -99,9 +96,8 @@ const ManufacturerProductCRUD = () => {
                 setSuccess('Product created successfully!');
             }
 
-            console.log(isEditing ? 'Product updated:' : 'Product created:', response.data);
-            fetchProducts(); // Refresh the product list
-            resetForm(); // Reset the form after successful submission
+            fetchProducts(); // Refresh product list
+            resetForm(); // Reset the form
         } catch (err) {
             console.error('Error saving product:', err);
             const message = err.response?.data?.msg || 'Server error';
@@ -119,8 +115,7 @@ const ManufacturerProductCRUD = () => {
         setImage(null);
         setCurrentProductId(null);
         setIsEditing(false);
-        setModalVisible(false);
-        document.getElementById('imageInput').value = ''; // Clear the file input
+        document.getElementById('imageInput').value = ''; // Clear file input
     };
 
     const handleEdit = async (productId) => {
@@ -144,7 +139,6 @@ const ManufacturerProductCRUD = () => {
             setStock(product.stock);
             setCurrentProductId(productId);
             setIsEditing(true);
-            setModalVisible(true); // Show modal for editing
         } catch (err) {
             console.error('Error fetching product for edit:', err);
             setError('Failed to load product for editing');
@@ -165,7 +159,7 @@ const ManufacturerProductCRUD = () => {
                 },
             });
             setSuccess('Product deleted successfully!');
-            fetchProducts(); // Refresh product list after deletion
+            fetchProducts(); // Refresh list after deletion
         } catch (err) {
             console.error('Error deleting product:', err);
             const message = err.response?.data?.msg || 'Server error';
@@ -175,104 +169,108 @@ const ManufacturerProductCRUD = () => {
 
     return (
         <div className="container">
-            <h2>{isEditing ? 'Edit Product' : 'Create Product'}</h2>
-            <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                    <label htmlFor="name">Name:</label>
-                    <input
-                        type="text"
-                        id="name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        required
-                    />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="description">Description:</label>
-                    <textarea
-                        id="description"
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        required
-                    />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="price">Price:</label>
-                    <input
-                        type="number"
-                        id="price"
-                        value={price}
-                        onChange={(e) => setPrice(e.target.value)}
-                        required
-                        min="0.01"
-                        step="0.01"
-                    />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="stock">Stock:</label>
-                    <input
-                        type="number"
-                        id="stock"
-                        value={stock}
-                        onChange={(e) => setStock(e.target.value)}
-                        required
-                        min="0"
-                    />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="image">Image:</label>
-                    <input
-                        type="file"
-                        id="imageInput"
-                        accept="image/*"
-                        onChange={(e) => setImage(e.target.files[0])}
-                        required={!isEditing} // Make it required only if not editing
-                    />
-                </div>
-                <button type="submit" disabled={loading}>
-                    {loading ? (isEditing ? 'Updating...' : 'Creating...') : (isEditing ? 'Update Product' : 'Create Product')}
-                </button>
-            </form>
+            <div className="form-card">
+                <h2>{isEditing ? 'Edit Product' : 'Create Product'}</h2>
+                <form onSubmit={handleSubmit}>
+                    <div className="form-group">
+                        <label htmlFor="name">Name:</label>
+                        <input
+                            type="text"
+                            id="name"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="description">Description:</label>
+                        <textarea
+                            id="description"
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="price">Price:</label>
+                        <input
+                            type="number"
+                            id="price"
+                            value={price}
+                            onChange={(e) => setPrice(e.target.value)}
+                            required
+                            min="0.01"
+                            step="0.01"
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="stock">Stock:</label>
+                        <input
+                            type="number"
+                            id="stock"
+                            value={stock}
+                            onChange={(e) => setStock(e.target.value)}
+                            required
+                            min="0"
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="image">Image:</label>
+                        <input
+                            type="file"
+                            id="imageInput"
+                            accept="image/*"
+                            onChange={(e) => setImage(e.target.files[0])}
+                            required={!isEditing}
+                        />
+                    </div>
+                    <button type="submit" className="create-button" disabled={loading}>
+                        {loading ? (isEditing ? 'Updating...' : 'Creating...') : (isEditing ? 'Update Product' : 'Create Product')}
+                    </button>
 
-            {error && <div className="error">{error}</div>}
-            {success && <div className="success">{success}</div>}
+                    {error && <div className="error">{error}</div>}
+                    {success && <div className="success">{success}</div>}
+                </form>
+            </div>
 
-            <h2>Your Products</h2>
-            {products.length > 0 ? (
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Description</th>
-                            <th>Price</th>
-                            <th>Stock</th>
-                            <th>Image</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {products.map((product) => (
-                            <tr key={product._id}>
-                                <td>{product.name}</td>
-                                <td>{product.description}</td>
-                                <td>₱{product.price}</td>
-                                <td>{product.stock}</td>
-                                <td>
-                                    {product.image && (
-                                        <img src={`http://localhost:5001/${product.image.replace(/\\/g, '/')}`} alt={product.name} width="50" />
-                                    )}
-                                </td>
-                                <td>
-                                    <button onClick={() => handleEdit(product._id)}>Edit</button>
-                                    <button onClick={() => handleDelete(product._id)}>Delete</button>
-                                </td>
+            <div className="product-card">
+                <h2>Your Products</h2>
+                {products.length > 0 ? (
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Image</th>
+                                <th>Actions</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-            ) : (
-                <p>No products found.</p>
-            )}
+                        </thead>
+                        <tbody>
+                            {products.map((product) => (
+                                <tr key={product._id}>
+                                    <td>{product.name}</td>
+                                    <td>{product.description}</td>
+                                    <td>₱{product.price}</td>
+                                    <td>{product.stock}</td>
+                                    <td>
+                                        {product.image && (
+                                            <img src={`http://localhost:5001/${product.image.replace(/\\/g, '/')}`} alt={product.name} width="50" />
+                                        )}
+                                    </td>
+                                    <td>
+                                        <button className="edit-button" onClick={() => handleEdit(product._id)}>Edit</button>
+                                        <button className="delete-button" onClick={() => handleDelete(product._id)}>Delete</button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                ) : (
+                    <p>No products found.</p>
+                )}
+            </div>
         </div>
     );
 };

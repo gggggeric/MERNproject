@@ -1,0 +1,13 @@
+/* src/components/Footer.css */
+.footer {
+    background-color: #9290C3; 
+    color: black;
+    font-family: cursive;
+    font-size: 1.2rem;
+    text-align: center;
+    padding: 1rem;
+    position: sticky;
+    bottom: 0;
+    width: 100%;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* Optional shadow for effect */
+}

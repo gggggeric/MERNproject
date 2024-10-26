@@ -17,45 +17,45 @@
     margin-top: 2rem; /* Margin above the dashboard */
 }
 
-.dashboard-card {
-    background-color: #8e44ad; /* Purple background for cards */
-    color: white; /* White text color */
-    padding: 1.5rem; /* Padding inside cards */
-    border-radius: 8px; /* Rounded corners */
+/* Card styles */
+.card {
+    border: 1px solid #ddd; /* Light border for all cards */
+    border-radius: 5px; /* Rounded corners */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    padding: 15px; /* Inner padding */
+    margin-bottom: 15px; /* Space between cards */
+    transition: transform 0.3s; /* Smooth transition */
     cursor: pointer; /* Pointer on hover */
-    transition: transform 0.2s; /* Smooth scale effect */
 }
 
-.dashboard-card:hover {
-    transform: scale(1.05); /* Slightly scale up on hover */
+.card:hover {
+    transform: translateY(-5px); /* Elevate on hover */
 }
 
-/* Manage Accounts Container */
-.manage-accounts-container {
-    background-color: #8e44ad; /* Primary color from the purple scheme */
-    color: white; /* Text color */
-    padding: 15px 25px; /* Padding around the text */
-    margin-top: 20px; /* Space above the container */
-    border-radius: 5px; /* Slightly rounded corners */
-    cursor: pointer; /* Change cursor on hover */
-    transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transition */
+/* Color specific styles */
+.card-purple {
+    background-color: #8e44ad; /* Purple background */
+    color: white; /* White text */
 }
 
-.manage-accounts-container:hover {
-    background-color: #732d91; /* Darker purple on hover */
-    transform: translateY(-2px); /* Slight lift on hover */
+.card-green {
+    background-color: #2ecc71; /* Green background */
+    color: white; /* White text */
 }
 
-.manage-accounts-container h3 {
-    margin: 0; /* Remove default margin */
-    font-size: 1.5em; /* Increase font size */
+.card-orange {
+    background-color: #e67e22; /* Orange background */
+    color: white; /* White text */
 }
 
-/* Additional styles for View Reports and Settings */
-.view-reports {
-    background-color: #2ecc71; /* Green background for view reports */
+/* Text styles */
+.card h4 {
+    color: white; /* Ensures text is readable on colored backgrounds */
 }
 
-.settings {
-    background-color: #e67e22; /* Orange background for settings */
+/* Responsive styles */
+@media (max-width: 768px) {
+    .card {
+        margin-bottom: 20px; /* More spacing on smaller screens */
+    }
 }

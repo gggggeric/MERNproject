@@ -72,8 +72,8 @@ const Navbar = () => {
             <div className="left-content">
                 <Link to="/" className="logo-link">
                     <img src={logo} alt="SofaSphere Logo" className="logo" />
-                    <span className="store-name">SofaSphere</span>
-                </Link>
+                    <a href="#" class="store-name">SofaSphere</a> 
+                    </Link>
             </div>
             <div className="right-content">
                 {userEmail && (
@@ -91,11 +91,9 @@ const Navbar = () => {
                                 <div className="user-email-container">
                                     <span className="user-email">Logged in as: {username}</span> {/* Display the username here */}
                                 </div>
-                                {/* Add Edit Profile link */}
                                 <Link to={getProfileLink()} className="dropdown-item">
                                     <BiEdit className="icon" /> Edit Profile
                                 </Link>
-                                {/* Add Edit Password link */}
                                 <Link to={getPasswordEditLink()} className="dropdown-item">
                                     <BiEdit className="icon" /> Edit Password
                                 </Link>

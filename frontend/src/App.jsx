@@ -7,15 +7,16 @@ import UserHomePage from './components/UserHomePage';
 import SellerHomePage from './components/SellerHomePage';
 import AdminHomePage from './components/AdminHomePage';
 import Home from './components/Home'; // Assuming you have a home page
-import Navbar from './components/Navbar'
+import Navbar from './components/Navbar';
 import UserCrud from './components/UserCrud';
-import Register from './components/Register'
+import Register from './components/Register';
 import ManufacturerHomePage from './components/ManufacturerHomePage';
 import ManufacturerEditPassword from './components/ManufacturerEditPassword';
 import UserEditPassword from './components/UserEditPassword';
 import ManufacturerProfile from './components/ManufacturerProfile';
 import SellerEditPassword from './components/SellerEditPassword';
 import ManufacturerProductCRUD from './components/ManufacturerProductCRUD';
+import ResellProducts from './components/ResellProducts';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import "slick-carousel/slick/slick-theme.css"; 
 
@@ -55,7 +56,7 @@ const App = () => {
                             />
                         } 
                     />
-                     <Route 
+                    <Route 
                         path="/userCrud" 
                         element={
                             <ProtectedRoute 
@@ -64,7 +65,7 @@ const App = () => {
                             />
                         } 
                     />
-                     <Route 
+                    <Route 
                         path="/manufacturerHomePage" 
                         element={
                             <ProtectedRoute 
@@ -82,7 +83,7 @@ const App = () => {
                             />
                         } 
                     />
-                      <Route 
+                    <Route 
                         path="/sellerEditPassword" 
                         element={
                             <ProtectedRoute 
@@ -91,7 +92,7 @@ const App = () => {
                             />
                         } 
                     />
-                     <Route 
+                    <Route 
                         path="/manufacturerEditPassword" 
                         element={
                             <ProtectedRoute 
@@ -100,7 +101,7 @@ const App = () => {
                             />
                         } 
                     />
-                     <Route 
+                    <Route 
                         path="/manufacturerProfile" 
                         element={
                             <ProtectedRoute 
@@ -109,7 +110,7 @@ const App = () => {
                             />
                         } 
                     />
-                     <Route 
+                    <Route 
                         path="/manufacturers/product/CRUD" 
                         element={
                             <ProtectedRoute 
@@ -118,7 +119,15 @@ const App = () => {
                             />
                         } 
                     />
-                    {/* Other routes */}
+                    <Route 
+                        path="/resell-products" 
+                        element={
+                            <ProtectedRoute 
+                                element={<ResellProducts />} 
+                                allowedRoles={['seller', 'admin']} // Update roles if necessary
+                            />
+                        } 
+                    />
                 </Routes>
             </div>
         </Router>

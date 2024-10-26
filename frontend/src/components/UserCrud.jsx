@@ -75,9 +75,6 @@ const UserCrud = () => {
     const handleEditSubmit = async (e) => {
         e.preventDefault();
     
-        console.log('Editing user ID:', editingUser);
-        console.log('Edit form data:', editForm);
-    
         try {
             const response = await axios.put(
                 `http://localhost:5001/api/auth/users/${editingUser}`,
@@ -90,7 +87,6 @@ const UserCrud = () => {
                 }
             );
     
-            console.log('Response from server:', response.data);
             setUsers(users.map(user => user._id === editingUser ? { ...user, ...editForm } : user));
             setEditingUser(null);
             setEditForm({ userType: '', status: '' });
@@ -115,75 +111,82 @@ const UserCrud = () => {
         <div className="user-crud-container">
             <button className="back-button" onClick={handleBack}>Back to Admin Home</button> {/* Back button */}
 
-            <div className="user-crud-header">
-                <h2>User Management</h2>
+            <div className="user-crud-content">
+                <div className="user-management">
+                    <div className="user-crud-header">
+                        <h2>User Management</h2>
+                    </div>
+                    <form onSubmit={handleCreateUser} className="user-crud-form">
+                        <input 
+                            type="email" 
+                            placeholder="Email" 
+                            value={newUser.email} 
+                            onChange={e => setNewUser({ ...newUser, email: e.target.value })} 
+                            required 
+                        />
+                        <input 
+                            type="password" 
+                            placeholder="Password" 
+                            value={newUser.password} 
+                            onChange={e => setNewUser({ ...newUser, password: e.target.value })} 
+                            required 
+                        />
+                        <select 
+                            value={newUser.userType} 
+                            onChange={e => setNewUser({ ...newUser, userType: e.target.value })}
+                        >
+                            <option value="user">User</option>
+                            <option value="seller">Seller</option>
+                            <option value="admin">Admin</option>
+                            <option value="manufacturer">Manufacturer</option>
+                        </select>
+                        <button type="submit" className="create-btn">Create User</button>
+                    </form>
+                    {errorMessage && <div className="error-message">{errorMessage}</div>}
+                </div>
+
+                {/* All Users Table */}
+                <div className="all-users-container">
+                    <h3>All Users:</h3>
+                    <table className="user-crud-table">
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>User Type</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {users.map(user => (
+                                <tr key={user._id}>
+                                    <td>{user.email}</td>
+                                    <td>{user.userType}</td>
+                                    <td>{user.status ? 'True' : 'False'}</td>
+                                    <td>
+                                        <div className="action-buttons">
+                                            <button 
+                                                className="edit-button" 
+                                                onClick={() => handleEdit(user)}
+                                            >
+                                                Edit
+                                            </button>
+                                            {user.userType !== 'admin' && (
+                                                <button 
+                                                    className="delete-button" 
+                                                    onClick={() => handleDelete(user._id)}
+                                                >
+                                                    Delete
+                                                </button>
+                                            )}
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <form onSubmit={handleCreateUser} className="user-crud-form">
-                <input 
-                    type="email" 
-                    placeholder="Email" 
-                    value={newUser.email} 
-                    onChange={e => setNewUser({ ...newUser, email: e.target.value })} 
-                    required 
-                />
-                <input 
-                    type="password" 
-                    placeholder="Password" 
-                    value={newUser.password} 
-                    onChange={e => setNewUser({ ...newUser, password: e.target.value })} 
-                    required 
-                />
-                <select 
-                    value={newUser.userType} 
-                    onChange={e => setNewUser({ ...newUser, userType: e.target.value })}
-                >
-                    <option value="user">User</option>
-                    <option value="seller">Seller</option>
-                    <option value="admin">Admin</option>
-                    <option value="manufacturer">Manufacturer</option>
-                </select>
-                <button type="submit" className="create-btn">Create User</button>
-            </form>
-            {errorMessage && <div className="error-message">{errorMessage}</div>}
-            
-            <h3>All Users:</h3>
-            <table className="user-crud-table">
-                <thead>
-                    <tr>
-                        <th>Email</th>
-                        <th>User Type</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {users.map(user => (
-                        <tr key={user._id}>
-                            <td>{user.email}</td>
-                            <td>{user.userType}</td>
-                            <td>{user.status ? 'True' : 'False'}</td>
-                            <td>
-                                <div className="action-buttons">
-                                    <button 
-                                        className="edit-button" 
-                                        onClick={() => handleEdit(user)}
-                                    >
-                                        Edit
-                                    </button>
-                                    {user.userType !== 'admin' && (
-                                        <button 
-                                            className="delete-button" 
-                                            onClick={() => handleDelete(user._id)}
-                                        >
-                                            Delete
-                                        </button>
-                                    )}
-                                </div>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
 
             {/* Floating Edit Modal */}
             {showEditModal && (
@@ -210,7 +213,7 @@ const UserCrud = () => {
                                 <option value="false">False</option>
                             </select>
                             <button type="submit" className="save-btn">Save Changes</button>
-                            <button type="button" className="cancel-btn" onClick={handleCancelEdit}>Cancel</button>
+                            <button type="button" className="delete-btn" onClick={handleCancelEdit}>Cancel</button>
                         </form>
                     </div>
                 </div>

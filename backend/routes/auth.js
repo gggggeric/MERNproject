@@ -7,6 +7,8 @@ const { authenticateUser } = require('../middleware/auth');
 const ManufacturerProfile = require('../models/ManufacturerProfile'); // Adjust the path as needed
 const Product = require('../models/Product'); // Adjust path to your Product model
 const multer = require('multer');
+const { BrowserRouter: Router, Route, Routes } = require('react-router-dom');
+
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -63,6 +65,17 @@ router.get('/manufacturer-profile/me', authenticateUser, async (req, res) => {
     } catch (error) {
         console.error('Error retrieving manufacturer profile:', error.message);
         return res.status(500).json({ msg: 'Server Error', error: error.message });
+    }
+});
+// Add this route to your routes/auth.js
+router.get('/products', authenticateUser, async (req, res) => {
+    try {
+        // Fetch all products from the database
+        const products = await Product.find(); // Fetch all products
+        return res.status(200).json({ products });
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        return res.status(500).json({ message: 'Server error' });
     }
 });
 

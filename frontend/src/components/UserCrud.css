@@ -7,134 +7,99 @@ body {
 
 /* Container for the CRUD operations */
 .user-crud-container {
-    max-width: 800px;
+    max-width: 1200px; /* Increase max-width for better layout */
     margin: 20px auto;
     padding: 20px;
     background-color: #ffffff;
     border: 1px solid #8e44ad;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(142, 68, 173, 0.5);
-    animation: fadeIn 1s ease-in-out;
+    animation: fadeIn 0.5s; /* Optional: fade-in animation */
 }
 
-/* Fade-in animation for the main container */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
+/* Flex layout for content */
+.user-crud-content {
+    display: flex;
 }
 
-/* Heading styles */
-.user-crud-header {
-    text-align: center;
-    margin-bottom: 20px;
+/* User management form styles */
+.user-management {
+    flex: 1;
+    margin-right: 20px; /* Space between form and table */
 }
 
-.user-crud-header h2 {
-    font-size: 2rem;
-    color: #8e44ad;
-    animation: slideInDown 0.5s ease-in-out;
-}
-
-/* Slide-down animation for header */
-@keyframes slideInDown {
-    from {
-        transform: translateY(-50%);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
-/* Form styles */
+/* Form styling */
 .user-crud-form {
     display: flex;
-    flex-direction: column;
-}
-
-.user-crud-form input,
-.user-crud-form select,
-.user-crud-form button {
-    margin-bottom: 15px;
-    padding: 10px;
-    border: 1px solid #8e44ad;
-    border-radius: 5px;
-    transition: transform 0.3s ease-in-out;
-}
-
-/* Button styles (applies to all buttons) */
-button, .edit-button, .delete-button, .save-btn, .cancel-btn, .back-btn {
-    background-color: #8e44ad;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 10px 15px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-}
-
-/* Hover and focus effect for all buttons */
-button:hover, .edit-button:hover, .delete-button:hover, .save-btn:hover, .cancel-btn:hover, .back-btn:hover {
-    background-color: #732d91;
-    transform: scale(1.05);
-}
-
-/* Specific delete button styling */
-.delete-button {
-    background-color: #e74c3c; /* Red for delete */
-}
-
-.delete-button:hover {
-    background-color: #c0392b; /* Darker red on hover */
-}
-
-/* Input and button hover animation */
-.user-crud-form input:hover,
-.user-crud-form select:hover,
-button:hover {
-    transform: scale(1.05); /* Slight zoom on hover */
+    flex-direction: column; /* Stack the input fields vertically */
+    gap: 10px; /* Space between input fields */
 }
 
 /* Table styles */
+.all-users-container {
+    flex: 2; /* Adjust this to control width of the table */
+    overflow-x: auto; /* Allow horizontal scrolling if necessary */
+}
+
 .user-crud-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
-    animation: fadeIn 0.8s ease-in-out;
+    margin-top: 20px; /* Space above the table */
 }
 
-.user-crud-table th,
-.user-crud-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
+.user-crud-table th, .user-crud-table td {
+    border: 1px solid #ccc;
+    padding: 10px;
     text-align: left;
 }
 
 .user-crud-table th {
-    background-color: #f4f4f4;
-    color: #8e44ad;
+    background-color: #f2f2f2;
 }
 
-/* Action buttons in table */
 .action-buttons {
     display: flex;
-    gap: 10px;
+    gap: 10px; /* Space between action buttons */
 }
 
-/* Error message style */
-.error-message {
-    color: red;
-    margin-top: 10px;
-    font-size: 14px;
-    text-align: center;
+/* Button styles */
+.create-btn {
+    background-color: #28a745; /* Green */
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.create-btn:hover {
+    background-color: #218838;
+}
+
+.edit-button {
+    background-color: #ffc107; /* Yellow */
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.edit-button:hover {
+    background-color: #e0a800;
+}
+
+.delete-button {
+    background-color: #dc3545; /* Red */
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.delete-button:hover {
+    background-color: #c82333;
 }
 
 /* Modal styles */
@@ -142,93 +107,84 @@ button:hover {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
-    animation: fadeIn 0.5s ease-in-out;
+    z-index: 1000; /* Ensure modal is above other elements */
 }
 
 .edit-modal-content {
-    background: white;
+    background-color: white;
     padding: 20px;
     border-radius: 8px;
-    width: 400px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    animation: slideInUp 0.5s ease-in-out;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    width: 300px; /* Fixed width for modal */
 }
 
-/* Slide-up animation for the modal */
-@keyframes slideInUp {
-    from {
-        transform: translateY(50%);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
-/* Form in modal */
+/* Form in Modal */
 .edit-modal-content form {
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /* Stack input fields */
+    gap: 10px; /* Space between fields */
 }
 
-.edit-modal-content label {
-    margin-bottom: 8px;
-    font-weight: bold;
-    color: #8e44ad;
-}
-
-.edit-modal-content select, 
-.edit-modal-content input {
-    margin-bottom: 15px;
-    padding: 8px;
-    font-size: 14px;
-    border: 1px solid #8e44ad;
-    border-radius: 10px;
-    transition: transform 0.3s ease-in-out;
-}
-
-.edit-modal-content select:hover, 
-.edit-modal-content input:hover {
-    transform: scale(1.05);
-}
-
-/* Save and cancel buttons specific styles */
+/* Button styles in modal */
 .save-btn {
-    background-color: #27ae60; /* Green for save */
-}
-
-.save-btn:hover {
-    background-color: #229954;
-}
-
-.cancel-btn {
-    background-color: #e74c3c; /* Red for cancel */
-}
-
-.cancel-btn:hover {
-    background-color: #c0392b;
-}
-
-/* Back button styling */
-.back-btn {
-    margin-bottom: 15px;
-    background-color: #8e44ad;
+    background-color: #28a745; /* Green */
     color: white;
     border: none;
     padding: 10px 15px;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
 }
 
-.back-btn:hover {
-    background-color: #732d91;
+.save-btn:hover {
+    background-color: #218838;
+}
+
+.delete-btn {
+    background-color: #dc3545; /* Red */
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.delete-btn:hover {
+    background-color: #c82333;
+}
+
+/* Error message styles */
+.error-message {
+    color: red;
+    margin-top: 10px;
+}
+
+/* Back button styles */
+.back-button {
+    background-color: #007bff; /* Bootstrap primary color */
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 20px; /* Space below the button */
+}
+
+.back-button:hover {
+    background-color: #0056b3;
+}
+
+/* Optional animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }

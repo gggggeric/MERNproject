@@ -2,9 +2,10 @@
 .page-container {
     display: flex; /* Use flexbox to center the content */
     justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
+    align-items: flex-start; /* Align items to the top */
     height: 100vh; /* Full viewport height */
-    background-color: #f4f4f4; /* Light background */
+    background-color: #535C91; /* Darker background color */
+    padding-top: 50px; /* Padding at the top to give space for the card */
 }
 
 .form-container {
@@ -13,14 +14,15 @@
     padding: 2rem; /* Padding around the form */
     border: 1px solid #8e44ad; /* Border with purple color */
     border-radius: 10px; /* Rounded corners */
-    background-color: #ffffff; /* White background */
+    background-color: #9290C3; /* Card background color */
     box-shadow: 0 4px 10px rgba(142, 68, 173, 0.5); /* Darker purple shadow */
+    margin: 0; /* Remove any margin for consistent positioning */
 }
 
 .form-container h2 {
     text-align: center; /* Center the title */
     margin-bottom: 1.5rem; /* Space below the title */
-    color: #8e44ad; /* Title color */
+    color: white; /* Title color for contrast */
 }
 
 .form-group {
@@ -30,7 +32,7 @@
 .form-group label {
     display: block; /* Block display for labels */
     margin-bottom: 0.5rem; /* Space below labels */
-    color: #8e44ad; /* Label color */
+    color: white; /* Label color for contrast */
 }
 
 .form-group input {
@@ -61,4 +63,3 @@
     font-size: 14px;
     text-align: center;
 }
-

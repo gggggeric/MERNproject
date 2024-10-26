@@ -35,16 +35,43 @@ h3 {
     gap: 15px; /* Space between buttons */
 }
 
+/* Button styles */
 .action-btn {
     padding: 10px; /* Padding inside the button */
-    background-color: #8e44ad; /* Button background color */
     color: white; /* Text color for the button */
     border: none; /* No border */
     border-radius: 4px; /* Rounded corners for the button */
     cursor: pointer; /* Pointer cursor on hover */
-    transition: background-color 0.3s; /* Transition for hover effect */
+    transition: background-color 0.3s, transform 0.2s; /* Transition for hover effect */
+    font-size: 1rem; /* Font size for buttons */
 }
 
+/* Different button colors */
+.action-btn.post-product {
+    background-color: #8e44ad; /* Purple */
+}
+
+.action-btn.manage-reviews {
+    background-color: #3498db; /* Blue */
+}
+
+.action-btn.view-orders {
+    background-color: #2ecc71; /* Green */
+}
+
+/* Hover effects */
 .action-btn:hover {
-    background-color: #5e3370; /* Darker background color on hover */
+    transform: scale(1.05); /* Slightly enlarge button on hover */
+}
+
+.action-btn.post-product:hover {
+    background-color: #5e3370; /* Darker purple on hover */
+}
+
+.action-btn.manage-reviews:hover {
+    background-color: #2980b9; /* Darker blue on hover */
+}
+
+.action-btn.view-orders:hover {
+    background-color: #27ae60; /* Darker green on hover */
 }

@@ -8,7 +8,7 @@
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
     border-radius: 10px; 
     margin: 1rem; 
-    font-family: Arial, sans-serif; 
+    font-family: cursive; /* Set all font to cursive */
     font-size: 1rem; 
 }
 
@@ -26,18 +26,22 @@
     border-radius: 50%; 
     object-fit: cover; 
 }
-
 .store-name {
     font-size: 1.5rem;
     color: #8e44ad;
-    font-family: cursive;
-    text-decoration: none;
+    text-decoration: none; /* Ensure no underline */
+    font-family: cursive; /* Ensure cursive font */
 }
 
 .logo-link {
     display: flex;
     align-items: center;
     justify-content: flex-start;
+}
+
+/* If the .store-name is within a link, also target the link specifically */
+.logo-link a {
+    text-decoration: none; /* Remove underline from links */
 }
 
 .right-content {
