@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './SellerManageProducts.css'; // Import the CSS file for styling
-
 const SellerManageProducts = () => {
     const [resoldProducts, setResoldProducts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -38,9 +37,10 @@ const SellerManageProducts = () => {
             <h1>Manage Resold Products</h1>
             <div className="resold-product-container">
                 {resoldProducts.map(product => {
+                    // Ensure imagePath only appends the filename to the base URL
                     const imagePath = product.image ? 
-                        `http://localhost:5001/uploads/${product.image.replace(/\\/g, '/')}` : 
-                        '/path/to/default-image.png'; // Use a default image path if not available
+                        `http://localhost:5001/uploads/${product.image.split('/').pop()}` : 
+                        '/path/to/default-image.png';
 
                     return (
                         <div key={product._id} className="resold-product-card">
