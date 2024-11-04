@@ -1,31 +1,53 @@
-// src/components/Register.js
 import React, { useState } from 'react';
 import axios from 'axios';
-import './Register.css'; // Assuming you have a CSS file for styling
+import { GoogleLogin } from '@react-oauth/google'; // Ensure you're importing from @react-oauth/google
+import './Register.css';
 
 const Register = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState(null); // State for handling errors
-    const [successMessage, setSuccessMessage] = useState(null); // State for handling success messages
+    const [error, setError] = useState(null);
+    const [successMessage, setSuccessMessage] = useState(null);
 
+    // Handle form submission for regular registration
     const handleRegister = async (e) => {
         e.preventDefault();
-        setError(null); // Clear any existing errors
-        setSuccessMessage(null); // Clear any existing success messages
+        setError(null);
+        setSuccessMessage(null);
 
         try {
-            // Sending email and password to the backend API
             const res = await axios.post('http://localhost:5001/api/auth/register', { email, password });
-
-            // Display success message
-            setSuccessMessage(res.data.message); // Set the success message
-            setEmail(''); // Clear email input
-            setPassword(''); // Clear password input
+            setSuccessMessage(res.data.message);
+            setEmail('');
+            setPassword('');
         } catch (err) {
-            // Handle errors and display error message
             setError(err.response?.data?.message || 'Registration failed!');
         }
+    };
+
+    // Handle Google login response
+    const responseGoogle = async (credentialResponse) => {
+        const { credential } = credentialResponse; // Extract 'credential' from the response
+
+        try {
+            const res = await axios.post('http://localhost:5001/api/auth/google/register', { idToken: credential });
+            console.log('Google registration response:', res.data);
+            setSuccessMessage('Registration with Google successful!');
+            setEmail('');
+            setPassword(''); // Clear fields after successful registration
+
+            // Optionally, set user status to true (if not already done on the backend)
+            // You could also directly navigate the user to a different page after this
+        } catch (err) {
+            console.error('Google registration error:', err);
+            setError('Google registration failed!');
+        }
+    };
+
+    // Handle Google login failure
+    const onFailure = (error) => {
+        console.error('Google login failed:', error);
+        setError('Google registration failed!');
     };
 
     return (
@@ -55,8 +77,15 @@ const Register = () => {
                     </div>
                     <button type="submit" className="submit-btn">Register</button>
                 </form>
-                {successMessage && <p className="success-message">{successMessage}</p>} {/* Display success message */}
-                {error && <p className="error-message">{error}</p>} {/* Display error if exists */}
+                {successMessage && <p className="success-message">{successMessage}</p>}
+                {error && <p className="error-message">{error}</p>}
+
+                {/* Google Login Button for Registration */}
+                <GoogleLogin
+                    onSuccess={responseGoogle} // Handle successful login
+                    onFailure={onFailure} // Handle failed login
+                    style={{ marginTop: '20px' }} // Add some margin for spacing
+                />
             </div>
         </div>
     );

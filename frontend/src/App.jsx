@@ -1,6 +1,6 @@
-// src/App.js
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { GoogleOAuthProvider } from '@react-oauth/google'; // Import the provider
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './components/Login';
 import UserHomePage from './components/UserHomePage';
@@ -23,134 +23,138 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import "slick-carousel/slick/slick-theme.css"; 
 
 const App = () => {
+    const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID; // Ensure the client ID is set
+
     return (
-        <Router>
-            <Navbar />
-            <div className="main-content">
-                <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
-                    <Route 
-                        path="/userHomePage" 
-                        element={
-                            <ProtectedRoute 
-                                element={<UserHomePage />} 
-                                allowedRoles={['user', 'admin']} // Users can access this
-                            />
-                        } 
-                    />
-                    <Route 
-                        path="/sellerHomePage" 
-                        element={
-                            <ProtectedRoute 
-                                element={<SellerHomePage />} 
-                                allowedRoles={['seller', 'admin']} // Only sellers and admins can access
-                            />
-                        } 
-                    />
-                    <Route 
-                        path="/adminHomePage" 
-                        element={
-                            <ProtectedRoute 
-                                element={<AdminHomePage />} 
-                                allowedRoles={['admin']} // Only admins can access
-                            />
-                        } 
-                    />
-                    <Route 
-                        path="/userCrud" 
-                        element={
-                            <ProtectedRoute 
-                                element={<UserCrud />} 
-                                allowedRoles={['admin']} // Only admins can access
-                            />
-                        } 
-                    />
-                    <Route 
-                        path="/manufacturerHomePage" 
-                        element={
-                            <ProtectedRoute 
-                                element={<ManufacturerHomePage />} 
-                                allowedRoles={['manufacturer', 'admin']} // Only manufacturers can access
-                            />
-                        } 
-                    />
-                    <Route 
-                        path="/userEditPassword" 
-                        element={
-                            <ProtectedRoute 
-                                element={<UserEditPassword />} 
-                                allowedRoles={['user']}
-                            />
-                        } 
-                    />
-                    <Route 
-                        path="/sellerEditPassword" 
-                        element={
-                            <ProtectedRoute 
-                                element={<SellerEditPassword />} 
-                                allowedRoles={['seller']}
-                            />
-                        } 
-                    />
-                    <Route 
-                        path="/manufacturerEditPassword" 
-                        element={
-                            <ProtectedRoute 
-                                element={<ManufacturerEditPassword />} 
-                                allowedRoles={['manufacturer']}
-                            />
-                        } 
-                    />
-                    <Route 
-                        path="/manufacturerProfile" 
-                        element={
-                            <ProtectedRoute 
-                                element={<ManufacturerProfile />} 
-                                allowedRoles={['manufacturer']}
-                            />
-                        } 
-                    />
-                    <Route 
-                        path="/manufacturers/product/CRUD" 
-                        element={
-                            <ProtectedRoute 
-                                element={<ManufacturerProductCRUD />} 
-                                allowedRoles={['manufacturer']}
-                            />
-                        } 
-                    />
-                    <Route 
-                        path="/seller/products" 
-                        element={
-                            <ProtectedRoute 
-                                element={<SellerResellProducts />} 
-                                allowedRoles={['seller', 'admin']} // Update roles if necessary
-                            />
-                        } 
-                    />
-                      <Route 
-                        path="/sellerProfile" 
-                        element={
-                            <ProtectedRoute 
-                                element={<SellerProfile />} 
-                                allowedRoles={['seller', 'admin']} // Update roles if necessary
-                            />
-                        } 
-                    />
+        <GoogleOAuthProvider clientId={clientId}>
+            <Router>
+                <Navbar />
+                <div className="main-content">
+                    <Routes>
+                        <Route path="/" element={<Home />} />
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/register" element={<Register />} />
                         <Route 
-                        path="/sellerManageProducts" 
-                        element={
-                            <ProtectedRoute 
-                                element={<SellerManageProducts />} 
-                                allowedRoles={['seller', 'admin']} // Update roles if necessary
-                            />
-                        } 
-                    />
-                </Routes>
-            </div>
-        </Router>
+                            path="/userHomePage" 
+                            element={
+                                <ProtectedRoute 
+                                    element={<UserHomePage />} 
+                                    allowedRoles={['user', 'admin']} // Users can access this
+                                />
+                            } 
+                        />
+                        <Route 
+                            path="/sellerHomePage" 
+                            element={
+                                <ProtectedRoute 
+                                    element={<SellerHomePage />} 
+                                    allowedRoles={['seller', 'admin']} // Only sellers and admins can access
+                                />
+                            } 
+                        />
+                        <Route 
+                            path="/adminHomePage" 
+                            element={
+                                <ProtectedRoute 
+                                    element={<AdminHomePage />} 
+                                    allowedRoles={['admin']} // Only admins can access
+                                />
+                            } 
+                        />
+                        <Route 
+                            path="/userCrud" 
+                            element={
+                                <ProtectedRoute 
+                                    element={<UserCrud />} 
+                                    allowedRoles={['admin']} // Only admins can access
+                                />
+                            } 
+                        />
+                        <Route 
+                            path="/manufacturerHomePage" 
+                            element={
+                                <ProtectedRoute 
+                                    element={<ManufacturerHomePage />} 
+                                    allowedRoles={['manufacturer', 'admin']} // Only manufacturers can access
+                                />
+                            } 
+                        />
+                        <Route 
+                            path="/userEditPassword" 
+                            element={
+                                <ProtectedRoute 
+                                    element={<UserEditPassword />} 
+                                    allowedRoles={['user']}
+                                />
+                            } 
+                        />
+                        <Route 
+                            path="/sellerEditPassword" 
+                            element={
+                                <ProtectedRoute 
+                                    element={<SellerEditPassword />} 
+                                    allowedRoles={['seller']}
+                                />
+                            } 
+                        />
+                        <Route 
+                            path="/manufacturerEditPassword" 
+                            element={
+                                <ProtectedRoute 
+                                    element={<ManufacturerEditPassword />} 
+                                    allowedRoles={['manufacturer']}
+                                />
+                            } 
+                        />
+                        <Route 
+                            path="/manufacturerProfile" 
+                            element={
+                                <ProtectedRoute 
+                                    element={<ManufacturerProfile />} 
+                                    allowedRoles={['manufacturer']}
+                                />
+                            } 
+                        />
+                        <Route 
+                            path="/manufacturers/product/CRUD" 
+                            element={
+                                <ProtectedRoute 
+                                    element={<ManufacturerProductCRUD />} 
+                                    allowedRoles={['manufacturer']}
+                                />
+                            } 
+                        />
+                        <Route 
+                            path="/seller/products" 
+                            element={
+                                <ProtectedRoute 
+                                    element={<SellerResellProducts />} 
+                                    allowedRoles={['seller', 'admin']} // Update roles if necessary
+                                />
+                            } 
+                        />
+                        <Route 
+                            path="/sellerProfile" 
+                            element={
+                                <ProtectedRoute 
+                                    element={<SellerProfile />} 
+                                    allowedRoles={['seller', 'admin']} // Update roles if necessary
+                                />
+                            } 
+                        />
+                        <Route 
+                            path="/sellerManageProducts" 
+                            element={
+                                <ProtectedRoute 
+                                    element={<SellerManageProducts />} 
+                                    allowedRoles={['seller', 'admin']} // Update roles if necessary
+                                />
+                            } 
+                        />
+                    </Routes>
+                </div>
+            </Router>
+        </GoogleOAuthProvider>
     );
 };
 
