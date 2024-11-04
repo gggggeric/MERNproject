@@ -1,7 +1,6 @@
-// src/components/ManufacturerHomePage.js
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import './ManufacturerHomePage.css';
+import { Box, Button, Container, Typography, Card, CardContent } from '@mui/material';
 
 const ManufacturerHomePage = () => {
     const navigate = useNavigate();
@@ -19,23 +18,30 @@ const ManufacturerHomePage = () => {
     };
 
     return (
-        <div className="manufacturer-dashboard-container">
-            <h2>Manufacturer Dashboard</h2>
-            <div className="dashboard-card">
-                <h3>Actions</h3>
-                <div className="button-container">
-                    <button className="action-btn post-product" onClick={handlePostProductClick}>
-                        Post a Product
-                    </button>
-                    <button className="action-btn manage-reviews" onClick={handleManageReviewsClick}>
-                        Manage Reviews
-                    </button>
-                    <button className="action-btn view-orders" onClick={handleViewOrdersClick}>
-                        View Orders
-                    </button>
-                </div>
-            </div>
-        </div>
+        <Container sx={{ py: 8, bgcolor: 'background.default' }}>
+            <Typography variant="h4" component="h2" gutterBottom textAlign="center">
+                Manufacturer Dashboard
+            </Typography>
+
+            <Card variant="outlined" sx={{ textAlign: 'center', mb: 4 }}>
+                <CardContent>
+                    <Typography variant="h5" component="h3" gutterBottom>
+                        Actions
+                    </Typography>
+                    <Box display="flex" justifyContent="center" gap={2}>
+                        <Button variant="contained" color="primary" onClick={handlePostProductClick}>
+                            Post a Product
+                        </Button>
+                        <Button variant="outlined" color="secondary" onClick={handleManageReviewsClick}>
+                            Manage Reviews
+                        </Button>
+                        <Button variant="outlined" color="secondary" onClick={handleViewOrdersClick}>
+                            View Orders
+                        </Button>
+                    </Box>
+                </CardContent>
+            </Card>
+        </Container>
     );
 };
 

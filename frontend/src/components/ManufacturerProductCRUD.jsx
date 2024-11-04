@@ -1,6 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
+import {
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Typography,
+    Paper,
+} from '@mui/material';
 import './ManufacturerProductCRUD.css';
 
 const ManufacturerProductCRUD = () => {
@@ -245,9 +260,9 @@ const ManufacturerProductCRUD = () => {
                             required={!isEditing}
                         />
                     </div>
-                    <button type="submit" className="create-button" disabled={loading}>
+                    <Button type="submit" variant="contained" color="primary" disabled={loading}>
                         {loading ? (isEditing ? 'Updating...' : 'Creating...') : (isEditing ? 'Update Product' : 'Create Product')}
-                    </button>
+                    </Button>
 
                     {error && <div className="error">{error}</div>}
                     {success && <div className="success">{success}</div>}
@@ -257,49 +272,58 @@ const ManufacturerProductCRUD = () => {
             <div className="product-card">
                 <h2>Your Products</h2>
                 {products.length > 0 ? (
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Description</th>
-                                <th>Price</th>
-                                <th>Stock</th>
-                                <th>Image</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {products.map((product) => (
-                                <tr key={product._id}>
-                                    <td>{product.name}</td>
-                                    <td>{product.description}</td>
-                                    <td>₱{product.price}</td>
-                                    <td>{product.stock}</td>
-                                    <td>
-                                        {product.image && (
-                                            <img src={`http://localhost:5001/${product.image.replace(/\\/g, '/')}`} alt={product.name} width="50" />
-                                        )}
-                                    </td>
-                                    <td>
-                                        <button className="edit-button" onClick={() => handleEdit(product._id)}>Edit</button>
-                                        <button className="delete-button" onClick={() => handleDelete(product._id)}>Delete</button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                    <TableContainer component={Paper}>
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>Name</TableCell>
+                                    <TableCell>Description</TableCell>
+                                    <TableCell>Price</TableCell>
+                                    <TableCell>Stock</TableCell>
+                                    <TableCell>Image</TableCell>
+                                    <TableCell>Actions</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {products.map((product) => (
+                                    <TableRow key={product._id}>
+                                        <TableCell>{product.name}</TableCell>
+                                        <TableCell>{product.description}</TableCell>
+                                        <TableCell>₱{product.price}</TableCell>
+                                        <TableCell>{product.stock}</TableCell>
+                                        <TableCell>
+                                            {product.image && (
+                                                <img
+                                                    src={`http://localhost:5001/${product.image.replace(/\\/g, '/')}`}
+                                                    alt={product.name}
+                                                    width="50"
+                                                />
+                                            )}
+                                        </TableCell>
+                                        <TableCell>
+                                            <Button variant="contained" color="primary" onClick={() => handleEdit(product._id)}>Edit</Button>
+                                            <Button variant="contained" color="secondary" onClick={() => handleDelete(product._id)}>Delete</Button>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
                 ) : (
-                    <p>No products available.</p>
+                    <Typography variant="body1" color="textSecondary">No products available.</Typography>
                 )}
             </div>
 
-            {showDeleteConfirm && (
-                <div className="confirm-delete">
-                    <p>Are you sure you want to delete this product?</p>
-                    <button onClick={confirmDelete}>Yes, delete</button>
-                    <button onClick={cancelDelete}>Cancel</button>
-                </div>
-            )}
+            <Dialog open={showDeleteConfirm} onClose={cancelDelete}>
+                <DialogTitle>Confirm Delete</DialogTitle>
+                <DialogContent>
+                    <Typography>Are you sure you want to delete this product?</Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={cancelDelete} color="primary">Cancel</Button>
+                    <Button onClick={confirmDelete} color="secondary">Delete</Button>
+                </DialogActions>
+            </Dialog>
         </div>
     );
 };

@@ -1,9 +1,8 @@
-// src/components/AdminHomePage.js
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Box, Container, Typography, Grid, Card, CardContent, IconButton } from '@mui/material';
 import { FaUser, FaFileAlt, FaCog } from 'react-icons/fa'; // Importing icons
 import { FaChevronRight } from 'react-icons/fa'; // Importing the Chevron icon
-import './AdminHomePage.css';
 
 const AdminHomePage = () => {
     const navigate = useNavigate(); // Initialize useNavigate for navigation
@@ -21,76 +20,72 @@ const AdminHomePage = () => {
     };
 
     return (
-        <div className="py-lg-14 bg-light pt-8 pb-8">
-            <div className="container">
-                <div className="row text-center">
-                    <div className="col-md-12 px-lg-8 mb-8 mt-6">
-                        <span className="text-uppercase text-primary fw-semibold ls-md">Admin Dashboard</span>
-                        <h2 className="h1 fw-bold mt-3">Welcome to Your Dashboard!</h2>
-                        <p className="mb-0 fs-4">Select an action below to get started.</p>
-                    </div>
-                </div>
+        <Container sx={{ py: 8, bgcolor: 'background.default' }}>
+            <Box textAlign="center" mb={6}>
+                <Typography variant="h5" color="primary" fontWeight="bold" letterSpacing={1}>
+                    Admin Dashboard
+                </Typography>
+                <Typography variant="h4" fontWeight="bold" mt={2}>
+                    Welcome to Your Dashboard!
+                </Typography>
+                <Typography variant="h6" mt={1}>
+                    Select an action below to get started.
+                </Typography>
+            </Box>
 
-                <div className="row gy-4">
-                    {/* Manage Accounts Card */}
-                    <div className="col-md-4 col-12">
-                        <div className="card card-purple" onClick={handleRedirectToUserCrud}>
-                            <div className="card-body">
-                                <div className="icon-shape icon-lg rounded-circle bg-light mb-3 card-icon">
+            <Grid container spacing={4}>
+                {/* Manage Accounts Card */}
+                <Grid item md={4} xs={12}>
+                    <Card variant="outlined" onClick={handleRedirectToUserCrud} sx={{ cursor: 'pointer', bgcolor: '#f3e5f5' }}>
+                        <CardContent>
+                            <Box display="flex" flexDirection="column" alignItems="center">
+                                <Box sx={{ bgcolor: 'lightgray', borderRadius: '50%', p: 2, mb: 2 }}>
                                     <FaUser size={24} />
-                                </div>
-                                <div className="d-flex align-items-center justify-content-between">
-                                    <div>
-                                        <h4 className="mb-0">Manage Accounts</h4>
-                                    </div>
-                                    <a className="text-inherit">
-                                        <FaChevronRight size={16} />
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                                </Box>
+                                <Typography variant="h6" fontWeight="bold">Manage Accounts</Typography>
+                                <IconButton>
+                                    <FaChevronRight size={16} />
+                                </IconButton>
+                            </Box>
+                        </CardContent>
+                    </Card>
+                </Grid>
 
-                    {/* View Reports Card */}
-                    <div className="col-md-4 col-12">
-                        <div className="card card-green" onClick={handleRedirectToReports}>
-                            <div className="card-body">
-                                <div className="icon-shape icon-lg rounded-circle bg-light mb-3 card-icon">
+                {/* View Reports Card */}
+                <Grid item md={4} xs={12}>
+                    <Card variant="outlined" onClick={handleRedirectToReports} sx={{ cursor: 'pointer', bgcolor: '#e8f5e9' }}>
+                        <CardContent>
+                            <Box display="flex" flexDirection="column" alignItems="center">
+                                <Box sx={{ bgcolor: 'lightgray', borderRadius: '50%', p: 2, mb: 2 }}>
                                     <FaFileAlt size={24} />
-                                </div>
-                                <div className="d-flex align-items-center justify-content-between">
-                                    <div>
-                                        <h4 className="mb-0">View Reports</h4>
-                                    </div>
-                                    <a className="text-inherit">
-                                        <FaChevronRight size={16} />
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                                </Box>
+                                <Typography variant="h6" fontWeight="bold">View Reports</Typography>
+                                <IconButton>
+                                    <FaChevronRight size={16} />
+                                </IconButton>
+                            </Box>
+                        </CardContent>
+                    </Card>
+                </Grid>
 
-                    {/* Settings Card */}
-                    <div className="col-md-4 col-12">
-                        <div className="card card-orange" onClick={handleRedirectToSettings}>
-                            <div className="card-body">
-                                <div className="icon-shape icon-lg rounded-circle bg-light mb-3 card-icon">
+                {/* Settings Card */}
+                <Grid item md={4} xs={12}>
+                    <Card variant="outlined" onClick={handleRedirectToSettings} sx={{ cursor: 'pointer', bgcolor: '#fff3e0' }}>
+                        <CardContent>
+                            <Box display="flex" flexDirection="column" alignItems="center">
+                                <Box sx={{ bgcolor: 'lightgray', borderRadius: '50%', p: 2, mb: 2 }}>
                                     <FaCog size={24} />
-                                </div>
-                                <div className="d-flex align-items-center justify-content-between">
-                                    <div>
-                                        <h4 className="mb-0">Settings</h4>
-                                    </div>
-                                    <a className="text-inherit">
-                                        <FaChevronRight size={16} />
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                                </Box>
+                                <Typography variant="h6" fontWeight="bold">Settings</Typography>
+                                <IconButton>
+                                    <FaChevronRight size={16} />
+                                </IconButton>
+                            </Box>
+                        </CardContent>
+                    </Card>
+                </Grid>
+            </Grid>
+        </Container>
     );
 };
 

@@ -1,102 +1,111 @@
 import React from 'react';
-import './SellerHomePage.css'; // Import styles
+import { Box, Button, Container, Typography, Card, CardContent, Grid } from '@mui/material';
 import { FaBox, FaClipboardList, FaChartBar } from 'react-icons/fa';
 import { FaChevronRight } from 'react-icons/fa';
+
 const SellerHomePage = () => {
     return (
-        <div className="py-lg-14 bg-light pt-8 pb-8">
-            {/* Container */}
-            <div className="container">
-                <div className="row text-center mb-5">
-                    {/* Heading */}
-                    <div className="col-md-12">
-                        <span className="text-uppercase text-primary fw-semibold ls-md">Seller Dashboard</span>
-                        <h2 className="h1 fw-bold mt-3">Welcome to Your Dashboard!</h2>
-                        <p className="mb-0 fs-4">Select an action below to get started.</p>
-                    </div>
-                </div>
+        <Container sx={{ py: 8, bgcolor: 'background.default' }}>
+            <Typography variant="h4" component="span" gutterBottom textAlign="center" color="primary">
+                Seller Dashboard
+            </Typography>
+            <Typography variant="h5" component="h2" gutterBottom textAlign="center">
+                Welcome to Your Dashboard!
+            </Typography>
+            <Typography variant="body1" gutterBottom textAlign="center">
+                Select an action below to get started.
+            </Typography>
 
-                <div className="row gy-4">
-                    {/* First Row of Cards */}
-                    <div className="col-md-6 col-12 mb-4">
-                        <div className="card card-orange">
-                            <div className="card-body">
-                                <div className="icon-shape icon-lg rounded-circle bg-light mb-3 card-icon">
-                                    <FaBox size={24} />
-                                </div>
-                                <div className="d-flex align-items-center justify-content-between">
-                                    <div>
-                                        <h4 className="mb-0">Manage Products</h4>
-                                        <p className="mb-0">Add, edit, or delete products</p>
-                                    </div>
-                                    <a href="sellerManageProducts" className="text-inherit">
-                                        <FaChevronRight size={16} />
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            <Grid container spacing={4} justifyContent="center">
+                {/* Manage Products Card */}
+                <Grid item md={6} xs={12}>
+                    <Card sx={{ bgcolor: '#FFB74D' }} onClick={() => window.location.href = 'sellerManageProducts'}>
+                        <CardContent>
+                            <Box display="flex" alignItems="center" justifyContent="space-between">
+                                <Box>
+                                    <Box sx={{ bgcolor: 'background.paper', borderRadius: '50%', padding: 2, mb: 2 }}>
+                                        <FaBox size={24} />
+                                    </Box>
+                                    <Typography variant="h6" gutterBottom>
+                                        Manage Products
+                                    </Typography>
+                                    <Typography variant="body2">Add, edit, or delete products</Typography>
+                                </Box>
+                                <Button>
+                                    <FaChevronRight size={16} />
+                                </Button>
+                            </Box>
+                        </CardContent>
+                    </Card>
+                </Grid>
 
-                    <div className="col-md-6 col-12 mb-4">
-                        <div className="card card-green">
-                            <div className="card-body">
-                                <div className="icon-shape icon-lg rounded-circle bg-light mb-3 card-icon">
-                                    <FaClipboardList size={24} />
-                                </div>
-                                <div className="d-flex align-items-center justify-content-between">
-                                    <div>
-                                        <h4 className="mb-0">View Orders</h4>
-                                        <p className="mb-0">Check your recent orders</p>
-                                    </div>
-                                    <a href="/orders" className="text-inherit">
-                                        <FaChevronRight size={16} />
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                {/* View Orders Card */}
+                <Grid item md={6} xs={12}>
+                    <Card sx={{ bgcolor: '#66BB6A' }} onClick={() => window.location.href = '/orders'}>
+                        <CardContent>
+                            <Box display="flex" alignItems="center" justifyContent="space-between">
+                                <Box>
+                                    <Box sx={{ bgcolor: 'background.paper', borderRadius: '50%', padding: 2, mb: 2 }}>
+                                        <FaClipboardList size={24} />
+                                    </Box>
+                                    <Typography variant="h6" gutterBottom>
+                                        View Orders
+                                    </Typography>
+                                    <Typography variant="body2">Check your recent orders</Typography>
+                                </Box>
+                                <Button>
+                                    <FaChevronRight size={16} />
+                                </Button>
+                            </Box>
+                        </CardContent>
+                    </Card>
+                </Grid>
 
-                    {/* Second Row of Cards */}
-                    <div className="col-md-6 col-12 mb-4">
-                        <div className="card card-blue">
-                            <div className="card-body">
-                                <div className="icon-shape icon-lg rounded-circle bg-light mb-3 card-icon">
-                                    <FaChartBar size={24} />
-                                </div>
-                                <div className="d-flex align-items-center justify-content-between">
-                                    <div>
-                                        <h4 className="mb-0">Sales Report</h4>
-                                        <p className="mb-0">Analyze your sales performance</p>
-                                    </div>
-                                    <a href="/sales-report" className="text-inherit">
-                                        <FaChevronRight size={16} />
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                {/* Sales Report Card */}
+                <Grid item md={6} xs={12}>
+                    <Card sx={{ bgcolor: '#42A5F5' }} onClick={() => window.location.href = '/sales-report'}>
+                        <CardContent>
+                            <Box display="flex" alignItems="center" justifyContent="space-between">
+                                <Box>
+                                    <Box sx={{ bgcolor: 'background.paper', borderRadius: '50%', padding: 2, mb: 2 }}>
+                                        <FaChartBar size={24} />
+                                    </Box>
+                                    <Typography variant="h6" gutterBottom>
+                                        Sales Report
+                                    </Typography>
+                                    <Typography variant="body2">Analyze your sales performance</Typography>
+                                </Box>
+                                <Button>
+                                    <FaChevronRight size={16} />
+                                </Button>
+                            </Box>
+                        </CardContent>
+                    </Card>
+                </Grid>
 
-                    <div className="col-md-6 col-12 mb-4">
-                        <div className="card card-yellow">
-                            <div className="card-body">
-                                <div className="icon-shape icon-lg rounded-circle bg-light mb-3 card-icon">
-                                    <FaBox size={24} />
-                                </div>
-                                <div className="d-flex align-items-center justify-content-between" >
-                                    <div>
-                                        <h4 className="mb-0">Resell Product</h4>
-                                        <p className="mb-0">List your products for resale</p>
-                                    </div>
-                                    <a href="/seller/products" className="text-inherit">
-                                        <FaChevronRight size={16} />
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                {/* Resell Product Card */}
+                <Grid item md={6} xs={12}>
+                    <Card sx={{ bgcolor: '#FFCA28' }} onClick={() => window.location.href = '/seller/products'}>
+                        <CardContent>
+                            <Box display="flex" alignItems="center" justifyContent="space-between">
+                                <Box>
+                                    <Box sx={{ bgcolor: 'background.paper', borderRadius: '50%', padding: 2, mb: 2 }}>
+                                        <FaBox size={24} />
+                                    </Box>
+                                    <Typography variant="h6" gutterBottom>
+                                        Resell Product
+                                    </Typography>
+                                    <Typography variant="body2">List your products for resale</Typography>
+                                </Box>
+                                <Button>
+                                    <FaChevronRight size={16} />
+                                </Button>
+                            </Box>
+                        </CardContent>
+                    </Card>
+                </Grid>
+            </Grid>
+        </Container>
     );
 };
 
