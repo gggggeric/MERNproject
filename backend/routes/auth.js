@@ -11,34 +11,62 @@ const { OAuth2Client } = require('google-auth-library');
 const Cart = require('../models/Cart');
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID); // Use environment variable
 
-router.post('/user/add-to-cart', authenticateUser, async (req, res) => {
-    const { productId, quantity, image } = req.body;
-    const userId = req.user.id; // Get userId from the authenticated user info
+// Route to add a product to the cart
+router.post('/cart/add', authenticateUser, async (req, res) => {
+    const { productId, quantity } = req.body;
+    const userId = req.user.id; // Get userId from the authenticated user
+
+    console.log('POST /cart/add - Request body:', req.body);
+    console.log('User ID:', userId);
 
     try {
+        // Find the user and check their user type
         const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
+        if (user.userType !== 'user') {
+            return res.status(403).json({ message: 'Access denied: Not a user' });
+        }
 
+        // Find the product by ID
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        // Find the cart for the user
         let cart = await Cart.findOne({ user: userId });
         if (!cart) {
-            // Create a new cart with the userId set correctly
-            cart = new Cart({ user: userId, products: [] });
+            // Create a new cart if it doesn't exist
+            cart = new Cart({
+                user: userId,
+                products: []
+            });
         }
 
-        const existingProductIndex = cart.products.findIndex(p => p.product.toString() === productId);
-        if (existingProductIndex > -1) {
-            cart.products[existingProductIndex].quantity += quantity;
+        // Check if the product is already in the cart
+        const productInCart = cart.products.find(item => item.product.toString() === productId);
+        if (productInCart) {
+            // If the product is already in the cart, update the quantity
+            productInCart.quantity += quantity;
         } else {
-            cart.products.push({ product: productId, quantity, image });
+            // If the product is not in the cart, add it with price and image
+            cart.products.push({
+                product: productId,
+                quantity: quantity,
+                image: product.image, // Assuming the Product model has an image field
+                price: product.price, // Assuming the Product model has a price field
+            });
         }
 
+        // Save the cart
         await cart.save();
-        res.status(200).json({ message: 'Item added to cart', cart });
+
+        res.status(200).json({ message: 'Product added to cart', cart });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Error adding item to cart' });
+        console.error('Error adding product to cart:', error);
+        res.status(500).json({ message: 'Server error', error });
     }
 });
 
@@ -54,50 +82,58 @@ router.get('/user/products', authenticateUser, async (req, res) => {
 
 // Function to generate a JWT token
 const generateToken = (user) => {
-    return jwt.sign({ userId: user._id, userType: user.userType }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    return jwt.sign(
+        { userId: user._id, email: user.email },
+        process.env.JWT_SECRET, // Your secret from environment variables
+        { expiresIn: '1h' } // Token expiration
+    );
 };
-
-// Route for Google login
-router.post('/api/auth/google/login', async (req, res) => {
-    const { idToken } = req.body; // Extract ID token from the request body
+// Google login endpoint
+router.post('/google/login', async (req, res) => {
+    const { idToken } = req.body;
 
     try {
-        // Verify the ID token with Google and extract the user info
-        const googleUser = await verifyGoogleToken(idToken); // Assuming you have a function to verify the token
+        // Verify the ID token with Google
+        const ticket = await client.verifyIdToken({
+            idToken,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
 
-        // Check if the user already exists in your database
-        let user = await User.findOne({ googleId: googleUser.id });
+        const payload = ticket.getPayload();
+        const userId = payload['sub'];
+        const email = payload['email'];
 
-        // If the user does not exist, create a new user
+        // Check if the user exists in your database
+        let user = await User.findOne({ $or: [{ email }, { googleId: userId }] });
+
         if (!user) {
+            // If the user doesn't exist, create a new user record
+            console.log('Creating new user:', email); // Debugging statement
             user = new User({
-                email: googleUser.email,
-                googleId: googleUser.id,
-                userType: 'user', // Set default user type for new users
-                status: true // Assume active by default
+                email,
+                googleId: userId,
+                status: true, // Set the status to true for new users
+                userType: 'user', // Set default user type
             });
-            await user.save(); // Save the new user to the database
+            await user.save(); // Save the new user in the database
+        } else {
+            // If user exists, check if the user account is active
+            console.log('User found:', user.email, 'Status:', user.status); // Debugging statement
+            if (!user.status) {
+                return res.status(403).json({ message: 'User account is inactive. Please contact support.' });
+            }
         }
 
-        // Generate a JWT token
-        const token = generateToken(user);
+        // Create a JWT token using the generateToken function
+        const token = generateToken(user); // Use the defined function
 
-        // Respond with the token and user info including userType
-        return res.status(200).json({
-            message: 'Login successful',
-            token,
-            user: {
-                userId: user._id,
-                email: user.email,
-                userType: user.userType // Include userType here
-            }
-        });
+        // Respond with the token and user info
+        res.status(200).json({ message: 'Login successful', token, user: { email: user.email, userType: user.userType } });
     } catch (error) {
         console.error('Error during Google login:', error);
-        return res.status(500).json({ message: 'Internal server error' });
+        res.status(400).json({ message: 'Google login failed', error });
     }
 });
-
 
 router.post('/google/register', async (req, res) => {
     const { idToken } = req.body;

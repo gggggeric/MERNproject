@@ -1,32 +1,33 @@
-// models/Cart.js
 const mongoose = require('mongoose');
 
-const cartSchema = new mongoose.Schema({
+const CartSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User', // Reference to the User model
-        required: true
+        ref: 'User',
+        required: true,
     },
     products: [{
         product: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Product', // Reference to the Product model
-            required: true
+            ref: 'Product',
+            required: true,
         },
         quantity: {
             type: Number,
-            default: 1,
-            required: true
+            required: true,
+            min: 1,
         },
         image: {
-            type: String, // Assuming the image is stored as a string (URL or path)
-            required: true // Set this to true if you want to make it mandatory
-        }
+            type: String,
+            required: true,
+        },
+        price: {
+            type: Number,
+            required: true,
+        },
     }],
 }, {
-    timestamps: true // Automatically create createdAt and updatedAt fields
+    timestamps: true, // Automatically manage createdAt and updatedAt fields
 });
 
-const Cart = mongoose.model('Cart', cartSchema);
-
-module.exports = Cart;
+module.exports = mongoose.model('Cart', CartSchema);

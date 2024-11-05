@@ -1,10 +1,10 @@
 const jwt = require('jsonwebtoken');
 
-// Middleware to authenticate user
 const authenticateUser = (req, res, next) => {
     const token = req.headers['authorization']?.split(' ')[1];
 
     if (!token) {
+        console.error('No token provided'); // Log when no token is present
         return res.status(401).json({ message: 'Unauthorized! No token provided.' });
     }
 
@@ -14,9 +14,9 @@ const authenticateUser = (req, res, next) => {
             return res.status(403).json({ message: 'Unauthorized! Invalid token.' });
         }
 
-        req.user = user;
+        console.log('Decoded user from token:', user); // Log the user object for debugging
+        req.user = user; // Ensure req.user is set properly
         next();
-        
     });
 };
 

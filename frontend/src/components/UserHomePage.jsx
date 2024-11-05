@@ -8,8 +8,8 @@ const UserHomePage = () => {
     const [loading, setLoading] = useState(true); // State to manage loading status
     const [error, setError] = useState(null); // State to manage errors
     const userEmail = localStorage.getItem('user-email'); // Retrieve user's email from local storage
-    const userId = localStorage.getItem('user-id'); // Retrieve user's ID from local storage
     const navigate = useNavigate(); // Hook for navigation
+    const [quantity, setQuantity] = useState(1); // Initialize quantity state
 
     const fetchProducts = async () => {
         try {
@@ -35,42 +35,38 @@ const UserHomePage = () => {
         fetchProducts(); // Fetch products when the component mounts
     }, []);
 
-    // Function to handle placing an order (to be implemented)
-    const handlePlaceOrder = (product) => {
-        console.log('Place order for:', product);
-        // Implement your place order logic here
-    };
-
-    // Function to handle adding a product to the cart
     const handleAddToCart = async (product) => {
-        const quantity = prompt('Enter quantity:', '1'); // Prompt for quantity
-        if (quantity && !isNaN(quantity) && quantity > 0) { // Validate quantity
-            try {
-                const token = localStorage.getItem('auth-token'); // Retrieve the JWT token
-                const userId = localStorage.getItem('user-id'); // Retrieve user ID
-    
-                // Make POST request to add item to cart
-                const response = await axios.post('http://localhost:5001/api/auth/user/add-to-cart', {
-                    productId: product._id,
-                    quantity: parseInt(quantity), // Convert quantity to integer
-                    image: product.image,
-                }, {
-                    headers: {
-                        Authorization: `Bearer ${token}` // Include token in the request headers
-                    }
-                });
-    
-                console.log('Add to cart response:', response.data); // Log response data
-                navigate('/cart'); // Redirect to cart page after adding to cart
-            } catch (error) {
-                console.error('Error adding to cart:', error);
-                alert('Failed to add item to cart.'); // Alert on error
+        const productId = product._id; // Get the product ID from the clicked product
+        try {
+            // Retrieve the token from localStorage
+            const token = localStorage.getItem('auth-token');
+
+            // Ensure the token is set in the headers
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`, // Set the token in the header
+                },
+            };
+
+            // Make the request to add to the cart
+            const res = await axios.post('http://localhost:5001/api/auth/cart/add', 
+            { productId, quantity }, config);
+
+            console.log('Add to cart response:', res.data); // Log response for debugging
+            alert(res.data.message); // Notify user of success
+        } catch (err) {
+            console.error('Error adding to cart:', err); // Log the error for debugging
+            // Set specific error messages based on response status
+            if (err.response && err.response.status === 403) {
+                setError('Access denied: You are not authorized to add items to the cart.');
+            } else if (err.response && err.response.status === 404) {
+                setError('Product not found. Please check the product ID.');
+            } else {
+                setError('Error adding to cart. Please try again later.');
             }
-        } else {
-            alert('Please enter a valid quantity.'); // Alert on invalid quantity
         }
     };
-    
+
     // Show loading spinner while fetching products
     if (loading) {
         return (
@@ -134,14 +130,14 @@ const UserHomePage = () => {
                                     <Button 
                                         variant="contained" 
                                         color="primary" 
-                                        onClick={() => handleAddToCart(product)} // Add to cart handler
+                                        onClick={() => handleAddToCart(product)} // Pass the product to add to cart
                                     >
                                         Add to Cart
                                     </Button>
                                     <Button 
                                         variant="outlined" 
                                         color="secondary" 
-                                        onClick={() => handlePlaceOrder(product)} // Place order handler
+                                        // onClick={() => handlePlaceOrder(product)} // Place order handler
                                     >
                                         Place Order
                                     </Button>
