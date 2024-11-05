@@ -7,63 +7,94 @@ const { authenticateUser } = require('../middleware/auth');
 const ManufacturerProfile = require('../models/ManufacturerProfile'); // Adjust the path as needed
 const Product = require('../models/Product'); // Adjust path to your Product model
 const multer = require('multer');
-const SellerProfile = require('../models/SellerProfile'); // Adjust path if necessary
 const { OAuth2Client } = require('google-auth-library');
+const Cart = require('../models/Cart');
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID); // Use environment variable
-// Function to generate a JWT token
-const generateToken = (user) => {
-    return jwt.sign(
-        { userId: user._id, email: user.email },
-        process.env.JWT_SECRET, // Your secret from environment variables
-        { expiresIn: '1h' } // Token expiration
-    );
-};
 
-// Google login endpoint
-router.post('/google/login', async (req, res) => {
-    const { idToken } = req.body;
+router.post('/user/add-to-cart', authenticateUser, async (req, res) => {
+    const { productId, quantity, image } = req.body;
+    const userId = req.user.id; // Get userId from the authenticated user info
 
     try {
-        const ticket = await client.verifyIdToken({
-            idToken,
-            audience: process.env.GOOGLE_CLIENT_ID,
-        });
-
-        const payload = ticket.getPayload();
-        const userId = payload['sub'];
-        const email = payload['email'];
-
-        // Check if the user exists in your database
-        let user = await User.findOne({ $or: [{ email }, { googleId: userId }] });
-
+        const user = await User.findById(userId);
         if (!user) {
-            // If user doesn't exist, create a new user record
-            console.log('Creating new user:', email); // Debugging statement
-            user = new User({
-                email,
-                googleId: userId,
-                status: true, // Set the status to true for new users
-                userType: 'user', // Set default user type
-            });
-            await user.save(); // Save the new user in the database
-        } else {
-            // If user exists, check and update their status if needed
-            console.log('User found:', user.email, 'Status:', user.status); // Debugging statement
-            if (!user.status) {
-                console.log('Updating user status to true for:', user.email); // Debugging statement
-                user.status = true; // Update existing user's status to true
-                await user.save(); // Save the updated user in the database
-            }
+            return res.status(404).json({ message: 'User not found' });
         }
 
-        // Create a JWT token using the generateToken function
-        const token = generateToken(user); // Use the defined function
+        let cart = await Cart.findOne({ user: userId });
+        if (!cart) {
+            // Create a new cart with the userId set correctly
+            cart = new Cart({ user: userId, products: [] });
+        }
 
-        // Respond with the token and user info
-        res.status(200).json({ message: 'Login successful', token, user });
+        const existingProductIndex = cart.products.findIndex(p => p.product.toString() === productId);
+        if (existingProductIndex > -1) {
+            cart.products[existingProductIndex].quantity += quantity;
+        } else {
+            cart.products.push({ product: productId, quantity, image });
+        }
+
+        await cart.save();
+        res.status(200).json({ message: 'Item added to cart', cart });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error adding item to cart' });
+    }
+});
+
+router.get('/user/products', authenticateUser, async (req, res) => {
+    try {
+        const products = await Product.find(); // Fetch all products from the database
+        res.status(200).json(products); // Send the products as a JSON response
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+// Function to generate a JWT token
+const generateToken = (user) => {
+    return jwt.sign({ userId: user._id, userType: user.userType }, process.env.JWT_SECRET, { expiresIn: '1h' });
+};
+
+// Route for Google login
+router.post('/api/auth/google/login', async (req, res) => {
+    const { idToken } = req.body; // Extract ID token from the request body
+
+    try {
+        // Verify the ID token with Google and extract the user info
+        const googleUser = await verifyGoogleToken(idToken); // Assuming you have a function to verify the token
+
+        // Check if the user already exists in your database
+        let user = await User.findOne({ googleId: googleUser.id });
+
+        // If the user does not exist, create a new user
+        if (!user) {
+            user = new User({
+                email: googleUser.email,
+                googleId: googleUser.id,
+                userType: 'user', // Set default user type for new users
+                status: true // Assume active by default
+            });
+            await user.save(); // Save the new user to the database
+        }
+
+        // Generate a JWT token
+        const token = generateToken(user);
+
+        // Respond with the token and user info including userType
+        return res.status(200).json({
+            message: 'Login successful',
+            token,
+            user: {
+                userId: user._id,
+                email: user.email,
+                userType: user.userType // Include userType here
+            }
+        });
     } catch (error) {
         console.error('Error during Google login:', error);
-        res.status(400).json({ message: 'Google login failed', error });
+        return res.status(500).json({ message: 'Internal server error' });
     }
 });
 
@@ -104,64 +135,6 @@ router.post('/google/register', async (req, res) => {
     }
 });
 
-
-
-// POST Create Seller Profile
-router.post('/sellerProfile', authenticateUser, async (req, res) => {
-    try {
-        const { storeName, address, contactNo } = req.body;
-        const user = await User.findById(req.user._id); // Fetch the authenticated user
-
-        // Check if user is a seller
-        if (user.userType !== 'seller') {
-            return res.status(403).json({ message: 'Unauthorized: Only sellers can create a profile' });
-        }
-
-        // Check if the seller profile already exists
-        const existingProfile = await SellerProfile.findOne({ user: user._id });
-        if (existingProfile) {
-            return res.status(400).json({ message: 'Profile already exists' });
-        }
-
-        // Create a new seller profile
-        const newProfile = new SellerProfile({
-            user: user._id,
-            storeName,
-            address,
-            contactNo,
-        });
-
-        await newProfile.save();
-        res.status(201).json({ message: 'Profile created successfully!', profile: newProfile });
-    } catch (error) {
-        console.error('Error creating seller profile:', error);
-        res.status(500).json({ message: 'Server error', error: error.message });
-    }
-});
-
-// GET Seller Profile
-router.get('/sellerProfile', authenticateUser, async (req, res) => {
-    try {
-        const user = await User.findById(req.user._id); // Fetch the authenticated user
-
-        // Check if user is a seller
-        if (user.userType !== 'seller') {
-            return res.status(403).json({ message: 'Unauthorized: Only sellers can access this profile' });
-        }
-
-        // Find the seller profile associated with this user and populate the user data
-        const profile = await SellerProfile.findOne({ user: user._id }).populate('user');
-
-        if (!profile) {
-            return res.status(404).json({ message: 'Seller profile not found' });
-        }
-
-        res.status(200).json(profile);
-    } catch (error) {
-        console.error('Error retrieving seller profile:', error);
-        res.status(500).json({ message: 'Server error', error: error.message });
-    }
-});
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -603,25 +576,25 @@ router.get('/confirm/:token', async (req, res) => {
     }
 });
 
-// Login route
-router.post('/login', async (req, res) => {
-    try {
-        const user = await User.findOne({ email: req.body.email });
-        if (!user) return res.status(404).json('User not found!');
+    // Login route
+    router.post('/login', async (req, res) => {
+        try {
+            const user = await User.findOne({ email: req.body.email });
+            if (!user) return res.status(404).json('User not found!');
 
-        // Check if user is inactive
-        if (!user.status) return res.status(403).json('Account is inactive. Contact support.');
+            // Check if user is inactive
+            if (!user.status) return res.status(403).json('Account is inactive. Contact support.');
 
-        const validPassword = await bcrypt.compare(req.body.password, user.password);
-        if (!validPassword) return res.status(400).json('Wrong password!');
+            const validPassword = await bcrypt.compare(req.body.password, user.password);
+            if (!validPassword) return res.status(400).json('Wrong password!');
 
-        const token = jwt.sign({ _id: user._id, userType: user.userType }, process.env.JWT_SECRET, { expiresIn: '1h' });
-        res.header('auth-token', token).json({ token, userType: user.userType, message: 'Login successful!' });
-    } catch (err) {
-        console.error('Login error:', err);
-        res.status(500).json(err);
-    }
-});
+            const token = jwt.sign({ _id: user._id, userType: user.userType }, process.env.JWT_SECRET, { expiresIn: '1h' });
+            res.header('auth-token', token).json({ token, userType: user.userType, message: 'Login successful!' });
+        } catch (err) {
+            console.error('Login error:', err);
+            res.status(500).json(err);
+        }
+    });
 
 // Fetch all users
 router.get('/users', async (req, res) => {

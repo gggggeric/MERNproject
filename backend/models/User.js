@@ -6,7 +6,7 @@ const UserSchema = new mongoose.Schema({
     googleId: { type: String, unique: true }, // New field for Google users
     userType: { 
         type: String, 
-        enum: ['user', 'admin', 'seller', 'manufacturer'], // Declaring manufacturer as a possible user type
+        enum: ['user', 'admin', 'manufacturer'], 
         default: 'user' 
     },
     status: { type: Boolean, default: false }, // Indicates if the user is confirmed

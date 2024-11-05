@@ -4,7 +4,6 @@ import { GoogleOAuthProvider } from '@react-oauth/google'; // Import the provide
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './components/Login';
 import UserHomePage from './components/UserHomePage';
-import SellerHomePage from './components/SellerHomePage';
 import AdminHomePage from './components/AdminHomePage';
 import Home from './components/Home'; // Assuming you have a home page
 import Navbar from './components/Navbar';
@@ -14,11 +13,8 @@ import ManufacturerHomePage from './components/ManufacturerHomePage';
 import ManufacturerEditPassword from './components/ManufacturerEditPassword';
 import UserEditPassword from './components/UserEditPassword';
 import ManufacturerProfile from './components/ManufacturerProfile';
-import SellerEditPassword from './components/SellerEditPassword';
 import ManufacturerProductCRUD from './components/ManufacturerProductCRUD';
-import SellerResellProducts from './components/SellerResellProducts';
-import SellerProfile from './components/SellerProfile';
-import SellerManageProducts from './components/SellerManageProducts';
+import Cart from './components/Cart';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import "slick-carousel/slick/slick-theme.css"; 
 
@@ -40,15 +36,6 @@ const App = () => {
                                 <ProtectedRoute 
                                     element={<UserHomePage />} 
                                     allowedRoles={['user', 'admin']} // Users can access this
-                                />
-                            } 
-                        />
-                        <Route 
-                            path="/sellerHomePage" 
-                            element={
-                                <ProtectedRoute 
-                                    element={<SellerHomePage />} 
-                                    allowedRoles={['seller', 'admin']} // Only sellers and admins can access
                                 />
                             } 
                         />
@@ -89,15 +76,6 @@ const App = () => {
                             } 
                         />
                         <Route 
-                            path="/sellerEditPassword" 
-                            element={
-                                <ProtectedRoute 
-                                    element={<SellerEditPassword />} 
-                                    allowedRoles={['seller']}
-                                />
-                            } 
-                        />
-                        <Route 
                             path="/manufacturerEditPassword" 
                             element={
                                 <ProtectedRoute 
@@ -124,30 +102,12 @@ const App = () => {
                                 />
                             } 
                         />
-                        <Route 
-                            path="/seller/products" 
+                          <Route 
+                            path="/cart/user" 
                             element={
                                 <ProtectedRoute 
-                                    element={<SellerResellProducts />} 
-                                    allowedRoles={['seller', 'admin']} // Update roles if necessary
-                                />
-                            } 
-                        />
-                        <Route 
-                            path="/sellerProfile" 
-                            element={
-                                <ProtectedRoute 
-                                    element={<SellerProfile />} 
-                                    allowedRoles={['seller', 'admin']} // Update roles if necessary
-                                />
-                            } 
-                        />
-                        <Route 
-                            path="/sellerManageProducts" 
-                            element={
-                                <ProtectedRoute 
-                                    element={<SellerManageProducts />} 
-                                    allowedRoles={['seller', 'admin']} // Update roles if necessary
+                                    element={<Cart />} 
+                                    allowedRoles={['user']}
                                 />
                             } 
                         />

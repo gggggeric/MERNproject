@@ -76,7 +76,7 @@ const UserCrud = () => {
         e.preventDefault();
     
         try {
-          await axios.put(
+            await axios.put(
                 `http://localhost:5001/api/auth/users/${editingUser}`,
                 {
                     userType: editForm.userType,
@@ -136,7 +136,6 @@ const UserCrud = () => {
                             onChange={e => setNewUser({ ...newUser, userType: e.target.value })}
                         >
                             <option value="user">User</option>
-                            <option value="seller">Seller</option>
                             <option value="admin">Admin</option>
                             <option value="manufacturer">Manufacturer</option>
                         </select>
@@ -200,7 +199,6 @@ const UserCrud = () => {
                                 onChange={e => setEditForm({ ...editForm, userType: e.target.value })}
                             >
                                 <option value="user">User</option>
-                                <option value="seller">Seller</option>
                                 <option value="admin">Admin</option>
                                 <option value="manufacturer">Manufacturer</option>
                             </select>

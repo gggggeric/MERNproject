@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './Navbar.css';
 import logo from '../photos/logo.png'; // Ensure this path is correct
-import { BiEdit, BiLogOut, BiLogIn, BiUserPlus } from 'react-icons/bi'; // Importing icons
+import { BiEdit, BiLogOut, BiLogIn, BiUserPlus, BiCart } from 'react-icons/bi'; // Importing icons
 
 const Navbar = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -72,14 +72,21 @@ const Navbar = () => {
             <div className="left-content">
                 <Link to="/" className="logo-link">
                     <img src={logo} alt="SofaSphere Logo" className="logo" />
-                    <span className="store-name">SofaSphere</span> {/* Changed from <a> to <span> */}
+                    <span className="store-name">SofaSphere</span>
                 </Link>
             </div>
             <div className="right-content">
                 {userEmail && (
-                    <Link to={getHomePageLink()} className="home-link">
-                        <i className="bi bi-house-fill"></i> Home
-                    </Link>
+                    <>
+                        <Link to={getHomePageLink()} className="home-link">
+                            <i className="bi bi-house-fill"></i> Home
+                        </Link>
+                        {userType === 'user' && ( // Only show cart for users with userType 'user'
+                            <Link to="/cart/user" className="cart-link">
+                                <BiCart className="icon" title="Cart" /> Cart
+                            </Link>
+                        )}
+                    </>
                 )}
                 {userEmail && userType && (
                     <div className="profile-container" onClick={toggleDropdown}>
@@ -89,7 +96,7 @@ const Navbar = () => {
                         {dropdownOpen && (
                             <div className="dropdown">
                                 <div className="user-email-container">
-                                    <span className="user-email">Logged in as: {username}</span> {/* Display the username here */}
+                                    <span className="user-email">Logged in as: {username}</span>
                                 </div>
                                 <Link to={getProfileLink()} className="dropdown-item">
                                     <BiEdit className="icon" /> Edit Profile
