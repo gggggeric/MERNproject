@@ -6,6 +6,7 @@ import './Register.css';
 const Register = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [profileImage, setProfileImage] = useState(null); // Manage profile image state
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
 
@@ -14,9 +15,27 @@ const Register = () => {
         e.preventDefault();
         setError(null);
         setSuccessMessage(null);
-
+    
+        const formData = new FormData();
+        formData.append('email', email);
+        formData.append('password', password);
+        formData.append('userType', 'user'); // Default userType
+    
+        if (profileImage) {
+            formData.append('profileImage', profileImage); // Append profile image if it's selected
+        }
+    
+        // Log the formData to check what's being sent
+        for (let [key, value] of formData.entries()) {
+            console.log(`${key}: ${value}`);
+        }
+    
         try {
-            const res = await axios.post('http://localhost:5001/api/auth/register', { email, password });
+            const res = await axios.post('http://localhost:5001/api/auth/register', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
             setSuccessMessage(res.data.message);
             setEmail('');
             setPassword('');
@@ -35,9 +54,6 @@ const Register = () => {
             setSuccessMessage('Registration with Google successful!');
             setEmail('');
             setPassword(''); // Clear fields after successful registration
-
-            // Optionally, set user status to true (if not already done on the backend)
-            // You could also directly navigate the user to a different page after this
         } catch (err) {
             console.error('Google registration error:', err);
             setError('Google registration failed!');
@@ -75,8 +91,20 @@ const Register = () => {
                             required
                         />
                     </div>
+                    
+                    {/* Profile Image Input */}
+                    <div className="form-group">
+                        <label>Profile Picture:</label>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={e => setProfileImage(e.target.files[0])} // Set profile image on change
+                        />
+                    </div>
+                    
                     <button type="submit" className="submit-btn">Register</button>
                 </form>
+                
                 {successMessage && <p className="success-message">{successMessage}</p>}
                 {error && <p className="error-message">{error}</p>}
 

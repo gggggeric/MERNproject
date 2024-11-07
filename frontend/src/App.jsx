@@ -11,10 +11,10 @@ import UserCrud from './components/UserCrud';
 import Register from './components/Register';
 import ManufacturerHomePage from './components/ManufacturerHomePage';
 import ManufacturerEditPassword from './components/ManufacturerEditPassword';
-import UserEditPassword from './components/UserEditPassword';
 import ManufacturerProfile from './components/ManufacturerProfile';
 import ManufacturerProductCRUD from './components/ManufacturerProductCRUD';
 import Cart from './components/Cart';
+import UserEditPassword from './components/UserEditPassword';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import "slick-carousel/slick/slick-theme.css"; 
 
@@ -102,7 +102,7 @@ const App = () => {
                                 />
                             } 
                         />
-                          <Route 
+                        <Route 
                             path="/cart/user" 
                             element={
                                 <ProtectedRoute 
@@ -111,6 +111,15 @@ const App = () => {
                                 />
                             } 
                         />
+                     <Route 
+                    path="/user/editProfile" 
+                    element={
+                        <ProtectedRoute 
+                            element={<UserEditPassword />} 
+                            allowedRoles={['user', 'admin']} // Allow users and admins to access the order page
+                        />
+                    } 
+                />
                     </Routes>
                 </div>
             </Router>

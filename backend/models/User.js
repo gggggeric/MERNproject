@@ -11,7 +11,8 @@ const UserSchema = new mongoose.Schema({
     },
     status: { type: Boolean, default: false }, // Indicates if the user is confirmed
     confirmationToken: { type: String }, // Token for email confirmation
-    manufacturerProfile: { type: mongoose.Schema.Types.ObjectId, ref: 'ManufacturerProfile' } // Reference to ManufacturerProfile
+    manufacturerProfile: { type: mongoose.Schema.Types.ObjectId, ref: 'ManufacturerProfile' }, // Reference to ManufacturerProfile
+    profileImage: { type: String, default: '' }// This will store the path or URL of the profile image
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', UserSchema);

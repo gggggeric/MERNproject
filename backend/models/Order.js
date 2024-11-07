@@ -1,52 +1,32 @@
 const mongoose = require('mongoose');
 
-const OrderSchema = new mongoose.Schema({
-    product: {
+// Define the schema for an order
+const orderSchema = new mongoose.Schema({
+    user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Product', // Reference to the Product model
-        required: true,
+        ref: 'User', // Assuming you have a 'User' model for users
+        required: true
     },
-    name: {
-        type: String,
-        required: true,
-    },
-    description: {
-        type: String,
-        required: true,
-    },
-    price: {
-        type: Number,
-        required: true,
-    },
-    quantity: {
-        type: Number,
-        required: true,
-        min: 1,
-    },
-    storeName: {
-        type: String,
-        required: true,
-    },
+    products: [
+        {
+            product: { 
+                type: mongoose.Schema.Types.ObjectId, 
+                ref: 'Product', // Assuming you have a 'Product' model for products
+                required: true // Add required for product as it's important
+            },
+            quantity: { 
+                type: Number, 
+                required: true,
+                min: 1 // Ensure quantity is at least 1
+            }
+        }
+    ],
     totalPrice: {
         type: Number,
-        required: true,
+        required: true
     },
-    orderDate: {
-        type: Date,
-        default: Date.now,
-    },
-    status: {
-        type: String,
-        enum: ['Pending', 'Completed', 'Cancelled'],
-        default: 'Pending',
-    },
-});
+}, { timestamps: true });
 
-OrderSchema.pre('save', function (next) {
-    // Calculate total price based on price and quantity before saving
-    this.totalPrice = this.price * this.quantity;
-    next();
-});
+const Order = mongoose.model('Order', orderSchema);
 
-const Order = mongoose.model('Order', OrderSchema);
 module.exports = Order;

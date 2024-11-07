@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
+const Order = require('../models/Order'); // Import Order model
 const jwt = require('jsonwebtoken');
 const { sendConfirmationEmail } = require('../utils/emailService'); // Import the email service
 const { authenticateUser } = require('../middleware/auth');
@@ -9,66 +10,54 @@ const Product = require('../models/Product'); // Adjust path to your Product mod
 const multer = require('multer');
 const { OAuth2Client } = require('google-auth-library');
 const Cart = require('../models/Cart');
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID); // Use environment variable
-
-// Route to add a product to the cart
-router.post('/cart/add', authenticateUser, async (req, res) => {
-    const { productId, quantity } = req.body;
-    const userId = req.user.id; // Get userId from the authenticated user
-
-    console.log('POST /cart/add - Request body:', req.body);
-    console.log('User ID:', userId);
-
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID); // Use environment variable\
+// Route to place an order (requires authentication)
+router.post('/order/place', authenticateUser, async (req, res) => {
     try {
-        // Find the user and check their user type
-        const user = await User.findById(userId);
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-        if (user.userType !== 'user') {
-            return res.status(403).json({ message: 'Access denied: Not a user' });
-        }
+        console.log('Order data received:', req.body);  // Log the incoming order data
 
-        // Find the product by ID
-        const product = await Product.findById(productId);
-        if (!product) {
-            return res.status(404).json({ message: 'Product not found' });
+        const { products } = req.body;  // Get the products in the order
+        const userId = req.user._id;  // Extract the user ID from the authenticated token
+
+        console.log('User ID from token:', userId);
+
+        if (!userId) {
+            return res.status(400).json({ error: 'User not found in token.' });
         }
 
-        // Find the cart for the user
-        let cart = await Cart.findOne({ user: userId });
-        if (!cart) {
-            // Create a new cart if it doesn't exist
-            cart = new Cart({
-                user: userId,
-                products: []
-            });
+        if (!products || !Array.isArray(products) || products.length === 0) {
+            return res.status(400).json({ error: 'Invalid products data.' });
         }
 
-        // Check if the product is already in the cart
-        const productInCart = cart.products.find(item => item.product.toString() === productId);
-        if (productInCart) {
-            // If the product is already in the cart, update the quantity
-            productInCart.quantity += quantity;
-        } else {
-            // If the product is not in the cart, add it with price and image
-            cart.products.push({
-                product: productId,
-                quantity: quantity,
-                image: product.image, // Assuming the Product model has an image field
-                price: product.price, // Assuming the Product model has a price field
-            });
+        let totalPrice = 0;
+        for (const item of products) {
+            const product = await Product.findById(item.product);
+            if (!product) {
+                return res.status(404).json({ error: 'Product not found' });
+            }
+            totalPrice += product.price * item.quantity;
         }
 
-        // Save the cart
-        await cart.save();
+        // Create a new order with the user ID
+        const newOrder = new Order({
+            user: userId,  // Attach the user ID from the authenticated token
+            products: products,
+            totalPrice: totalPrice,
+        });
 
-        res.status(200).json({ message: 'Product added to cart', cart });
+        // Save the new order
+        await newOrder.save();
+
+        res.status(201).json({
+            message: 'Order placed successfully!',
+            order: newOrder,
+        });
     } catch (error) {
-        console.error('Error adding product to cart:', error);
-        res.status(500).json({ message: 'Server error', error });
+        console.error('Error placing order:', error); // Log the error
+        res.status(500).json({ error: 'Error placing the order. Please try again.' });
     }
 });
+
 
 router.get('/user/products', authenticateUser, async (req, res) => {
     try {
@@ -171,7 +160,6 @@ router.post('/google/register', async (req, res) => {
     }
 });
 
-
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, 'uploads/'); // Specify the directory to save the uploaded files
@@ -180,42 +168,94 @@ const storage = multer.diskStorage({
         cb(null, `${Date.now()}-${file.originalname}`); // Create a unique filename
     },
 });
-
-
 const upload = multer({ storage });
 
-router.post('/register', async (req, res) => {
+
+router.patch('/update-password', authenticateUser, async (req, res) => {
+    try {
+        const userId = req.user.id; // Get the logged-in user's ID from the decoded token
+        const { password } = req.body;
+
+        // Ensure the user is of type 'user'
+        if (req.user.userType !== 'user') {
+            return res.status(403).json({ error: 'Only users with userType "user" can update their password.' });
+        }
+
+        // Validate password
+        if (!password) {
+            return res.status(400).json({ error: 'Password is required.' });
+        }
+
+        // Hash the new password
+        const hashedPassword = await bcrypt.hash(password, 10);
+        
+        // Find the user and update the password
+        const user = await User.findByIdAndUpdate(userId, { password: hashedPassword }, { new: true });
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found.' });
+        }
+
+        res.status(200).json({ message: 'Password updated successfully.' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server error.' });
+    }
+});
+
+
+
+router.post('/register', upload.single('profileImage'), async (req, res) => {
     const { email, password, userType = 'user' } = req.body;
+
+    // Check if email and password are provided
+    if (!email || !password) {
+        return res.status(400).json({ message: 'Email and password are required' });
+    }
+
     console.log('Registration attempt:', { email, userType });
 
     try {
+        // Check if the user already exists
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(400).json({ message: 'User already exists!' });
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const confirmationToken = Math.random().toString(36).substr(2); // Generate a random confirmation token
+        // Handle profile image upload (if any)
+        const profileImagePath = req.file ? `/uploads/profile_images/${req.file.filename}` : null;
 
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Generate a confirmation token (using crypto for better security)
+        const crypto = require('crypto');
+        const confirmationToken = crypto.randomBytes(32).toString('hex');
+
+        // Create the new user
         const newUser = new User({
             email,
             password: hashedPassword,
             userType,
-            status: false, // Set to false to indicate the user is not yet confirmed
-            confirmationToken // Store the confirmation token
+            status: false, // Indicating the user is not confirmed yet
+            confirmationToken, // Confirmation token
+            profileImage: profileImagePath // Save image path if available
         });
 
+        // Save user to the database
         await newUser.save();
 
-        // Send confirmation email
+        // Send confirmation email (assuming the function is defined)
         await sendConfirmationEmail(email, confirmationToken);
 
+        // Send success response
         res.status(201).json({ message: 'User registered successfully! Please check your email to confirm.' });
     } catch (error) {
         console.error('Registration error:', error);
         res.status(500).json({ message: 'Registration failed!', error: error.message });
     }
 });
+
 
 router.get('/manufacturer-profile/me', authenticateUser, async (req, res) => {
     try {
@@ -480,12 +520,31 @@ router.get('/manufacturerProfile', authenticateUser, async (req, res) => {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 });
+router.get('/user/profile', authenticateUser, async (req, res) => {
+    try {
+        // Fetch user data from the database based on the decoded token user ID
+        const user = await User.findById(req.user._id);  // Use req.user._id here as well
 
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
 
+        // If there's a profile image, prepend the server's base URL
+        const profileImageUrl = user.profileImage ? `http://localhost:5001/${user.profileImage}` : null;
 
-// Update password route
-router.put('/user/password', authenticateUser, async (req, res) => {
-    console.log('Updating password for user:', req.user._id); // req.user is populated by middleware
+        // Send back user profile information
+        res.json({
+            name: user.name,
+            email: user.email,
+            profileImage: profileImageUrl,  // Include the full URL to the profile image
+        });
+    } catch (err) {
+        console.error('Error fetching user profile:', err); // Log any server error
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+router.put('/user/password', authenticateUser, upload.single('profileImage'), async (req, res) => {
     try {
         const { oldPassword, password } = req.body;
 
@@ -495,23 +554,32 @@ router.put('/user/password', authenticateUser, async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // Check if the old password matches the one in the database
-        const isMatch = await bcrypt.compare(oldPassword, user.password);
-        if (!isMatch) {
-            return res.status(400).json({ message: 'Incorrect old password' });
+        // Password update logic
+        if (user.password && oldPassword) {
+            const isMatch = await bcrypt.compare(oldPassword, user.password);
+            if (!isMatch) {
+                return res.status(400).json({ message: 'Incorrect old password' });
+            }
         }
 
-        // Hash the new password before saving
-        const hashedPassword = await bcrypt.hash(password, 10);
-        user.password = hashedPassword;
+        if (password) {
+            const hashedPassword = await bcrypt.hash(password, 10);
+            user.password = hashedPassword;
+        }
+
+        // Update profile image if a new one is provided
+        if (req.file) {
+            user.profileImage = `uploads/${req.file.filename}`; // Save file path in DB
+        }
 
         await user.save();
-        res.json({ message: 'Password updated successfully!' });
+        res.json({ message: 'Profile updated successfully!' });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Server error' });
     }
 });
+
 
 
 

@@ -66,7 +66,35 @@ const UserHomePage = () => {
             }
         }
     };
-
+    const handlePlaceOrder = async (orderData) => {
+        const token = localStorage.getItem('auth-token');
+        
+        if (!token) {
+            console.error('No token found in localStorage');
+            alert('You must be logged in to place an order.');
+            return;
+        }
+    
+        // Log the orderData to inspect the format
+        console.log('Order data being sent:', orderData);
+    
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        };
+    
+        try {
+            const response = await axios.post('http://localhost:5001/api/auth/order/place', orderData, config);
+            console.log('Order placed successfully:', response.data);
+            alert('Order placed successfully!');
+        } catch (error) {
+            console.error('Error placing order:', error.response);
+            alert('Failed to place the order. Please try again.');
+        }
+    };
+    
+    
     // Show loading spinner while fetching products
     if (loading) {
         return (
@@ -137,7 +165,7 @@ const UserHomePage = () => {
                                     <Button 
                                         variant="outlined" 
                                         color="secondary" 
-                                        // onClick={() => handlePlaceOrder(product)} // Place order handler
+                                        onClick={() => handlePlaceOrder(product)} // Place order handler
                                     >
                                         Place Order
                                     </Button>
