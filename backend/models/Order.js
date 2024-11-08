@@ -25,6 +25,11 @@ const orderSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    orderStatus: {
+        type: String,
+        enum: ['Pending', 'Accepted'], // Limit to specific statuses
+        default: 'Pending' // Set default status to 'Pending'
+    }
 }, { timestamps: true });
 
 const Order = mongoose.model('Order', orderSchema);

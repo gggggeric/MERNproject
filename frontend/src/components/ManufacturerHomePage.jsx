@@ -14,7 +14,8 @@ const ManufacturerHomePage = () => {
     };
 
     const handleViewOrdersClick = () => {
-        // Add functionality for View Orders if needed
+      
+        navigate('/manufacturers/orders'); // Redirects to the product creation page
     };
 
     return (

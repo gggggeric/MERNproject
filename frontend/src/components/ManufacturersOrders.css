@@ -1,0 +1,146 @@
+/* Main container for the order list */
+.order-list-container {
+    margin: 20px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    max-width: 1000px;
+    margin: 0 auto;
+    text-align: center; /* Center-align content for better UX */
+}
+
+/* Style for each order card */
+.order-card {
+    background-color: white;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 70%;
+    margin: 0 auto;
+}
+
+/* Title for each order */
+h3 {
+    font-size: 1.3rem;
+    color: #333;
+    margin: 0;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #eee;
+    font-weight: 500;
+}
+
+/* Subheading for product section */
+h4 {
+    font-size: 1.1rem;
+    color: #555;
+}
+
+/* General paragraph style */
+p {
+    font-size: 0.95rem;
+    color: #777;
+}
+
+/* Container for the list of products */
+.order-products {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 10px;
+    justify-content: center; /* Center align product cards */
+}
+
+
+/* Style for individual product card */
+.product-card {
+    background-color: #fafafa;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+/* Hover effect for product cards */
+.product-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Image within the product card */
+.product-image img {
+    max-width: 80px;
+    max-height: 80px;
+    border-radius: 5px;
+    object-fit: cover;
+}
+
+/* Product details section */
+.product-details {
+    margin-top: 8px;
+    text-align: center;
+}
+
+/* Product detail paragraph */
+.product-details p {
+    margin: 3px 0;
+    font-size: 0.85rem;
+}
+
+/* Product name and pricing */
+.product-details strong {
+    color: #333;
+}
+
+/* Style for small text (e.g., date) */
+small {
+    color: #aaa;
+}
+
+/* Error message for no orders found */
+.no-orders-message {
+    font-size: 1.2rem;
+    color: #888;
+    padding: 20px;
+    background-color: #f2f2f2;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    width: 70%;
+    margin: 20px auto;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+    .order-card {
+        width: 85%;
+    }
+
+    .product-card {
+        width: 45%;
+    }
+}
+
+@media (max-width: 480px) {
+    .order-card {
+        width: 100%;
+    }
+
+    .product-card {
+        width: 100%;
+    }
+
+    h3 {
+        font-size: 1.2rem;
+    }
+
+    h4 {
+        font-size: 1rem;
+    }
+
+    p {
+        font-size: 0.85rem;
+    }
+}

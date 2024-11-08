@@ -15,6 +15,7 @@ import ManufacturerProfile from './components/ManufacturerProfile';
 import ManufacturerProductCRUD from './components/ManufacturerProductCRUD';
 import Cart from './components/Cart';
 import UserEditPassword from './components/UserEditPassword';
+import OrderList from './components/ManufacturersOrders';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import "slick-carousel/slick/slick-theme.css"; 
 
@@ -118,8 +119,17 @@ const App = () => {
                             element={<UserEditPassword />} 
                             allowedRoles={['user', 'admin']} // Allow users and admins to access the order page
                         />
-                    } 
-                />
+                     } 
+                     />
+                       <Route 
+                    path="/manufacturers/orders" 
+                    element={
+                        <ProtectedRoute 
+                            element={<OrderList />} 
+                            allowedRoles={['manufacturer', 'admin']} // Allow users and admins to access the order page
+                        />
+                     } 
+                     />
                     </Routes>
                 </div>
             </Router>

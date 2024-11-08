@@ -36,3 +36,71 @@
 .action-btn:hover {
     background-color: #732d91; /* Darker purple on hover */
 }
+.receipt-modal {
+    font-family: 'Roboto', sans-serif;
+    width: 80%; /* Make the modal wider */
+    margin: auto; /* Center the modal horizontally */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.receipt-modal-header {
+    background-color: #8e44ad;
+    color: white;
+    font-weight: bold;
+}
+
+.receipt-modal-content {
+    background-color: #f7f7f7;
+    padding: 20px;
+}
+
+.receipt-item {
+    margin-bottom: 20px;
+}
+
+.receipt-item-name {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #1976d2;
+}
+
+.receipt-item-description {
+    color: #666;
+}
+
+.receipt-item-price {
+    margin-top: 10px;
+    color: #1976d2;
+}
+
+.receipt-item-quantity {
+    margin-top: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.order-summary {
+    background-color: #f0f0f0;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+.order-summary .receipt-item-name {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #1976d2;
+}
+
+.order-summary p {
+    font-size: 1rem;
+    color: #555;
+}
+
+.MuiDialog-root {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

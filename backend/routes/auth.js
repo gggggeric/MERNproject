@@ -11,8 +11,96 @@ const multer = require('multer');
 const { OAuth2Client } = require('google-auth-library');
 const Cart = require('../models/Cart');
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID); // Use environment variable\
-// Route to place an order (requires authentication)
-router.post('/order/place', authenticateUser, async (req, res) => {
+const mongoose = require('mongoose');
+// Endpoint to update order status
+router.patch('/orders/:id/status', authenticateUser, async (req, res) => {
+    const userId = req.user._id;
+    const userType = req.user.userType;
+    const { id } = req.params;
+    const { status } = req.body;
+  
+    try {
+      // Ensure the user is a manufacturer
+      if (userType !== 'manufacturer') {
+        return res.status(403).json({ msg: 'Access denied' });
+      }
+  
+      // Find the order by ID
+      const order = await Order.findById(id);
+      if (!order) return res.status(404).json({ msg: 'Order not found' });
+  
+      // Get IDs of products in the order
+      const productIds = order.products.map(item => item.product);
+  
+      // Verify that each product in the order belongs to the manufacturer
+      const manufacturerProducts = await Product.find({
+        _id: { $in: productIds },
+        user: userId,
+      });
+  
+      if (manufacturerProducts.length === 0) {
+        return res.status(403).json({ msg: 'You can only accept orders for your own products.' });
+      }
+  
+      // Update order status
+      order.orderStatus = status;
+      await order.save();
+  
+      res.status(200).json({ msg: 'Order status updated', order });
+    } catch (error) {
+      console.error('Error updating order status:', error);
+      res.status(500).json({ msg: 'Server error', error: error.message });
+    }
+  });
+  
+
+
+// GET all orders for a specific manufacturer
+router.get('/orders', authenticateUser, async (req, res) => {
+    const userId = req.user._id;
+    const userType = req.user.userType;
+
+    try {
+        // Ensure the user is a manufacturer
+        if (userType !== 'manufacturer') {
+            return res.status(403).json({ msg: 'Access denied' });
+        }
+
+        // Find products created by the manufacturer
+        const manufacturerProducts = await Product.find({ user: userId }).select('_id');
+        const productIds = manufacturerProducts.map(product => product._id);
+
+        // Find orders that contain the manufacturer’s products
+        const orders = await Order.find({
+            'products.product': { $in: productIds }
+        })
+        .populate({
+            path: 'products.product',
+            model: 'Product',
+            populate: {
+                path: 'user', 
+                model: 'User', 
+                select: 'name email'
+            }
+        })
+        .populate('user', 'name email'); // Populate customer info
+
+        if (orders.length === 0) {
+            return res.status(404).json({ msg: 'No orders found' });
+        }
+
+        res.status(200).json(orders);
+    } catch (error) {
+        console.error('Error fetching orders:', error);
+        res.status(500).json({ msg: 'Server error', error: error.message });
+    }
+});
+
+
+ router.post('/order/place', authenticateUser, async (req, res) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
     try {
         console.log('Order data received:', req.body);  // Log the incoming order data
 
@@ -30,11 +118,37 @@ router.post('/order/place', authenticateUser, async (req, res) => {
         }
 
         let totalPrice = 0;
+
+        // Loop through the products to calculate the total price and update stock
         for (const item of products) {
-            const product = await Product.findById(item.product);
+            console.log(`Processing product ID: ${item.product} with quantity: ${item.quantity}`);  // Log product processing
+
+            const product = await Product.findById(item.product).session(session);  // Find product by ID within the session
             if (!product) {
-                return res.status(404).json({ error: 'Product not found' });
+                console.error(`Product not found for ID: ${item.product}`);
+                await session.abortTransaction();
+                return res.status(404).json({ error: `Product not found for ID: ${item.product}` });
             }
+
+            // Check if there is enough stock
+            if (product.stock < item.quantity) {
+                console.error(`Insufficient stock for ${product.name}`);
+                await session.abortTransaction();
+                return res.status(400).json({ error: `Insufficient stock for ${product.name}` });
+            }
+
+            // Log the stock before updating
+            console.log(`Product ${product.name} - Stock before update: ${product.stock}`);
+
+            // Reduce the stock of the product by the ordered quantity
+            product.stock -= item.quantity;
+
+            // Log the stock after update
+            console.log(`Product ${product.name} - Stock after update: ${product.stock}`);
+
+            // Save the updated product stock in the database within the transaction session
+            await product.save({ session });
+
             totalPrice += product.price * item.quantity;
         }
 
@@ -45,24 +159,44 @@ router.post('/order/place', authenticateUser, async (req, res) => {
             totalPrice: totalPrice,
         });
 
-        // Save the new order
-        await newOrder.save();
+        // Save the new order in the database within the transaction session
+        await newOrder.save({ session });
+
+        // Commit the transaction to finalize changes
+        await session.commitTransaction();
+        session.endSession();
 
         res.status(201).json({
             message: 'Order placed successfully!',
             order: newOrder,
         });
+
     } catch (error) {
         console.error('Error placing order:', error); // Log the error
+        await session.abortTransaction();
+        session.endSession();
         res.status(500).json({ error: 'Error placing the order. Please try again.' });
     }
 });
 
 
+    
+    
 router.get('/user/products', authenticateUser, async (req, res) => {
     try {
-        const products = await Product.find(); // Fetch all products from the database
-        res.status(200).json(products); // Send the products as a JSON response
+        // Extract pagination parameters from the query, set default values if not provided
+        const page = parseInt(req.query.page) || 1;  // Default to page 1 if not provided
+        const limit = parseInt(req.query.limit) || 10;  // Default to 10 products per page if not provided
+
+        // Calculate the number of products to skip based on the current page
+        const skip = (page - 1) * limit;
+
+        // Fetch a specific number of products based on the page and limit
+        const products = await Product.find()
+            .skip(skip) // Skip products for previous pages
+            .limit(limit); // Limit to the specified number of products
+
+        res.status(200).json(products); // Send the fetched products as a JSON response
     } catch (error) {
         console.error('Error fetching products:', error);
         res.status(500).json({ message: 'Internal Server Error' });
@@ -223,7 +357,7 @@ router.post('/register', upload.single('profileImage'), async (req, res) => {
         }
 
         // Handle profile image upload (if any)
-        const profileImagePath = req.file ? `/uploads/profile_images/${req.file.filename}` : null;
+        const profileImagePath = req.file ? `uploads/${req.file.filename}` : null;
 
         // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -269,6 +403,7 @@ router.get('/manufacturer-profile/me', authenticateUser, async (req, res) => {
         return res.status(500).json({ msg: 'Server Error', error: error.message });
     }
 });
+
 router.get('/products', authenticateUser, async (req, res) => {
     const userId = req.user._id; // Get the authenticated user's ID
 

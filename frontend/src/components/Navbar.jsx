@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './Navbar.css';
 import logo from '../photos/logo.png'; // Ensure this path is correct
-import { BiEdit, BiLogOut, BiLogIn, BiUserPlus, BiCart } from 'react-icons/bi'; // Importing icons
+import { BiEdit, BiLogOut, BiLogIn, BiUserPlus } from 'react-icons/bi'; // Importing icons
 
 const Navbar = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -81,11 +81,6 @@ const Navbar = () => {
                         <Link to={getHomePageLink()} className="home-link">
                             <i className="bi bi-house-fill"></i> Home
                         </Link>
-                        {userType === 'user' && ( // Only show cart for users with userType 'user'
-                            <Link to="/cart/user" className="cart-link">
-                                <BiCart className="icon" title="Cart" /> Cart
-                            </Link>
-                        )}
                     </>
                 )}
                 {userEmail && userType && (
