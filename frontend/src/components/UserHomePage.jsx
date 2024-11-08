@@ -16,6 +16,19 @@ const UserHomePage = () => {
     const userEmail = localStorage.getItem('user-email');
     const navigate = useNavigate();
 
+    // Function to render stars for product rating
+    const renderStars = (rating) => {
+        const totalStars = 5;
+        let stars = [];
+        for (let i = 1; i <= totalStars; i++) {
+            stars.push(
+                <span key={i} style={{ color: i <= rating ? '#FFD700' : '#ddd' }}>★</span>
+            );
+        }
+        return stars;
+    };
+
+    // Fetch products with pagination
     const fetchProducts = useCallback(async () => {
         try {
             const token = localStorage.getItem('auth-token');
@@ -40,6 +53,7 @@ const UserHomePage = () => {
         fetchProducts();
     }, [fetchProducts]);
 
+    // Infinite scrolling logic
     const handleScroll = useCallback(() => {
         const bottom = window.innerHeight + document.documentElement.scrollTop === document.documentElement.offsetHeight;
         if (bottom && hasMore && !loading) {
@@ -55,6 +69,7 @@ const UserHomePage = () => {
         };
     }, [handleScroll]);
 
+    // Handle placing the order
     const handlePlaceOrder = async (product) => {
         const token = localStorage.getItem('auth-token');
         const orderDataToSend = {
@@ -62,7 +77,7 @@ const UserHomePage = () => {
                 { product: product._id, quantity: quantity }
             ]
         };
-    
+
         try {
             // Send the order to the backend
             await axios.post('http://localhost:5001/api/auth/order/place', orderDataToSend, {
@@ -89,6 +104,7 @@ const UserHomePage = () => {
         setQuantity(value);
     };
 
+    // Loading or error handling UI
     if (loading && page === 1) {
         return (
             <Container maxWidth="md" sx={{ textAlign: 'center', mt: 4 }}>
@@ -118,6 +134,8 @@ const UserHomePage = () => {
                     Here you can view your products and manage your profile.
                 </Typography>
             </Paper>
+
+            {/* Displaying Products */}
             <Grid container spacing={4}>
                 {products.map(product => (
                     <Grid item xs={12} sm={6} md={4} key={product._id}>
@@ -129,6 +147,15 @@ const UserHomePage = () => {
                                 <Typography variant="h6" sx={{ mt: 2, color: '#1976d2' }}>Price: ${product.price}</Typography>
                                 <Typography variant="body2" sx={{ color: '#666' }}>Company: {product.companyName}</Typography>
                                 <Typography variant="body2" sx={{ color: '#666' }}>Stock: {product.stock}</Typography>
+
+                                {/* Render Rating */}
+                                <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
+                                    <Typography variant="body2" sx={{ color: '#666' }}>Rating: </Typography>
+                                    <Box sx={{ ml: 1, display: 'flex' }}>
+                                        {renderStars(product.averageRating || 0)} {/* Default rating to 0 if not available */}
+                                    </Box>
+                                </Box>
+
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
                                     <Button variant="outlined" color="secondary" onClick={() => handleOpenModal(product)}>Place Order</Button>
                                 </Box>
@@ -138,12 +165,14 @@ const UserHomePage = () => {
                 ))}
             </Grid>
 
+            {/* Loading spinner while fetching more data */}
             {loading && hasMore && (
                 <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
                     <CircularProgress />
                 </Box>
             )}
 
+            {/* Place Order Modal */}
             <Dialog open={openModal} onClose={handleCloseModal}>
                 <DialogTitle>Place Order for {selectedProduct?.name}</DialogTitle>
                 <DialogContent>
@@ -159,4 +188,3 @@ const UserHomePage = () => {
 };
 
 export default UserHomePage;
-    
