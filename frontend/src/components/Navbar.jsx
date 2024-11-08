@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './Navbar.css';
 import logo from '../photos/logo.png'; // Ensure this path is correct
-import { BiEdit, BiLogOut, BiLogIn, BiUserPlus, BiPackage } from 'react-icons/bi'; // Added package icon for "View Orders"
+import { BiEdit, BiLogOut, BiLogIn, BiUserPlus, BiPackage, BiCommentDetail } from 'react-icons/bi'; // Added icon for "View Submitted Review"
 
 const Navbar = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -81,12 +81,20 @@ const Navbar = () => {
                         <Link to={getHomePageLink()} className="home-link">
                             <i className="bi bi-house-fill"></i> Home
                         </Link>
+                        <div className="separator"></div> {/* Add separator here */}
                         {/* Conditionally render View Orders only for userType 'user' */}
                         {userType === 'user' && (
-                           <Link to="/view/orders" className="view-orders-link">
-                           <BiPackage className="icon" /> View Orders
-                       </Link>
-                       
+                            <>
+                            
+                                <Link to="/view/orders" className="view-orders-link">
+                                    <BiPackage className="icon" /> View Orders
+                                </Link>
+                                <div className="separator"></div> {/* Add separator here */}
+                                <Link to="/user/view/review" className="view-submitted-review-link">
+                                    <BiCommentDetail className="icon" /> View Submitted Review
+                                </Link>
+                                <div className="separator"></div> {/* Add separator here */}
+                            </>
                         )}
                     </>
                 )}
@@ -119,6 +127,7 @@ const Navbar = () => {
                             <Link to="/login" className="icon-btn">
                                 <BiLogIn className="icon" title="Login" /> Login
                             </Link>
+                            <div className="separator"></div> {/* Add separator here */}
                             <Link to="/register" className="icon-btn">
                                 <BiUserPlus className="icon" title="Register" /> Register
                             </Link>

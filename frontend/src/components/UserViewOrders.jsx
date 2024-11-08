@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import './UserViewOrders.css'; // Import the CSS for styling
+import './UserViewOrders.css';
 
 const UserViewOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const [modalVisible, setModalVisible] = useState(false); // State for modal visibility
-  const [selectedOrder, setSelectedOrder] = useState(null); // Store the selected order for review
-  const [review, setReview] = useState({ rating: 0, description: '', image: null, productId: '' }); // Review data
-  const [imagePreview, setImagePreview] = useState(null); // Preview of the uploaded image
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [review, setReview] = useState({ rating: 0, description: '', image: null, productId: '', reviewId: null });
+  const [imagePreview, setImagePreview] = useState(null);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -31,22 +31,7 @@ const UserViewOrders = () => {
         setOrders(response.data);
       } catch (err) {
         console.error('Error fetching orders:', err);
-
-        if (err.response) {
-          if (err.response.status === 401) {
-            setError('You need to log in to view your orders.');
-          } else if (err.response.status === 403) {
-            setError('You are not authorized to view these orders.');
-          } else if (err.response.status === 404) {
-            setError('Orders not found. Please check the backend route or try again later.');
-          } else if (err.response.status === 500) {
-            setError('Server error. Please try again later.');
-          } else {
-            setError('Error fetching orders. Please try again later.');
-          }
-        } else {
-          setError('Network error. Please check your connection and try again.');
-        }
+        setError(err.response?.data?.message || 'Error fetching orders. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -58,54 +43,55 @@ const UserViewOrders = () => {
   const handleReviewSubmit = async () => {
     const token = localStorage.getItem('auth-token');
     const formData = new FormData();
-    formData.append('productId', review.productId); // Ensure productId is passed from the modal
+    formData.append('productId', review.productId);
     formData.append('rating', review.rating);
     formData.append('description', review.description);
     if (review.image) formData.append('image', review.image);
 
-    // Debug: Log the formData to check if all fields are added correctly
-    for (let [key, value] of formData.entries()) {
-      console.log(key, value);
-    }
-
     try {
-      const response = await axios.post(
-        'http://localhost:5001/api/auth/submit-review',
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const endpoint = review.reviewId
+        ? `http://localhost:5001/api/auth/update-review/${review.reviewId}`
+        : 'http://localhost:5001/api/auth/submit-review';
+
+      const response = await axios.post(endpoint, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       console.log('Review submitted:', response.data);
-      setModalVisible(false); // Close the modal after submission
+      setModalVisible(false);
     } catch (error) {
-      // Debug: Log the full error to check the response details
-      console.error('Error submitting review:', error.response || error);
-      if (error.response) {
-        alert(`Error: ${error.response.data.message || error.response.statusText}`);
-      } else {
-        alert('Error submitting review. Please try again later.');
-      }
+      console.error('Error submitting review:', error);
+      alert(`Error: ${error.response?.data?.message || error.response?.statusText || 'Please try again later.'}`);
     }
   };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setReview({ ...review, image: file });
-    setImagePreview(URL.createObjectURL(file)); // Preview image
+    setImagePreview(URL.createObjectURL(file));
   };
 
   const openReviewModal = (order, product) => {
+    const existingReview = product.review || null;
     setSelectedOrder(order);
-    setReview({ ...review, productId: product._id }); // Set the productId for the selected product
+
+    setReview({
+      rating: existingReview ? existingReview.rating : 0,
+      description: existingReview ? existingReview.description : '',
+      image: null,
+      productId: product._id,
+      reviewId: existingReview ? existingReview._id : null,
+    });
+
+    setImagePreview(null);
     setModalVisible(true);
   };
 
   const closeModal = () => {
     setModalVisible(false);
-    setReview({ rating: 0, description: '', image: null, productId: '' });
+    setReview({ rating: 0, description: '', image: null, productId: '', reviewId: null });
     setImagePreview(null);
   };
 
@@ -151,11 +137,10 @@ const UserViewOrders = () => {
                   </ul>
                 </td>
                 <td>
-                  {/* Only show the "Submit Review" button if the order status is "Accepted" */}
                   {order.orderStatus === 'Accepted' && (
                     <button
                       className="review-button"
-                      onClick={() => openReviewModal(order, order.products[0].product)} // Pass product data here
+                      onClick={() => openReviewModal(order, order.products[0].product)}
                     >
                       Submit a Review
                     </button>
@@ -167,11 +152,10 @@ const UserViewOrders = () => {
         </table>
       )}
 
-      {/* Modal for submitting a review */}
       {modalVisible && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <h2>Submit a Review for {selectedOrder && selectedOrder.products.find(p => p._id === review.productId)?.product.name}</h2>
+            <h2>Submit a Review for {selectedOrder && selectedOrder.products.find(p => p.product._id === review.productId)?.product.name}</h2>
             <form onSubmit={(e) => e.preventDefault()}>
               <label>Rating (1-5):</label>
               <input
@@ -200,7 +184,7 @@ const UserViewOrders = () => {
                   Cancel
                 </button>
                 <button type="button" onClick={handleReviewSubmit}>
-                  Submit Review
+                  {review.reviewId ? 'Update Review' : 'Submit Review'}
                 </button>
               </div>
             </form>
@@ -212,3 +196,4 @@ const UserViewOrders = () => {
 };
 
 export default UserViewOrders;
+    

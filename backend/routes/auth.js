@@ -20,11 +20,73 @@ const storage = multer.diskStorage({
         cb(null, `${Date.now()}-${file.originalname}`); // Create a unique filename
     },
 });
-
 const upload = multer({ storage });
+// Get reviews submitted by the authenticated user
 
 
 
+// PUT route to update the rating of a review
+router.put('/user/:reviewId', authenticateUser, async (req, res) => {
+    const { reviewId } = req.params;
+    const { rating } = req.body;
+  
+    try {
+      // Check if the review exists in the database
+      const review = await Review.findById(reviewId);
+      if (!review) {
+        return res.status(404).json({ message: 'Review not found' });
+      }
+  
+      // Fetch the user who is trying to update the review
+      const user = await User.findById(req.user._id);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      // Check if the user's userType is 'user'
+      if (user.userType !== 'user') {
+        return res.status(403).json({ message: 'Only users with userType "user" can update the review rating' });
+      }
+  
+      // Ensure that the user is the one who created the review
+      if (review.user.toString() !== req.user._id.toString()) {
+        return res.status(403).json({ message: 'You are not authorized to edit this review' });
+      }
+  
+      // Update the rating
+      review.rating = rating;
+  
+      // Save the updated review
+      await review.save();
+  
+      res.json(review); // Return the updated review
+    } catch (err) {
+      console.error('Error updating rating:', err); // Log any error
+      res.status(500).json({ message: 'Error updating review rating' });
+    }
+  });
+  
+router.get('/user/reviews', authenticateUser, async (req, res) => {
+    try {
+      // Check if the user type is 'user'
+      if (req.user.userType !== 'user') {
+        return res.status(403).json({ message: 'Access forbidden: Only regular users can view their reviews' });
+      }
+  
+      const userId = req.user._id; // Accessing the user ID from the decoded JWT payload
+      const reviews = await Review.find({ user: userId }).populate('product'); // Populate to get product details
+  
+      if (!reviews || reviews.length === 0) {
+        return res.status(404).json({ message: 'No reviews found' });
+      }
+  
+      res.json(reviews);
+    } catch (error) {
+      console.error('Error fetching reviews:', error); // Log any errors
+      res.status(500).json({ message: 'Error fetching reviews' });
+    }
+  });
+  
 router.post('/submit-review', authenticateUser, upload.single('image'), async (req, res) => {
     const { productId, rating, description } = req.body; // User's review data
     const userId = req.user._id; // Get the userId from the JWT token

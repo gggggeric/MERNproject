@@ -1,0 +1,127 @@
+/* Container for the reviews section */
+.reviews-container {
+    max-width: 800px; /* Adjusted width for better readability */
+    margin: 0 auto;
+    padding: 30px; /* Added more padding */
+    font-family: 'Arial', sans-serif;
+    background-color: #f9f9f9; /* Added background for better contrast */
+    border-radius: 10px; /* Rounded corners for the entire section */
+  }
+  
+  /* Title for the reviews section */
+  .reviews-title {
+    font-size: 2.2rem; /* Slightly larger title */
+    font-weight: 700; /* Bold font weight */
+    text-align: center;
+    color: #333;
+    margin-bottom: 40px; /* Increased bottom margin */
+  }
+  
+  /* List of reviews */
+  .reviews-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 25px; /* Increased gap between reviews */
+  }
+  
+  /* Each review card */
+  .review-card {
+    background-color: #fff;
+    padding: 25px; /* Increased padding for better spacing */
+    border-radius: 12px; /* Slightly more rounded corners */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); /* Softer shadow for a modern feel */
+    transition: all 0.3s ease-in-out;
+    border: 1px solid #e0e0e0; /* Subtle border */
+  }
+  
+  /* Hover effect for the review card */
+  .review-card:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    transform: translateY(-8px); /* Added a more noticeable hover effect */
+  }
+  
+  /* Product name style */
+  .product-name {
+    font-size: 1.3rem; /* Slightly larger font size */
+    font-weight: 700; /* Bold product name */
+    color: #444;
+    margin-bottom: 15px; /* Increased space between product name and description */
+  }
+  
+  /* Review description style */
+  .review-description {
+    font-size: 1.1rem; /* Slightly larger font size for better readability */
+    color: #555; /* Slightly darker color for better contrast */
+    margin-bottom: 20px; /* More space between description and rating */
+    line-height: 1.6; /* Improved line height for better readability */
+  }
+  
+  /* Rating style */
+  .review-rating {
+    font-size: 1.1rem;
+    color: #f39c12; /* Yellow color for the rating */
+    font-weight: 600; /* Slightly bolder for better emphasis */
+    margin-bottom: 15px; /* Increased space below rating */
+  }
+  
+  /* Image style */
+  .review-image {
+    width: 100%;
+    max-height: 350px; /* Increased max-height for better image visibility */
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 20px; /* More space after image */
+    transition: transform 0.3s ease;
+    border: 2px solid #ddd; /* Subtle border around image */
+  }
+  
+  /* Hover effect for the image */
+  .review-image:hover {
+    transform: scale(1.05); /* Slight zoom on hover */
+  }
+  
+  /* Error message styling */
+  .error {
+    color: red;
+    text-align: center;
+    font-size: 1.3rem; /* Larger error message */
+    margin-top: 25px; /* More spacing at the top */
+  }
+  
+  /* Empty state when no reviews are found */
+  .empty-state {
+    text-align: center;
+    color: #888;
+    font-size: 1.3rem; /* Slightly larger font */
+    margin-top: 30px; /* More spacing at the top */
+  }
+  
+  /* Rating Container styling */
+  .rating-container {
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    font-size: 1.1rem;
+  }
+  
+  .rating-container select {
+    padding: 8px;
+    font-size: 1.1rem;
+    margin-left: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    width: 80px; /* Added width to make dropdown uniform */
+  }
+  
+  /* Disable select when loading */
+  .rating-container select:disabled {
+    background-color: #f0f0f0;
+    cursor: not-allowed;
+  }
+  
+  .rating-container label {
+    font-weight: 600; /* Make the label bold for emphasis */
+    color: #444;
+  }
+  

@@ -1,31 +1,32 @@
 /* Navbar.css */
 .navbar {
-    display: flex; 
+    display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #ffffff; 
-    padding: 1rem 2rem; 
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
-    border-radius: 10px; 
-    margin: 1rem; 
+    background-color: #ffffff;
+    padding: 1rem 2rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    margin: 1rem;
     font-family: cursive; /* Set all font to cursive */
-    font-size: 1rem; 
+    font-size: 1rem;
 }
 
 .left-content {
-    flex: 1; 
+    flex: 1;
     display: flex;
     align-items: center;
-    justify-content: flex-start; 
+    justify-content: flex-start;
 }
 
 .logo {
     width: 50px;
     height: 50px;
     margin-right: 10px;
-    border-radius: 50%; 
-    object-fit: cover; 
+    border-radius: 50%;
+    object-fit: cover;
 }
+
 .store-name {
     font-size: 1.5rem;
     color: #8e44ad;
@@ -45,10 +46,10 @@
 }
 
 .right-content {
-    display: flex; 
+    display: flex;
     align-items: center;
     justify-content: flex-end;
-    flex: 1; 
+    flex: 1;
 }
 
 .nav-title {
@@ -57,25 +58,28 @@
 }
 
 .nav-links {
-    display: flex; 
-    list-style-type: none; 
+    display: flex;
+    list-style-type: none;
     padding: 0;
-    margin: 0; 
+    margin: 0;
 }
 
 .home-link,
 .edit-profile-link,
-.view-orders-link { /* Added .view-orders-link */
-    display: inline-block;
-    color: #8e44ad; 
-    text-decoration: none; 
-    margin-left: 1rem; 
-    font-weight: 600; 
+.view-orders-link,
+.view-submitted-reviews-link { /* Added .view-submitted-reviews-link */
+    display: inline-flex; /* Use inline-flex to properly align icon and text */
+    align-items: center; /* Vertically center the icon and text */
+    color: #8e44ad;
+    text-decoration: none;
+    margin-left: 1rem;
+    font-weight: 600;
 }
 
 .home-link:hover,
 .edit-profile-link:hover,
-.view-orders-link:hover { /* Added hover effect for .view-orders-link */
+.view-orders-link:hover,
+.view-submitted-reviews-link:hover { /* Added hover effect for .view-submitted-reviews-link */
     color: #5e3370;
 }
 
@@ -98,7 +102,7 @@
 }
 
 .nav-btn:hover {
-    background-color: #5e3370; 
+    background-color: #5e3370;
 }
 
 .nav-btn .icon {
@@ -108,7 +112,7 @@
 
 /* Login and Register button styling */
 .icon-btn {
-    text-decoration: none; 
+    text-decoration: none;
     background-color: #8e44ad;
     color: #ffffff !important;
     font-weight: bold; /* Bold text */
@@ -209,19 +213,55 @@
 }
 
 .icon {
-    margin-right: 5px; /* Space between icon and text */
+    margin-right: 0.5rem; /* Adjust spacing between icon and text uniformly */
     font-size: 1.3rem; /* Match the size of other icons */
 }
 
 /* Styling for View Orders link */
-.view-orders-link {
-    display: inline-block;
+.view-orders-link,
+.view-submitted-reviews-link { /* Styling both View Orders and View Submitted Reviews uniformly */
+    display: inline-flex; /* Ensures icons align properly */
+    align-items: center; /* Vertically centers the icon and text */
     color: #8e44ad;
     text-decoration: none;
     margin-left: 1rem;
     font-weight: 600;
 }
 
-.view-orders-link:hover {
+.view-orders-link:hover,
+.view-submitted-reviews-link:hover {
     color: #5e3370; /* Change color on hover */
+}
+
+.view-orders-link .icon,
+.view-submitted-reviews-link .icon { 
+    font-size: 1.3rem; /* Ensures consistent icon size */
+    margin-right: 0.5rem; /* Adjust spacing uniformly */
+}
+
+/* View Submitted Reviews link styling */
+.view-submitted-review-link {
+    display: inline-block;
+    color: #8e44ad;
+    text-decoration: none;
+    margin-left: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center; /* Ensures the icon and text are aligned */
+}
+
+.view-submitted-review-link:hover {
+    color: #5e3370;
+}
+
+.view-submitted-review-link .icon {
+    margin-right: 0.5rem; /* Adjusted to ensure uniform spacing */
+    font-size: 1.3rem; /* Icon size */
+}
+
+.separator {
+    border-left: 2px solid #ccc; /* Light grey color for separator */
+    height: 24px; /* Adjust the height of the separator */
+    margin: 0 12px; /* Space out the separator from the links */
+    display: inline-block; /* Make the separator align next to the links */
 }
