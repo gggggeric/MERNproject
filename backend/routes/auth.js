@@ -9,9 +9,76 @@ const ManufacturerProfile = require('../models/ManufacturerProfile'); // Adjust 
 const Product = require('../models/Product'); // Adjust path to your Product model
 const multer = require('multer');
 const { OAuth2Client } = require('google-auth-library');
-const Cart = require('../models/Cart');
+const Review = require('../models/Review');
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID); // Use environment variable\
 const mongoose = require('mongoose');
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/'); // Specify the directory to save the uploaded files
+    },
+    filename: (req, file, cb) => {
+        cb(null, `${Date.now()}-${file.originalname}`); // Create a unique filename
+    },
+});
+
+const upload = multer({ storage });
+
+
+
+router.post('/submit-review', authenticateUser, upload.single('image'), async (req, res) => {
+    const { productId, rating, description } = req.body; // User's review data
+    const userId = req.user._id; // Get the userId from the JWT token
+    const image = req.file ? req.file.path : null; // Save image path if uploaded
+
+    try {
+        // Check if the user has 'user' as their userType
+        if (req.user.userType !== 'user') {
+            return res.status(403).json({ message: 'Only users are allowed to submit reviews.' });
+        }
+
+        // Validate review data
+        if (!productId || !rating || !description) {
+            return res.status(400).json({ message: 'All fields are required.' });
+        }
+
+        // Find the product by productId
+        const product = await Product.findById(productId);
+        if (!product) return res.status(404).json({ message: 'Product not found.' });
+
+        // Create a new review with the image URL if it's available
+        const newReview = new Review({
+            user: userId,
+            product: productId,
+            rating,
+            description,
+            photo: image ? image : null, // Only store image path if available
+        });
+
+        // Save the review to the database
+        await newReview.save();
+
+        // Update the product's rating information
+        const reviews = await Review.find({ product: productId });
+        const totalRatings = reviews.length;
+        const sumOfRatings = reviews.reduce((sum, review) => sum + review.rating, 0);
+        const averageRating = sumOfRatings / totalRatings;
+
+        // Update the product's average rating and total ratings count
+        await Product.findByIdAndUpdate(productId, {
+            averageRating,
+            totalRatings,
+        });
+
+        res.status(201).json({ message: 'Review submitted successfully!' });
+
+    } catch (err) {
+        console.error('Error submitting review:', err);
+        res.status(500).json({ message: 'Server error. Please try again later.' });
+    }
+});
+
+
+
 // Route to view orders for a user
 router.get('/view/orders', authenticateUser, async (req, res) => {
     try {
@@ -44,32 +111,6 @@ router.get('/view/orders', authenticateUser, async (req, res) => {
     }
   });
   
-
-// POST: Submit a review for a product
-// router.post('/reviews/:productId', upload.single('image'), async (req, res) => {
-//     const { productId } = req.params;
-//     const { rating, description } = req.body;
-//     const image = req.file ? req.file.path : null;  // File path of the uploaded image
-
-//     try {
-//         const newReview = new Review({
-//             product: productId,
-//             user: req.user.id,  // Assuming the user is authenticated and available in req.user
-//             rating,
-//             description,
-//             photo: image,
-//         });
-
-//         // Save the review
-//         await newReview.save();
-
-//         // Respond with success
-//         res.status(201).json({ message: 'Review submitted successfully!', review: newReview });
-//     } catch (error) {
-//         console.error('Error saving review:', error);
-//         res.status(500).json({ message: 'Failed to submit the review' });
-//     }
-// });
 
 // Endpoint to update order status
 router.patch('/orders/:id/status', authenticateUser, async (req, res) => {
@@ -352,17 +393,6 @@ router.post('/google/register', async (req, res) => {
         res.status(400).json({ message: 'Google registration failed', error });
     }
 });
-
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/'); // Specify the directory to save the uploaded files
-    },
-    filename: (req, file, cb) => {
-        cb(null, `${Date.now()}-${file.originalname}`); // Create a unique filename
-    },
-});
-const upload = multer({ storage });
-
 
 router.patch('/update-password', authenticateUser, async (req, res) => {
     try {

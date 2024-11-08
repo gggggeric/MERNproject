@@ -1,4 +1,3 @@
-// models/Product.js
 const mongoose = require('mongoose');
 
 const ProductSchema = new mongoose.Schema({
@@ -33,7 +32,11 @@ const ProductSchema = new mongoose.Schema({
     },
     averageRating: {
         type: Number,
-        default: 0, // Initialize with 0
+        default: 0, // Initialize with 0 to avoid undefined issues
+    },
+    totalRatings: {
+        type: Number,
+        default: 0, // Track the total number of reviews for the product
     },
     createdAt: {
         type: Date,

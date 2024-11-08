@@ -7,6 +7,11 @@ const UserViewOrders = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const [modalVisible, setModalVisible] = useState(false); // State for modal visibility
+  const [selectedOrder, setSelectedOrder] = useState(null); // Store the selected order for review
+  const [review, setReview] = useState({ rating: 0, description: '', image: null, productId: '' }); // Review data
+  const [imagePreview, setImagePreview] = useState(null); // Preview of the uploaded image
+
   useEffect(() => {
     const fetchOrders = async () => {
       try {
@@ -50,6 +55,60 @@ const UserViewOrders = () => {
     fetchOrders();
   }, []);
 
+  const handleReviewSubmit = async () => {
+    const token = localStorage.getItem('auth-token');
+    const formData = new FormData();
+    formData.append('productId', review.productId); // Ensure productId is passed from the modal
+    formData.append('rating', review.rating);
+    formData.append('description', review.description);
+    if (review.image) formData.append('image', review.image);
+
+    // Debug: Log the formData to check if all fields are added correctly
+    for (let [key, value] of formData.entries()) {
+      console.log(key, value);
+    }
+
+    try {
+      const response = await axios.post(
+        'http://localhost:5001/api/auth/submit-review',
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log('Review submitted:', response.data);
+      setModalVisible(false); // Close the modal after submission
+    } catch (error) {
+      // Debug: Log the full error to check the response details
+      console.error('Error submitting review:', error.response || error);
+      if (error.response) {
+        alert(`Error: ${error.response.data.message || error.response.statusText}`);
+      } else {
+        alert('Error submitting review. Please try again later.');
+      }
+    }
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    setReview({ ...review, image: file });
+    setImagePreview(URL.createObjectURL(file)); // Preview image
+  };
+
+  const openReviewModal = (order, product) => {
+    setSelectedOrder(order);
+    setReview({ ...review, productId: product._id }); // Set the productId for the selected product
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+    setReview({ rating: 0, description: '', image: null, productId: '' });
+    setImagePreview(null);
+  };
+
   if (loading) {
     return <div className="loading">Loading...</div>;
   }
@@ -72,6 +131,7 @@ const UserViewOrders = () => {
               <th>Total</th>
               <th>Created At</th>
               <th>Products</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -90,10 +150,62 @@ const UserViewOrders = () => {
                     ))}
                   </ul>
                 </td>
+                <td>
+                  {/* Only show the "Submit Review" button if the order status is "Accepted" */}
+                  {order.orderStatus === 'Accepted' && (
+                    <button
+                      className="review-button"
+                      onClick={() => openReviewModal(order, order.products[0].product)} // Pass product data here
+                    >
+                      Submit a Review
+                    </button>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
+      )}
+
+      {/* Modal for submitting a review */}
+      {modalVisible && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h2>Submit a Review for {selectedOrder && selectedOrder.products.find(p => p._id === review.productId)?.product.name}</h2>
+            <form onSubmit={(e) => e.preventDefault()}>
+              <label>Rating (1-5):</label>
+              <input
+                type="number"
+                min="1"
+                max="5"
+                value={review.rating}
+                onChange={(e) => setReview({ ...review, rating: e.target.value })}
+                required
+              />
+              <label>Description:</label>
+              <textarea
+                value={review.description}
+                onChange={(e) => setReview({ ...review, description: e.target.value })}
+                required
+              />
+              <label>Upload Image (optional):</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+              />
+              {imagePreview && <img src={imagePreview} alt="Preview" className="image-preview" />}
+              <div className="modal-actions">
+                <button type="button" onClick={closeModal}>
+                  Cancel
+                </button>
+                <button type="button" onClick={handleReviewSubmit}>
+                  Submit Review
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </div>
   );

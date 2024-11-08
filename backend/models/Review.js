@@ -1,4 +1,3 @@
-// models/Review.js
 const mongoose = require('mongoose');
 
 const reviewSchema = new mongoose.Schema({
@@ -31,30 +30,7 @@ const reviewSchema = new mongoose.Schema({
     },
 });
 
-// Update the product's average rating based on reviews
-reviewSchema.statics.calculateAverageRating = async function(productId) {
-    const result = await this.aggregate([
-        { $match: { product: productId } },
-        { $group: { _id: '$product', avgRating: { $avg: '$rating' } } }
-    ]);
-
-    try {
-        await mongoose.model('Product').findByIdAndUpdate(productId, {
-            averageRating: result.length ? result[0].avgRating : 0
-        });
-    } catch (error) {
-        console.error("Error updating product's average rating:", error);
-    }
-};
-
-// Update average rating after saving or removing a review
-reviewSchema.post('save', function() {
-    this.constructor.calculateAverageRating(this.product);
-});
-
-reviewSchema.post('remove', function() {
-    this.constructor.calculateAverageRating(this.product);
-});
-
+// Ensure the model is registered correctly
 const Review = mongoose.model('Review', reviewSchema);
+
 module.exports = Review;
