@@ -144,7 +144,7 @@ const UserHomePage = () => {
                             <CardContent sx={{ backgroundColor: '#f9f9f9' }}>
                                 <Typography variant="h6" component="div" sx={{ fontWeight: 'bold' }}>{product.name}</Typography>
                                 <Typography variant="body2" color="text.secondary">{product.description}</Typography>
-                                <Typography variant="h6" sx={{ mt: 2, color: '#1976d2' }}>Price: ${product.price}</Typography>
+                                <Typography variant="h6" sx={{ mt: 2, color: '#1976d2' }}>Price: ₱{product.price}</Typography>
                                 <Typography variant="body2" sx={{ color: '#666' }}>Company: {product.companyName}</Typography>
                                 <Typography variant="body2" sx={{ color: '#666' }}>Stock: {product.stock}</Typography>
 

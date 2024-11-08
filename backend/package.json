@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@mui/styles": "^6.1.6",
+    "bad-words": "^4.0.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",

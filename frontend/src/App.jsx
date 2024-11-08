@@ -16,7 +16,6 @@ import ManufacturerProductCRUD from './components/ManufacturerProductCRUD';
 import Cart from './components/Cart';
 import UserEditPassword from './components/UserEditPassword';
 import OrderList from './components/ManufacturersOrders';
-import SubmitReview from './components/SubmitReview';
 import UserViewOrders from './components/UserViewOrders';
 import UserReviews from './components/UserViewReviews';
 import 'bootstrap-icons/font/bootstrap-icons.css';
@@ -133,16 +132,6 @@ const App = () => {
                         />
                      } 
                      />
-                       <Route 
-                    path="/user/review/product" 
-                    element={
-                        <ProtectedRoute 
-                            element={<SubmitReview />} 
-                            allowedRoles={['user']} // Allow users and admins to access the order page
-                        />
-                     } 
-                     />
-
                     <Route 
                     path="/view/orders" 
                     element={

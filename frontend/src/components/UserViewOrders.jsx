@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './UserViewOrders.css';
+import { Filter } from 'bad-words';  // Import bad-words package
 
 const UserViewOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -11,6 +12,9 @@ const UserViewOrders = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [review, setReview] = useState({ rating: 0, description: '', image: null, productId: '', reviewId: null });
   const [imagePreview, setImagePreview] = useState(null);
+
+  // Create a filter instance
+  const filter = new Filter();
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -41,11 +45,14 @@ const UserViewOrders = () => {
   }, []);
 
   const handleReviewSubmit = async () => {
+    // Clean the description before submission
+    const cleanDescription = filter.clean(review.description);
+    
     const token = localStorage.getItem('auth-token');
     const formData = new FormData();
     formData.append('productId', review.productId);
     formData.append('rating', review.rating);
-    formData.append('description', review.description);
+    formData.append('description', cleanDescription);  // Send the cleaned description
     if (review.image) formData.append('image', review.image);
 
     try {
@@ -196,4 +203,3 @@ const UserViewOrders = () => {
 };
 
 export default UserViewOrders;
-    
