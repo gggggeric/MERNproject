@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './Navbar.css';
 import logo from '../photos/logo.png'; // Ensure this path is correct
-import { BiEdit, BiLogOut, BiLogIn, BiUserPlus } from 'react-icons/bi'; // Importing icons
+import { BiEdit, BiLogOut, BiLogIn, BiUserPlus, BiPackage } from 'react-icons/bi'; // Added package icon for "View Orders"
 
 const Navbar = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -81,6 +81,13 @@ const Navbar = () => {
                         <Link to={getHomePageLink()} className="home-link">
                             <i className="bi bi-house-fill"></i> Home
                         </Link>
+                        {/* Conditionally render View Orders only for userType 'user' */}
+                        {userType === 'user' && (
+                           <Link to="/view/orders" className="view-orders-link">
+                           <BiPackage className="icon" /> View Orders
+                       </Link>
+                       
+                        )}
                     </>
                 )}
                 {userEmail && userType && (

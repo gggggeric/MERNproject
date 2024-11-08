@@ -1,3 +1,4 @@
+// models/Product.js
 const mongoose = require('mongoose');
 
 const ProductSchema = new mongoose.Schema({
@@ -14,24 +15,26 @@ const ProductSchema = new mongoose.Schema({
         required: true,
     },
     stock: {
-        
         type: Number,
         required: true,
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User', // Reference to User model
+        ref: 'User',
         required: true,
     },
-    companyName: {  // Add companyName field
-        type: String, // Type String for company name
-        required: true, // Make it required if necessary
+    companyName: {
+        type: String,
+        required: true,
     },
     image: {
-        type: String, // This will store the image URL or file path
+        type: String,
         required: true,
     },
-    
+    averageRating: {
+        type: Number,
+        default: 0, // Initialize with 0
+    },
     createdAt: {
         type: Date,
         default: Date.now,

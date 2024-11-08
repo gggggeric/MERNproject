@@ -12,6 +12,65 @@ const { OAuth2Client } = require('google-auth-library');
 const Cart = require('../models/Cart');
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID); // Use environment variable\
 const mongoose = require('mongoose');
+// Route to view orders for a user
+router.get('/view/orders', authenticateUser, async (req, res) => {
+    try {
+      const userId = req.user._id; // Get the logged-in user's ID from the JWT token
+  
+      // Fetch the user's data from the database
+      const user = await User.findById(userId);
+      
+      // Check if the user is authenticated and if their type is 'user'
+      if (!user) {
+        return res.status(404).json({ message: 'User not found.' });
+      }
+  
+      if (user.userType !== 'user') {
+        return res.status(403).json({ message: 'You are not authorized to view orders.' });
+      }
+  
+      // Fetch the orders that belong to the authenticated user
+      const orders = await Order.find({ user: userId }).populate('products.product', 'name price');
+  
+      if (orders.length === 0) {
+        return res.status(404).json({ message: 'No orders found for this user.' });
+      }
+  
+      res.json(orders); // Return the orders as JSON
+  
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+      res.status(500).json({ message: 'Server error', error });
+    }
+  });
+  
+
+// POST: Submit a review for a product
+// router.post('/reviews/:productId', upload.single('image'), async (req, res) => {
+//     const { productId } = req.params;
+//     const { rating, description } = req.body;
+//     const image = req.file ? req.file.path : null;  // File path of the uploaded image
+
+//     try {
+//         const newReview = new Review({
+//             product: productId,
+//             user: req.user.id,  // Assuming the user is authenticated and available in req.user
+//             rating,
+//             description,
+//             photo: image,
+//         });
+
+//         // Save the review
+//         await newReview.save();
+
+//         // Respond with success
+//         res.status(201).json({ message: 'Review submitted successfully!', review: newReview });
+//     } catch (error) {
+//         console.error('Error saving review:', error);
+//         res.status(500).json({ message: 'Failed to submit the review' });
+//     }
+// });
+
 // Endpoint to update order status
 router.patch('/orders/:id/status', authenticateUser, async (req, res) => {
     const userId = req.user._id;

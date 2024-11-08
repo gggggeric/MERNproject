@@ -1,0 +1,89 @@
+/* UserViewOrders.css */
+
+.orders-container {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    background-color: #f4f7f6;
+    max-width: 1200px;
+    margin: 0 auto;
+    box-sizing: border-box;
+  }
+  
+  h1 {
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .loading,
+  .error {
+    font-size: 1.2rem;
+    text-align: center;
+    color: #ff0000;
+    margin-top: 50px;
+  }
+  
+  .orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .orders-table th,
+  .orders-table td {
+    padding: 12px;
+    text-align: left;
+    font-size: 1rem;
+    color: #555;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .orders-table th {
+    background-color: #007bff;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.1rem;
+  }
+  
+  .orders-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  .orders-table tr:hover {
+    background-color: #f1f1f1;
+  }
+  
+  .orders-table ul {
+    list-style-type: none;
+    padding-left: 0;
+    margin: 0;
+  }
+  
+  .orders-table li {
+    font-size: 0.9rem;
+    color: #333;
+  }
+  
+  .orders-table td ul li {
+    padding: 5px 0;
+  }
+  
+  @media screen and (max-width: 768px) {
+    .orders-table {
+      font-size: 0.9rem;
+    }
+  
+    .orders-table th,
+    .orders-table td {
+      padding: 8px;
+    }
+  
+    .orders-table th {
+      font-size: 1rem;
+    }
+  }
+  

@@ -64,7 +64,8 @@
 }
 
 .home-link,
-.edit-profile-link {
+.edit-profile-link,
+.view-orders-link { /* Added .view-orders-link */
     display: inline-block;
     color: #8e44ad; 
     text-decoration: none; 
@@ -73,7 +74,8 @@
 }
 
 .home-link:hover,
-.edit-profile-link:hover {
+.edit-profile-link:hover,
+.view-orders-link:hover { /* Added hover effect for .view-orders-link */
     color: #5e3370;
 }
 
@@ -211,3 +213,15 @@
     font-size: 1.3rem; /* Match the size of other icons */
 }
 
+/* Styling for View Orders link */
+.view-orders-link {
+    display: inline-block;
+    color: #8e44ad;
+    text-decoration: none;
+    margin-left: 1rem;
+    font-weight: 600;
+}
+
+.view-orders-link:hover {
+    color: #5e3370; /* Change color on hover */
+}

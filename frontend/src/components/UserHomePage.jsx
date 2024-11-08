@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Container, Typography, Box, Grid, Card, CardContent, CardMedia, CircularProgress, Paper, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import './UserHomePage.css';
 
 const UserHomePage = () => {
@@ -9,10 +10,11 @@ const UserHomePage = () => {
     const [error, setError] = useState(null);
     const [openModal, setOpenModal] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
-    const [quantity, setQuantity] = useState(1);    
+    const [quantity, setQuantity] = useState(1);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const userEmail = localStorage.getItem('user-email');
+    const navigate = useNavigate();
 
     const fetchProducts = useCallback(async () => {
         try {
@@ -60,15 +62,15 @@ const UserHomePage = () => {
                 { product: product._id, quantity: quantity }
             ]
         };
-
+    
         try {
-          await axios.post('http://localhost:5001/api/auth/order/place', orderDataToSend, {
+            // Send the order to the backend
+            await axios.post('http://localhost:5001/api/auth/order/place', orderDataToSend, {
                 headers: { Authorization: `Bearer ${token}` },
             });
+            // After placing the order, close the modal and reset quantity
             setOpenModal(false);
-            setSelectedProduct(null);
-            setQuantity(1);
-            fetchProducts();
+            setQuantity(1);  // Reset quantity
         } catch (err) {
             alert('Failed to place the order. Please try again.');
         }
@@ -81,6 +83,11 @@ const UserHomePage = () => {
     };
 
     const handleCloseModal = () => setOpenModal(false);
+
+    const handleQuantityChange = (e) => {
+        const value = Math.max(1, parseInt(e.target.value) || 1); // Validate quantity input
+        setQuantity(value);
+    };
 
     if (loading && page === 1) {
         return (
@@ -140,7 +147,7 @@ const UserHomePage = () => {
             <Dialog open={openModal} onClose={handleCloseModal}>
                 <DialogTitle>Place Order for {selectedProduct?.name}</DialogTitle>
                 <DialogContent>
-                    <TextField label="Quantity" type="number" value={quantity} onChange={(e) => setQuantity(Math.max(1, e.target.value))} fullWidth margin="normal" />
+                    <TextField label="Quantity" type="number" value={quantity} onChange={handleQuantityChange} fullWidth margin="normal" />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseModal} color="primary">Cancel</Button>
@@ -152,3 +159,4 @@ const UserHomePage = () => {
 };
 
 export default UserHomePage;
+    
