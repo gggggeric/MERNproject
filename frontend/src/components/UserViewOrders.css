@@ -118,4 +118,24 @@
     max-height: 200px;
     margin-top: 10px;
   }
+  .star-rating {
+    display: flex;
+    gap: 5px;
+  }
   
+  .star {
+    font-size: 24px;
+    cursor: pointer;
+    color: #ccc;
+    transition: color 0.2s;
+  }
+  
+  .star.filled {
+    color: #ffd700; /* Gold color for filled stars */
+  }
+  
+  .star:hover,
+  .star:hover ~ .star {
+    color: #ffd700;
+  }
+    

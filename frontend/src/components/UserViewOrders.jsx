@@ -1,7 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './UserViewOrders.css';
-import { Filter } from 'bad-words';  // Import bad-words package
+import { Filter } from 'bad-words';
+
+const StarRating = ({ rating, setRating }) => {
+  const handleStarClick = (index) => {
+    setRating(index + 1);
+  };
+
+  return (
+    <div className="star-rating">
+      {[...Array(5)].map((_, index) => (
+        <span
+          key={index}
+          className={index < rating ? 'star filled' : 'star'}
+          onClick={() => handleStarClick(index)}
+        >
+          ★
+        </span>
+      ))}
+    </div>
+  );
+};
 
 const UserViewOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -13,46 +33,44 @@ const UserViewOrders = () => {
   const [review, setReview] = useState({ rating: 0, description: '', image: null, productId: '', reviewId: null });
   const [imagePreview, setImagePreview] = useState(null);
 
-  // Create a filter instance
   const filter = new Filter();
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const token = localStorage.getItem('auth-token');
-        if (!token) {
-          setError('You are not logged in. Please log in to view your orders.');
-          setLoading(false);
-          return;
-        }
-
-        const response = await axios.get('http://localhost:5001/api/auth/view/orders', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        setOrders(response.data);
-      } catch (err) {
-        console.error('Error fetching orders:', err);
-        setError(err.response?.data?.message || 'Error fetching orders. Please try again later.');
-      } finally {
+  const fetchOrders = async () => {
+    try {
+      const token = localStorage.getItem('auth-token');
+      if (!token) {
+        setError('You are not logged in. Please log in to view your orders.');
         setLoading(false);
+        return;
       }
-    };
 
+      const response = await axios.get('http://localhost:5001/api/auth/view/orders', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setOrders(response.data);
+    } catch (err) {
+      console.error('Error fetching orders:', err);
+      setError(err.response?.data?.message || 'Error fetching orders. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchOrders();
   }, []);
 
   const handleReviewSubmit = async () => {
-    // Clean the description before submission
     const cleanDescription = filter.clean(review.description);
-    
+
     const token = localStorage.getItem('auth-token');
     const formData = new FormData();
     formData.append('productId', review.productId);
     formData.append('rating', review.rating);
-    formData.append('description', cleanDescription);  // Send the cleaned description
+    formData.append('description', cleanDescription);
     if (review.image) formData.append('image', review.image);
 
     try {
@@ -68,6 +86,7 @@ const UserViewOrders = () => {
 
       console.log('Review submitted:', response.data);
       setModalVisible(false);
+      fetchOrders();  // Refresh orders after submitting the review
     } catch (error) {
       console.error('Error submitting review:', error);
       alert(`Error: ${error.response?.data?.message || error.response?.statusText || 'Please try again later.'}`);
@@ -81,15 +100,13 @@ const UserViewOrders = () => {
   };
 
   const openReviewModal = (order, product) => {
-    const existingReview = product.review || null;
     setSelectedOrder(order);
-
     setReview({
-      rating: existingReview ? existingReview.rating : 0,
-      description: existingReview ? existingReview.description : '',
+      rating: 0,
+      description: '',
       image: null,
       productId: product._id,
-      reviewId: existingReview ? existingReview._id : null,
+      reviewId: null,
     });
 
     setImagePreview(null);
@@ -145,12 +162,19 @@ const UserViewOrders = () => {
                 </td>
                 <td>
                   {order.orderStatus === 'Accepted' && (
-                    <button
-                      className="review-button"
-                      onClick={() => openReviewModal(order, order.products[0].product)}
-                    >
-                      Submit a Review
-                    </button>
+                    order.products.map((item) => (
+                      !item.reviewExists ? (
+                        <button
+                          key={item.product._id}
+                          className="review-button"
+                          onClick={() => openReviewModal(order, item.product)}
+                        >
+                          Submit a Review for {item.product.name}
+                        </button>
+                      ) : (
+                        <span key={item.product._id}>Review Already Submitted</span>
+                      )
+                    ))
                   )}
                 </td>
               </tr>
@@ -164,15 +188,8 @@ const UserViewOrders = () => {
           <div className="modal-content">
             <h2>Submit a Review for {selectedOrder && selectedOrder.products.find(p => p.product._id === review.productId)?.product.name}</h2>
             <form onSubmit={(e) => e.preventDefault()}>
-              <label>Rating (1-5):</label>
-              <input
-                type="number"
-                min="1"
-                max="5"
-                value={review.rating}
-                onChange={(e) => setReview({ ...review, rating: e.target.value })}
-                required
-              />
+              <label>Rating:</label>
+              <StarRating rating={review.rating} setRating={(value) => setReview({ ...review, rating: value })} />
               <label>Description:</label>
               <textarea
                 value={review.description}

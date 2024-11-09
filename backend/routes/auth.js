@@ -23,8 +23,6 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 // Get reviews submitted by the authenticated user
 
-
-
 // PUT route to update the rating of a review
 router.put('/user/:reviewId', authenticateUser, async (req, res) => {
     const { reviewId } = req.params;
@@ -140,15 +138,14 @@ router.post('/submit-review', authenticateUser, upload.single('image'), async (r
 });
 
 
-
-// Route to view orders for a user
+// Route to view orders for a user with review status check
 router.get('/view/orders', authenticateUser, async (req, res) => {
     try {
       const userId = req.user._id; // Get the logged-in user's ID from the JWT token
   
       // Fetch the user's data from the database
       const user = await User.findById(userId);
-      
+  
       // Check if the user is authenticated and if their type is 'user'
       if (!user) {
         return res.status(404).json({ message: 'User not found.' });
@@ -158,20 +155,44 @@ router.get('/view/orders', authenticateUser, async (req, res) => {
         return res.status(403).json({ message: 'You are not authorized to view orders.' });
       }
   
-      // Fetch the orders that belong to the authenticated user
+      // Fetch the orders that belong to the authenticated user and populate product details
       const orders = await Order.find({ user: userId }).populate('products.product', 'name price');
   
+      // If no orders found, return a message
       if (orders.length === 0) {
         return res.status(404).json({ message: 'No orders found for this user.' });
       }
   
-      res.json(orders); // Return the orders as JSON
+      // Add reviewExists status for each product in each order
+      const ordersWithReviews = await Promise.all(
+        orders.map(async (order) => {
+          const productsWithReviewStatus = await Promise.all(
+            order.products.map(async (item) => {
+              const reviewExists = await Review.exists({
+                product: item.product._id,
+                user: userId
+              });
+              return {
+                ...item.toObject(),
+                reviewExists // Add review existence status for each product
+              };
+            })
+          );
+          return {
+            ...order.toObject(),
+            products: productsWithReviewStatus
+          };
+        })
+      );
+  
+      res.json(ordersWithReviews); // Return the orders with review status as JSON
   
     } catch (error) {
       console.error('Error fetching orders:', error);
       res.status(500).json({ message: 'Server error', error });
     }
   });
+  
   
 
 // Endpoint to update order status
@@ -341,20 +362,36 @@ router.get('/orders', authenticateUser, async (req, res) => {
     }
 });
 
-
-    
-    
 router.get('/user/products', authenticateUser, async (req, res) => {
     try {
         // Extract pagination parameters from the query, set default values if not provided
         const page = parseInt(req.query.page) || 1;  // Default to page 1 if not provided
         const limit = parseInt(req.query.limit) || 10;  // Default to 10 products per page if not provided
 
+        // Extract the rating filter from the query (0 means no filter)
+        const ratingFilter = parseInt(req.query.rating) || 0;  // Default to 0 (no rating filter)
+
+        // Extract the category filter from the query (empty means no filter)
+        const categoryFilter = req.query.category || '';  // Default to empty string (no category filter)
+
         // Calculate the number of products to skip based on the current page
         const skip = (page - 1) * limit;
 
-        // Fetch a specific number of products based on the page and limit
-        const products = await Product.find()
+        // Build the query object for filtering
+        let filter = {};
+        
+        // Apply the rating filter if greater than 0
+        if (ratingFilter > 0) {
+            filter.averageRating = { $gte: ratingFilter }; // Filter products with average rating greater than or equal to the rating filter
+        }
+        
+        // Apply the category filter if not empty
+        if (categoryFilter) {
+            filter.category = categoryFilter; // Filter products based on the category
+        }
+
+        // Fetch products based on the page, limit, and filters
+        const products = await Product.find(filter) // Apply the filter
             .skip(skip) // Skip products for previous pages
             .limit(limit); // Limit to the specified number of products
 
@@ -365,16 +402,18 @@ router.get('/user/products', authenticateUser, async (req, res) => {
     }
 });
 
+
 // Function to generate a JWT token
 const generateToken = (user) => {
     return jwt.sign(
-        { userId: user._id, email: user.email },
-        process.env.JWT_SECRET, // Your secret from environment variables
-        { expiresIn: '1h' } // Token expiration
+        { userId: user._id, email: user.email, userType: user.userType },  // Include userType here
+        process.env.JWT_SECRET,  // Your secret from environment variables
+        { expiresIn: '1h' }  // Token expiration
     );
 };
 // Google login endpoint
 router.post('/google/login', async (req, res) => {
+    console.log(req.body); // Check if the idToken is received correctly
     const { idToken } = req.body;
 
     try {
@@ -409,16 +448,21 @@ router.post('/google/login', async (req, res) => {
             }
         }
 
-        // Create a JWT token using the generateToken function
-        const token = generateToken(user); // Use the defined function
+        // Generate the JWT token using the generateToken function
+        const token = generateToken(user);  // Use the defined function
 
-        // Respond with the token and user info
-        res.status(200).json({ message: 'Login successful', token, user: { email: user.email, userType: user.userType } });
+        // Send the token in the response header and response body, similar to normal login route
+        res.header('auth-token', token).json({
+            token,  // Send the token
+            userType: user.userType,  // Send userType as part of the response
+            message: 'Login successful!' // Message to confirm login
+        });
     } catch (error) {
         console.error('Error during Google login:', error);
         res.status(400).json({ message: 'Google login failed', error });
     }
 });
+
 
 router.post('/google/register', async (req, res) => {
     const { idToken } = req.body;
@@ -608,9 +652,8 @@ router.delete('/product/:id', authenticateUser, async (req, res) => {
         return res.status(500).json({ msg: 'Server error', error: error.message });
     }
 });
-
 router.post('/product/create', authenticateUser, upload.single('image'), async (req, res) => {
-    const { name, description, price, stock } = req.body;
+    const { name, description, price, stock, category } = req.body; // Destructure category from the body
     const userId = req.user._id; // Get user ID from authenticated request
 
     console.log('Request Body:', req.body);
@@ -633,7 +676,7 @@ router.post('/product/create', authenticateUser, upload.single('image'), async (
         }
 
         // Validate product data
-        if (!name || !description || !price || !stock) {
+        if (!name || !description || !price || !stock || !category) {
             return res.status(400).json({ msg: 'All fields are required' });
         }
 
@@ -649,12 +692,13 @@ router.post('/product/create', authenticateUser, upload.single('image'), async (
         const companyName = manufacturerProfile.companyName;
         console.log('Company Name:', companyName);
 
-        // Create new product
+        // Create new product with category included
         const newProduct = new Product({
             name,
             description,
             price,
             stock,
+            category, // Add category to the product
             user: userId, // Connect the product to the user
             companyName, // Store company name in the product
             image: req.file ? req.file.path : null, // Save the image path from multer, if provided
@@ -666,6 +710,7 @@ router.post('/product/create', authenticateUser, upload.single('image'), async (
             description,
             price,
             stock,
+            category, // Log category being saved with the product
             user: userId,
             companyName, // Log company name being saved with the product
             image: newProduct.image,
@@ -723,14 +768,14 @@ router.get('/product/:id', authenticateUser, async (req, res) => {
 });
 router.put('/product/edit/:id', authenticateUser, upload.single('image'), async (req, res) => {
     try {
-        const { name, description, price, stock } = req.body;
+        const { name, description, price, stock, category } = req.body;
         const productId = req.params.id;
 
         console.log('Incoming data:', req.body);
         console.log('Updating product ID:', productId);
 
         // Prepare the update object
-        const updateData = { name, description, price, stock };
+        const updateData = { name, description, price, stock, category };
 
         // If there's an image, include it in the update
         if (req.file) {
@@ -756,6 +801,7 @@ router.put('/product/edit/:id', authenticateUser, upload.single('image'), async 
         res.status(500).json({ msg: 'Server error' });
     }
 });
+
 
 //products
 

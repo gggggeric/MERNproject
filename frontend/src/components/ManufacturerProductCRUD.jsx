@@ -23,6 +23,7 @@ const ManufacturerProductCRUD = () => {
     const [description, setDescription] = useState('');
     const [price, setPrice] = useState('');
     const [stock, setStock] = useState('');
+    const [category, setCategory] = useState('');  // Added category state
     const [image, setImage] = useState(null);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
@@ -67,7 +68,7 @@ const ManufacturerProductCRUD = () => {
         setError('');
         setSuccess('');
 
-        if (!name || !description || !price || !stock || (!image && !isEditing)) {
+        if (!name || !description || !price || !stock || !category || (!image && !isEditing)) {
             setError('All fields are required');
             return;
         }
@@ -96,6 +97,7 @@ const ManufacturerProductCRUD = () => {
         formData.append('description', description);
         formData.append('price', price);
         formData.append('stock', stock);
+        formData.append('category', category); // Added category to form data
         if (image) formData.append('image', image);
 
         try {
@@ -135,6 +137,7 @@ const ManufacturerProductCRUD = () => {
         setDescription('');
         setPrice('');
         setStock('');
+        setCategory('');
         setImage(null);
         setCurrentProductId(null);
         setIsEditing(false);
@@ -160,6 +163,7 @@ const ManufacturerProductCRUD = () => {
             setDescription(product.description);
             setPrice(product.price);
             setStock(product.stock);
+            setCategory(product.category);  // Set the category field
             setCurrentProductId(productId);
             setIsEditing(true);
         } catch (err) {
@@ -251,6 +255,16 @@ const ManufacturerProductCRUD = () => {
                         />
                     </div>
                     <div className="form-group">
+                        <label htmlFor="category">Category:</label>
+                        <input
+                            type="text"
+                            id="category"
+                            value={category}
+                            onChange={(e) => setCategory(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
                         <label htmlFor="image">Image:</label>
                         <input
                             type="file"
@@ -280,6 +294,7 @@ const ManufacturerProductCRUD = () => {
                                     <TableCell>Description</TableCell>
                                     <TableCell>Price</TableCell>
                                     <TableCell>Stock</TableCell>
+                                    <TableCell>Category</TableCell>
                                     <TableCell>Image</TableCell>
                                     <TableCell>Actions</TableCell>
                                 </TableRow>
@@ -289,20 +304,28 @@ const ManufacturerProductCRUD = () => {
                                     <TableRow key={product._id}>
                                         <TableCell>{product.name}</TableCell>
                                         <TableCell>{product.description}</TableCell>
-                                        <TableCell>₱{product.price}</TableCell>
+                                        <TableCell>{product.price}</TableCell>
                                         <TableCell>{product.stock}</TableCell>
+                                        <TableCell>{product.category}</TableCell>
                                         <TableCell>
                                             {product.image && (
-                                                <img
-                                                    src={`http://localhost:5001/${product.image.replace(/\\/g, '/')}`}
-                                                    alt={product.name}
-                                                    width="50"
-                                                />
+                                                <img src={`http://localhost:5001/${product.image}`} alt="Product" width="50" />
                                             )}
                                         </TableCell>
                                         <TableCell>
-                                            <Button variant="contained" color="primary" onClick={() => handleEdit(product._id)}>Edit</Button>
-                                            <Button variant="contained" color="secondary" onClick={() => handleDelete(product._id)}>Delete</Button>
+                                            <Button
+                                                variant="outlined"
+                                                onClick={() => handleEdit(product._id)}
+                                            >
+                                                Edit
+                                            </Button>
+                                            <Button
+                                                variant="outlined"
+                                                color="secondary"
+                                                onClick={() => handleDelete(product._id)}
+                                            >
+                                                Delete
+                                            </Button>
                                         </TableCell>
                                     </TableRow>
                                 ))}
@@ -310,14 +333,14 @@ const ManufacturerProductCRUD = () => {
                         </Table>
                     </TableContainer>
                 ) : (
-                    <Typography variant="body1" color="textSecondary">No products available.</Typography>
+                    <Typography variant="body2">No products available</Typography>
                 )}
             </div>
 
             <Dialog open={showDeleteConfirm} onClose={cancelDelete}>
-                <DialogTitle>Confirm Delete</DialogTitle>
+                <DialogTitle>Confirm Deletion</DialogTitle>
                 <DialogContent>
-                    <Typography>Are you sure you want to delete this product?</Typography>
+                    Are you sure you want to delete this product?
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={cancelDelete} color="primary">Cancel</Button>

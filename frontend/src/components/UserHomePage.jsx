@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Container, Typography, Box, Grid, Card, CardContent, CardMedia, CircularProgress, Paper, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
+import { Typography, Grid, Card, CardContent, CardMedia, CircularProgress, Paper, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Select, MenuItem, InputLabel, FormControl, Box } from '@mui/material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './UserHomePage.css';
@@ -13,10 +13,12 @@ const UserHomePage = () => {
     const [quantity, setQuantity] = useState(1);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
-    const userEmail = localStorage.getItem('user-email');
+    const [orderSuccessModal, setOrderSuccessModal] = useState(false);
+    const [ratingFilter, setRatingFilter] = useState(0);
+    const [categoryFilter, setCategoryFilter] = useState(''); // State for category filter
+    const [categories, setCategories] = useState([]); // New state for categories
     const navigate = useNavigate();
 
-    // Function to render stars for product rating
     const renderStars = (rating) => {
         const totalStars = 5;
         let stars = [];
@@ -28,32 +30,33 @@ const UserHomePage = () => {
         return stars;
     };
 
-    // Fetch products with pagination
     const fetchProducts = useCallback(async () => {
         try {
             const token = localStorage.getItem('auth-token');
             const res = await axios.get('http://localhost:5001/api/auth/user/products', {
                 headers: { 'Authorization': `Bearer ${token}` },
-                params: { page, limit: 10 }
+                params: { page, limit: 10, rating: ratingFilter, category: categoryFilter }
             });
 
             if (res.data.length === 0) {
                 setHasMore(false);
             } else {
                 setProducts(prevProducts => [...prevProducts, ...res.data]);
+                // Extract unique categories from the fetched products and update the categories state
+                const uniqueCategories = [...new Set(res.data.map(product => product.category))];
+                setCategories(uniqueCategories);
             }
             setLoading(false);
         } catch (err) {
             setError('Failed to load products. Please try again later.');
             setLoading(false);
         }
-    }, [page]);
+    }, [page, ratingFilter, categoryFilter]);
 
     useEffect(() => {
         fetchProducts();
     }, [fetchProducts]);
 
-    // Infinite scrolling logic
     const handleScroll = useCallback(() => {
         const bottom = window.innerHeight + document.documentElement.scrollTop === document.documentElement.offsetHeight;
         if (bottom && hasMore && !loading) {
@@ -69,7 +72,6 @@ const UserHomePage = () => {
         };
     }, [handleScroll]);
 
-    // Handle placing the order
     const handlePlaceOrder = async (product) => {
         const token = localStorage.getItem('auth-token');
         const orderDataToSend = {
@@ -79,13 +81,12 @@ const UserHomePage = () => {
         };
 
         try {
-            // Send the order to the backend
             await axios.post('http://localhost:5001/api/auth/order/place', orderDataToSend, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            // After placing the order, close the modal and reset quantity
+            setOrderSuccessModal(true);
             setOpenModal(false);
-            setQuantity(1);  // Reset quantity
+            setQuantity(1);
         } catch (err) {
             alert('Failed to place the order. Please try again.');
         }
@@ -98,92 +99,181 @@ const UserHomePage = () => {
     };
 
     const handleCloseModal = () => setOpenModal(false);
+    const handleCloseOrderSuccessModal = () => setOrderSuccessModal(false);
 
     const handleQuantityChange = (e) => {
-        const value = Math.max(1, parseInt(e.target.value) || 1); // Validate quantity input
+        const value = Math.max(1, parseInt(e.target.value) || 1);
         setQuantity(value);
     };
 
-    // Loading or error handling UI
+    const handleRatingFilterChange = (event) => {
+        setRatingFilter(event.target.value);
+        setProducts([]);
+        setPage(1);
+    };
+
+    const handleCategoryFilterChange = (event) => {
+        setCategoryFilter(event.target.value);
+        setProducts([]);
+        setPage(1);
+    };
+
     if (loading && page === 1) {
         return (
-            <Container maxWidth="md" sx={{ textAlign: 'center', mt: 4 }}>
+            <Paper elevation={3} sx={{ padding: 4, borderRadius: 2, backgroundColor: '#f0f0f0', mb: 4 }}>
                 <CircularProgress />
                 <Typography variant="h5" sx={{ mt: 2 }}>Loading products...</Typography>
-            </Container>
+            </Paper>
         );
     }
 
     if (error) {
         return (
-            <Container maxWidth="md" sx={{ textAlign: 'center', mt: 4 }}>
+            <Paper elevation={3} sx={{ padding: 4, borderRadius: 2, backgroundColor: '#f0f0f0', mb: 4 }}>
                 <Typography variant="h6" color="error">{error}</Typography>
-            </Container>
+            </Paper>
         );
     }
 
     return (
-        <Container maxWidth="lg" sx={{ textAlign: 'center', mt: 4 }}>
-            <Paper elevation={3} sx={{ padding: 4, borderRadius: 2, backgroundColor: '#f0f0f0', mb: 4 }}>
-                {userEmail && (
-                    <Typography variant="h5" component="h2" sx={{ mb: 2, color: '#666' }}>
-                        Your email: {userEmail}
-                    </Typography>
-                )}
-                <Typography variant="body1" sx={{ color: '#555' }}>
-                    Here you can view your products and manage your profile.
-                </Typography>
-            </Paper>
+        <div>
+            <Box sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',   
+                padding: '20px',
+                backgroundColor: '#fff',
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                marginBottom: '20px',
+                maxWidth: '500px',
+                margin: '0 auto',
+                borderRadius: '12px',
+            }}>
+                <FormControl fullWidth sx={{ width: '250px', backgroundColor: 'white', borderRadius: 2 }}>
+                    <InputLabel id="rating-filter-label">Filter by Rating</InputLabel>
+                    <Select
+                        labelId="rating-filter-label"
+                        value={ratingFilter}
+                        onChange={handleRatingFilterChange}
+                        label="Filter by Rating"
+                        sx={{ borderRadius: 2 }}
+                    >
+                        <MenuItem value={0}>All Ratings</MenuItem>
+                        <MenuItem value={1}>1 Star & Above</MenuItem>
+                        <MenuItem value={2}>2 Stars & Above</MenuItem>
+                        <MenuItem value={3}>3 Stars & Above</MenuItem>
+                        <MenuItem value={4}>4 Stars & Above</MenuItem>
+                        <MenuItem value={5}>5 Stars</MenuItem>
+                    </Select>
+                </FormControl>
 
-            {/* Displaying Products */}
-            <Grid container spacing={4}>
-                {products.map(product => (
+                {/* Category Filter Dropdown */}
+                <FormControl fullWidth sx={{ width: '250px', backgroundColor: 'white', borderRadius: 2, marginLeft: 2 }}>
+                    <InputLabel id="category-filter-label">Filter by Category</InputLabel>
+                    <Select
+                        labelId="category-filter-label"
+                        value={categoryFilter}
+                        onChange={handleCategoryFilterChange}
+                        label="Filter by Category"
+                        sx={{ borderRadius: 2 }}
+                    >
+                        <MenuItem value="">All Categories</MenuItem>
+                        {categories.map((category, index) => (
+                            <MenuItem key={index} value={category}>{category}</MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+            </Box>
+
+            <Grid container spacing={4} justifyContent="center" sx={{ paddingTop: '20px', maxWidth: '1200px', margin: '0 auto' }}>
+                {products.map((product) => (
                     <Grid item xs={12} sm={6} md={4} key={product._id}>
                         <Card sx={{ borderRadius: 2, boxShadow: 3, transition: '0.3s', '&:hover': { transform: 'scale(1.05)', boxShadow: 6 } }}>
-                            <CardMedia component="img" alt={product.name} height="200" image={`http://localhost:5001/${product.image}`} sx={{ borderTopLeftRadius: 2, borderTopRightRadius: 2 }} />
+                            <CardMedia
+                                component="img"
+                                alt={product.name}
+                                height="200"
+                                image={`http://localhost:5001/${product.image}`}
+                                sx={{ borderTopLeftRadius: 2, borderTopRightRadius: 2 }}
+                            />
                             <CardContent sx={{ backgroundColor: '#f9f9f9' }}>
-                                <Typography variant="h6" component="div" sx={{ fontWeight: 'bold' }}>{product.name}</Typography>
-                                <Typography variant="body2" color="text.secondary">{product.description}</Typography>
-                                <Typography variant="h6" sx={{ mt: 2, color: '#1976d2' }}>Price: ₱{product.price}</Typography>
-                                <Typography variant="body2" sx={{ color: '#666' }}>Company: {product.companyName}</Typography>
-                                <Typography variant="body2" sx={{ color: '#666' }}>Stock: {product.stock}</Typography>
-
-                                {/* Render Rating */}
+                                <Typography variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
+                                    {product.name}
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                    {product.description}
+                                </Typography>
+                                <Typography variant="h6" sx={{ mt: 2, color: '#1976d2' }}>
+                                    Price: ₱{product.price}
+                                </Typography>
+                                <Typography variant="body2" sx={{ color: '#666' }}>
+                                    Stock: {product.stock}
+                                </Typography>
+                                <Typography variant="body2" sx={{ color: '#666' }}>
+                                    Company: {product.companyName}
+                                </Typography>
+                                <Typography variant="body2" sx={{ color: '#666' }}>
+                                    Category: {product.category}
+                                </Typography>
                                 <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
                                     <Typography variant="body2" sx={{ color: '#666' }}>Rating: </Typography>
                                     <Box sx={{ ml: 1, display: 'flex' }}>
                                         {renderStars(product.averageRating || 0)} {/* Default rating to 0 if not available */}
                                     </Box>
                                 </Box>
-
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                                    <Button variant="outlined" color="secondary" onClick={() => handleOpenModal(product)}>Place Order</Button>
-                                </Box>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    sx={{ width: '100%', marginTop: 2 }}
+                                    onClick={() => handleOpenModal(product)}
+                                >
+                                    Place Order
+                                </Button>
                             </CardContent>
                         </Card>
                     </Grid>
                 ))}
             </Grid>
 
-            {/* Loading spinner while fetching more data */}
-            {loading && hasMore && (
-                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-                    <CircularProgress />
-                </Box>
-            )}
-
-            {/* Place Order Modal */}
+            {/* Order Modal */}
             <Dialog open={openModal} onClose={handleCloseModal}>
-                <DialogTitle>Place Order for {selectedProduct?.name}</DialogTitle>
+                <DialogTitle>Place Order</DialogTitle>
                 <DialogContent>
-                    <TextField label="Quantity" type="number" value={quantity} onChange={handleQuantityChange} fullWidth margin="normal" />
+                    <TextField
+                        label="Quantity"
+                        type="number"
+                        value={quantity}
+                        onChange={handleQuantityChange}
+                        fullWidth
+                        margin="normal"
+                        inputProps={{ min: 1 }}
+                    />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCloseModal} color="primary">Cancel</Button>
-                    <Button onClick={() => handlePlaceOrder(selectedProduct)} color="primary">Place Order</Button>
+                    <Button onClick={handleCloseModal}>Cancel</Button>
+                    <Button
+                        onClick={() => handlePlaceOrder(selectedProduct)}
+                        variant="contained"
+                        color="primary"
+                    >
+                        Place Order
+                    </Button>
                 </DialogActions>
             </Dialog>
-        </Container>
+
+            {/* Order Success Modal */}
+            <Dialog open={orderSuccessModal} onClose={handleCloseOrderSuccessModal}>
+                <DialogTitle>Order Placed Successfully!</DialogTitle>
+                <DialogContent>
+                    <Typography>Your order has been successfully placed.</Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseOrderSuccessModal} color="primary">
+                        Close
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </div>
     );
 };
 

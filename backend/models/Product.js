@@ -42,6 +42,10 @@ const ProductSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+    category: {
+        type: String, // You can also use [String] for multiple categories
+        required: true,
+    },
 });
 
 const Product = mongoose.model('Product', ProductSchema);
