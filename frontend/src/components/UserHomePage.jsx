@@ -1,6 +1,9 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Typography, Grid, Card, CardContent, CardMedia, CircularProgress, Paper, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Select, MenuItem, InputLabel, FormControl, Box } from '@mui/material';
 import axios from 'axios';
+import { Carousel } from 'react-responsive-carousel'; // Import Carousel component
+import 'react-responsive-carousel/lib/styles/carousel.min.css'; // Import carousel styles
+
 
 import './UserHomePage.css';
 
@@ -233,54 +236,73 @@ useEffect(() => {
             </Box>
 
             <Grid container spacing={4} justifyContent="center" sx={{ paddingTop: '20px', maxWidth: '1200px', margin: '0 auto' }}>
-                {products.map((product) => (
-                    <Grid item xs={12} sm={6} md={4} key={product._id}>
-                        <Card sx={{ borderRadius: 2, boxShadow: 3, transition: '0.3s', '&:hover': { transform: 'scale(1.05)', boxShadow: 6 } }}>
-                            <CardMedia
-                                component="img"
-                                alt={product.name}
-                                height="200"
-                                image={`http://localhost:5001/${product.image}`}
-                                sx={{ borderTopLeftRadius: 2, borderTopRightRadius: 2 }}
-                            />
-                            <CardContent sx={{ backgroundColor: '#f9f9f9' }}>
-                                <Typography variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
-                                    {product.name}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                    {product.description}
-                                </Typography>
-                                <Typography variant="h6" sx={{ mt: 2, color: '#1976d2' }}>
-                                    Price: ₱{product.price}
-                                </Typography>
-                                <Typography variant="body2" sx={{ color: '#666' }}>
-                                    Stock: {product.stock}
-                                </Typography>
-                                <Typography variant="body2" sx={{ color: '#666' }}>
-                                    Company: {product.companyName}
-                                </Typography>
-                                <Typography variant="body2" sx={{ color: '#666' }}>
-                                    Category: {product.category}
-                                </Typography>
-                                <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-                                    <Typography variant="body2" sx={{ color: '#666' }}>Rating: </Typography>
-                                    <Box sx={{ ml: 1, display: 'flex' }}>
-                                        {renderStars(product.averageRating || 0)} {/* Default rating to 0 if not available */}
-                                    </Box>
-                                </Box>
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    sx={{ width: '100%', marginTop: 2 }}
-                                    onClick={() => handleOpenModal(product)}
-                                >
-                                    Place Order
-                                </Button>
-                            </CardContent>
-                        </Card>
-                    </Grid>
-                ))}
-            </Grid>
+    {products.map((product) => (
+        <Grid item xs={12} sm={6} md={4} key={product._id}>
+            <Card sx={{ borderRadius: 2, boxShadow: 3, transition: '0.3s', '&:hover': { transform: 'scale(1.05)', boxShadow: 6 } }}>
+                <div style={{ position: 'relative' }}>
+                    {/* Check if there are multiple images, use a Carousel */}
+                    {product.images && product.images.length > 0 ? (
+                        <Carousel>
+                            {product.images.map((image, index) => (
+                                <CardMedia
+                                    key={index}
+                                    component="img"
+                                    alt={product.name}
+                                    height="200"
+                                    image={`http://localhost:5001/${image}`} // Use multiple images here
+                                    sx={{ borderTopLeftRadius: 2, borderTopRightRadius: 2 }}
+                                />
+                            ))}
+                        </Carousel>
+                    ) : (
+                        <CardMedia
+                            component="img"
+                            alt={product.name}
+                            height="200"
+                            image={`http://localhost:5001/${product.image}`} // Fallback image
+                            sx={{ borderTopLeftRadius: 2, borderTopRightRadius: 2 }}
+                        />
+                    )}
+                </div>
+
+                <CardContent sx={{ backgroundColor: '#f9f9f9' }}>
+                    <Typography variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
+                        {product.name}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                        {product.description}
+                    </Typography>
+                    <Typography variant="h6" sx={{ mt: 2, color: '#1976d2' }}>
+                        Price: ₱{product.price}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: '#666' }}>
+                        Stock: {product.stock}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: '#666' }}>
+                        Company: {product.companyName}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: '#666' }}>
+                        Category: {product.category}
+                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
+                        <Typography variant="body2" sx={{ color: '#666' }}>Rating: </Typography>
+                        <Box sx={{ ml: 1, display: 'flex' }}>
+                            {renderStars(product.averageRating || 0)} {/* Default rating to 0 if not available */}
+                        </Box>
+                    </Box>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        sx={{ width: '100%', marginTop: 2 }}
+                        onClick={() => handleOpenModal(product)}
+                    >
+                        Place Order
+                    </Button>
+                </CardContent>
+            </Card>
+        </Grid>
+    ))}
+</Grid>
 
             {/* Order Modal */}
             <Dialog open={openModal} onClose={handleCloseModal}>

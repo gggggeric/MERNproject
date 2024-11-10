@@ -26,8 +26,8 @@ const ProductSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    image: {
-        type: String,
+    images: { // Updated field to store an array of image paths
+        type: [String], // An array of strings for image paths
         required: true,
     },
     averageRating: {

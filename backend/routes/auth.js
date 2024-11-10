@@ -23,6 +23,152 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 // Get reviews submitted by the authenticated user
 
+
+
+
+router.delete('/products/bulk-delete', authenticateUser, async (req, res) => {
+    try {
+        // Check if the user is a manufacturer
+        if (req.user.userType !== 'manufacturer') {
+            return res.status(403).json({ message: 'Forbidden! Only manufacturers can delete products.' });
+        }
+
+        const productIds = req.body.productIds;
+
+        if (!Array.isArray(productIds) || productIds.length === 0) {
+            return res.status(400).json({ message: 'Product IDs must be an array and cannot be empty' });
+        }
+
+        // Ensure that the user is the owner of the products they want to delete
+        const products = await Product.find({ 
+            _id: { $in: productIds },
+            user: req.user._id // Ensure the product belongs to the authenticated user
+        });
+
+        if (products.length !== productIds.length) {
+            return res.status(403).json({ message: 'You can only delete your own products.' });
+        }
+
+        // Perform the bulk delete operation
+        const result = await Product.deleteMany({
+            _id: { $in: productIds },
+            user: req.user._id // Ensure the product belongs to the authenticated user
+        });
+
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ message: 'No products found with the given IDs' });
+        }
+
+        res.status(200).json({ message: `${result.deletedCount} products deleted successfully` });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error. Please try again later.' });
+    }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+router.get('/sales/monthly', authenticateUser, async (req, res) => {
+    const userId = req.user._id; // Get the logged-in user's ID
+    console.log('Logged-in manufacturer userId:', userId);
+
+    // Check if the user is a manufacturer
+    if (req.user.userType !== 'manufacturer') {
+        return res.status(403).json({ message: 'Forbidden! You must be a manufacturer to access this resource.' });
+    }
+
+    try {
+        // Aggregation query to get monthly sales for the manufacturer
+        const salesData = await Order.aggregate([
+            // Match only "Accepted" orders
+            { 
+                $match: { 
+                    orderStatus: 'Accepted' 
+                }
+            },
+            {
+                // Unwind the products array to process each product individually
+                $unwind: "$products"
+            },
+            {
+                // Lookup the product details and check who made the product (the manufacturer)
+                $lookup: {
+                    from: "products", // Referencing the "Product" collection
+                    localField: "products.product", // Product field in orders
+                    foreignField: "_id", // _id field in the product collection
+                    as: "productDetails" // Store the result as productDetails in the order
+                }
+            },
+            {
+                // Unwind the productDetails array so that we can filter based on the manufacturer
+                $unwind: "$productDetails"
+            },
+            {
+                // Filter by matching the manufacturer (user) who created the product
+                $match: {
+                    "productDetails.user": new mongoose.Types.ObjectId(userId) // Ensure the userId is converted to ObjectId correctly
+                }
+            },
+            {
+                // Group by the month and sum the totalPrice for each month
+                $group: {
+                    _id: { $month: "$createdAt" }, // Group by month
+                    totalSales: { $sum: "$totalPrice" } // Sum the totalPrice for each month
+                }
+            },
+            {
+                // Sort by month in ascending order
+                $sort: { _id: 1 }
+            }
+        ]);
+
+        // Create a map to store sales data per month
+        const salesMap = {};
+        salesData.forEach(data => {
+            // Map the total sales to the month
+            salesMap[data._id] = data.totalSales;
+        });
+
+        // Array of month names for January to December
+        const monthNames = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+
+        // Initialize an array for all months (1 to 12), ensuring that each month is represented
+        const allMonthsData = [];
+        for (let month = 1; month <= 12; month++) {
+            allMonthsData.push({
+                month: monthNames[month - 1], // Get the month name
+                totalSales: salesMap[month] || 0 // If no sales for this month, set totalSales to 0
+            });
+        }
+
+        // Log the sales data to check if it's mapped correctly
+        console.log('Sales Data:', allMonthsData);
+
+        // Send the data to the frontend
+        res.json(allMonthsData);
+    } catch (err) {
+        console.error('Error fetching sales data:', err);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
+
+
+
 // PUT route to update the rating of a review
 router.put('/user/:reviewId', authenticateUser, async (req, res) => {
     const { reviewId } = req.params;
@@ -361,12 +507,11 @@ router.get('/orders', authenticateUser, async (req, res) => {
         res.status(500).json({ error: 'Error placing the order. Please try again.' });
     }
 });
-
 router.get('/user/products', authenticateUser, async (req, res) => {
     try {
         // Extract pagination parameters from the query, set default values if not provided
         const page = parseInt(req.query.page) || 1;  // Default to page 1 if not provided
-        const limit = parseInt(req.query.limit) || 10;  // Default to 10 products per page if not provided
+        const limit = parseInt(req.query.limit) || 9;  // Default to 10 products per page if not provided
 
         // Extract the rating filter from the query (0 means no filter)
         const ratingFilter = parseInt(req.query.rating) || 0;  // Default to 0 (no rating filter)
@@ -374,21 +519,28 @@ router.get('/user/products', authenticateUser, async (req, res) => {
         // Extract the category filter from the query (empty means no filter)
         const categoryFilter = req.query.category || '';  // Default to empty string (no category filter)
 
+        // Extract price range filters from the query (min and max prices)
+        const minPrice = parseFloat(req.query.minPrice) || 0; // Default to 0 if not provided
+        const maxPrice = parseFloat(req.query.maxPrice) || Number.MAX_VALUE; // Default to max value if not provided
+
         // Calculate the number of products to skip based on the current page
         const skip = (page - 1) * limit;
 
         // Build the query object for filtering
         let filter = {};
-        
+
         // Apply the rating filter if greater than 0
         if (ratingFilter > 0) {
             filter.averageRating = { $gte: ratingFilter }; // Filter products with average rating greater than or equal to the rating filter
         }
-        
+
         // Apply the category filter if not empty
         if (categoryFilter) {
             filter.category = categoryFilter; // Filter products based on the category
         }
+
+        // Apply the price filter (between minPrice and maxPrice)
+        filter.price = { $gte: minPrice, $lte: maxPrice };
 
         // Fetch products based on the page, limit, and filters
         const products = await Product.find(filter) // Apply the filter
@@ -401,6 +553,7 @@ router.get('/user/products', authenticateUser, async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
+
 
 
 // Function to generate a JWT token
@@ -652,8 +805,9 @@ router.delete('/product/:id', authenticateUser, async (req, res) => {
         return res.status(500).json({ msg: 'Server error', error: error.message });
     }
 });
-router.post('/product/create', authenticateUser, upload.single('image'), async (req, res) => {
-    const { name, description, price, stock, category } = req.body; // Destructure category from the body
+// Route to create a product with multiple images
+router.post('/product/create', authenticateUser, upload.array('images', 5), async (req, res) => {
+    const { name, description, price, stock, category } = req.body;
     const userId = req.user._id; // Get user ID from authenticated request
 
     console.log('Request Body:', req.body);
@@ -688,20 +842,22 @@ router.post('/product/create', authenticateUser, upload.single('image'), async (
             return res.status(404).json({ msg: 'Manufacturer profile not found' });
         }
 
-        // Log the company name being stored
         const companyName = manufacturerProfile.companyName;
         console.log('Company Name:', companyName);
 
-        // Create new product with category included
+        // Prepare an array of image paths
+        const imagePaths = req.files ? req.files.map(file => file.path) : [];
+
+        // Create new product with category and multiple images
         const newProduct = new Product({
             name,
             description,
             price,
             stock,
-            category, // Add category to the product
-            user: userId, // Connect the product to the user
-            companyName, // Store company name in the product
-            image: req.file ? req.file.path : null, // Save the image path from multer, if provided
+            category,
+            user: userId,
+            companyName,
+            images: imagePaths, // Save multiple image paths
         });
 
         // Log the product details being saved
@@ -710,10 +866,10 @@ router.post('/product/create', authenticateUser, upload.single('image'), async (
             description,
             price,
             stock,
-            category, // Log category being saved with the product
+            category,
             user: userId,
-            companyName, // Log company name being saved with the product
-            image: newProduct.image,
+            companyName,
+            images: imagePaths,
         });
 
         // Save product to database
@@ -730,7 +886,6 @@ router.post('/product/create', authenticateUser, upload.single('image'), async (
         return res.status(500).json({ msg: 'Server error', error: error.message });
     }
 });
-
 
 router.get('/products', authenticateUser, async (req, res) => {
     const userId = req.user._id; // Get the authenticated user's ID
@@ -751,6 +906,8 @@ router.get('/products', authenticateUser, async (req, res) => {
         res.status(500).json({ msg: 'Server error', error: error.message });
     }
 });
+
+
 router.get('/product/:id', authenticateUser, async (req, res) => {
     try {
         const productId = req.params.id;
@@ -766,7 +923,7 @@ router.get('/product/:id', authenticateUser, async (req, res) => {
         res.status(500).json({ msg: 'Server error' });
     }
 });
-router.put('/product/edit/:id', authenticateUser, upload.single('image'), async (req, res) => {
+router.put('/product/edit/:id', authenticateUser, upload.array('images', 5), async (req, res) => {
     try {
         const { name, description, price, stock, category } = req.body;
         const productId = req.params.id;
@@ -774,12 +931,30 @@ router.put('/product/edit/:id', authenticateUser, upload.single('image'), async 
         console.log('Incoming data:', req.body);
         console.log('Updating product ID:', productId);
 
-        // Prepare the update object
-        const updateData = { name, description, price, stock, category };
+        // Find the existing product
+        const existingProduct = await Product.findById(productId);
+        if (!existingProduct) {
+            return res.status(404).json({ msg: 'Product not found' });
+        }
 
-        // If there's an image, include it in the update
-        if (req.file) {
-            updateData.image = req.file.path; // Store the path or filename as needed
+        // Prepare the update object with the new data
+        const updateData = {
+            name,
+            description,
+            price,
+            stock,
+            category,
+        };
+
+        // If there are new images, update the images field
+        if (req.files && req.files.length > 0) {
+            // If new images are uploaded, we replace the old images with the new ones
+            updateData.images = req.files.map(file => file.path);
+        }
+
+        // If no new images are uploaded, retain the existing images (no change)
+        if (!req.files || req.files.length === 0) {
+            updateData.images = existingProduct.images;
         }
 
         // Find and update the product
@@ -801,7 +976,6 @@ router.put('/product/edit/:id', authenticateUser, upload.single('image'), async 
         res.status(500).json({ msg: 'Server error' });
     }
 });
-
 
 //products
 

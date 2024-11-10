@@ -38,7 +38,7 @@ const ManufacturerProductCRUD = () => {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [selectedProducts, setSelectedProducts] = useState([]); // Track selected products
     const [expandedRow, setExpandedRow] = useState(null); // Track expanded row
-
+    const [images, setImages] = useState([]); // State for multiple images
 
     const toggleRow = (productId) => {
         if (expandedRow === productId) {
@@ -87,43 +87,52 @@ const ManufacturerProductCRUD = () => {
         e.preventDefault();
         setError('');
         setSuccess('');
-
-        if (!name || !description || !price || !stock || !category || (!image && !isEditing)) {
+    
+        // Check for required fields and images (multiple image support)
+        if (!name || !description || !price || !stock || !category || (images.length === 0 && !isEditing)) {
             setError('All fields are required');
             return;
         }
-
+    
         if (price <= 0 || stock < 0) {
             setError('Price must be greater than 0 and stock cannot be negative.');
             return;
         }
-
+    
         const token = localStorage.getItem('auth-token');
         if (!token) {
             setError('No authorization token found');
             return;
         }
-
+    
         const decodedToken = jwtDecode(token);
         const userType = decodedToken.userType;
-
+    
         if (userType !== 'manufacturer') {
             setError('You do not have permission to create products.');
             return;
         }
-
+    
         const formData = new FormData();
         formData.append('name', name);
         formData.append('description', description);
         formData.append('price', price);
         formData.append('stock', stock);
         formData.append('category', category);
-        if (image) formData.append('image', image);
-
+    
+        // Convert FileList to an array and append all selected images to the FormData object
+        if (images.length > 0) {
+            Array.from(images).forEach((image) => {
+                formData.append('images', image); // 'images' is the field name used in the backend (Express)
+            });
+        }
+    
         try {
             setLoading(true);
-
+    
+            // If editing, update the existing product
             if (isEditing) {
+                // Include productId in the request for editing
                 await axios.put(`http://localhost:5001/api/auth/product/edit/${currentProductId}`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
@@ -132,6 +141,7 @@ const ManufacturerProductCRUD = () => {
                 });
                 setSuccess('Product updated successfully!');
             } else {
+                // If creating a new product, send a POST request
                 await axios.post('http://localhost:5001/api/auth/product/create', formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
@@ -140,7 +150,8 @@ const ManufacturerProductCRUD = () => {
                 });
                 setSuccess('Product created successfully!');
             }
-
+    
+            // Fetch the products after a successful operation
             fetchProducts();
             resetForm();
         } catch (err) {
@@ -151,6 +162,7 @@ const ManufacturerProductCRUD = () => {
             setLoading(false);
         }
     };
+    
 
     const resetForm = () => {
         setName('');
@@ -322,13 +334,15 @@ const ManufacturerProductCRUD = () => {
                     </div>
                     <div className="form-group">
                         <label htmlFor="image">Image:</label>
-                        <input
-                            type="file"
-                            id="imageInput"
-                            accept="image/*"
-                            onChange={(e) => setImage(e.target.files[0])}
-                            required={!isEditing}
-                        />
+                     <input 
+                        type="file" 
+                        id="imageInput" 
+                        accept="image/*" 
+                        multiple 
+                        onChange={(e) => setImages(e.target.files)} 
+                        required={!isEditing} 
+                    />
+
                     </div>
                     <Button type="submit" variant="contained" color="primary" disabled={loading}>
                         {loading ? (isEditing ? 'Updating...' : 'Creating...') : (isEditing ? 'Update Product' : 'Create Product')}
@@ -396,11 +410,19 @@ const ManufacturerProductCRUD = () => {
                                             <TableCell>{product.stock}</TableCell>
                                             <TableCell>{product.category}</TableCell>
                                             <TableCell>
-                                                <img
-                                                    src={`http://localhost:5001/${product.image}`}
-                                                    alt={product.name}
-                                                    style={{ width: '50px', height: '50px' }}
-                                                />
+                                        {product.images && product.images.length > 0 ? (
+                                        product.images.map((image, index) => (
+                                            <img
+                                                key={index}
+                                                src={`http://localhost:5001/${image}`}
+                                                alt={`Product Image ${index + 1}`}
+                                                style={{ width: '50px', height: '50px', marginRight: '10px' }}
+                                            />
+                                        ))
+                                    ) : (
+                                        <p>No images available</p>
+)}
+
                                             </TableCell>
                                             <TableCell>
                                                 <Button onClick={() => handleEdit(product._id)}>Edit</Button>
