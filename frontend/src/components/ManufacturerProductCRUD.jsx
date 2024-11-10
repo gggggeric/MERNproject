@@ -15,15 +15,19 @@ import {
     TableRow,
     Typography,
     Paper,
+    IconButton, 
+    Collapse 
 } from '@mui/material';
 import './ManufacturerProductCRUD.css';
+import { ExpandLess, ExpandMore } from '@mui/icons-material';
+
 
 const ManufacturerProductCRUD = () => {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [price, setPrice] = useState('');
     const [stock, setStock] = useState('');
-    const [category, setCategory] = useState('');  // Added category state
+    const [category, setCategory] = useState('');
     const [image, setImage] = useState(null);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
@@ -32,6 +36,22 @@ const ManufacturerProductCRUD = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [currentProductId, setCurrentProductId] = useState(null);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [selectedProducts, setSelectedProducts] = useState([]); // Track selected products
+    const [expandedRow, setExpandedRow] = useState(null); // Track expanded row
+
+
+    const toggleRow = (productId) => {
+        if (expandedRow === productId) {
+            setExpandedRow(null); // Collapse if it's already expanded
+        } else {
+            setExpandedRow(productId); // Expand the clicked row
+        }
+    };
+    
+    const handleExpandClick = (productId) => {
+        setExpandedRow(expandedRow === productId ? null : productId); // Toggle expand/collapse
+    };
+
 
     // Fetch products
     const fetchProducts = async () => {
@@ -97,7 +117,7 @@ const ManufacturerProductCRUD = () => {
         formData.append('description', description);
         formData.append('price', price);
         formData.append('stock', stock);
-        formData.append('category', category); // Added category to form data
+        formData.append('category', category);
         if (image) formData.append('image', image);
 
         try {
@@ -163,7 +183,7 @@ const ManufacturerProductCRUD = () => {
             setDescription(product.description);
             setPrice(product.price);
             setStock(product.stock);
-            setCategory(product.category);  // Set the category field
+            setCategory(product.category);
             setCurrentProductId(productId);
             setIsEditing(true);
         } catch (err) {
@@ -205,6 +225,42 @@ const ManufacturerProductCRUD = () => {
     const cancelDelete = () => {
         setShowDeleteConfirm(false);
         setCurrentProductId(null);
+    };
+
+    // Handle checkbox change for selecting products
+    const handleSelectProduct = (productId) => {
+        setSelectedProducts((prevSelected) =>
+            prevSelected.includes(productId)
+                ? prevSelected.filter((id) => id !== productId) // Deselect
+                : [...prevSelected, productId] // Select
+        );
+    };
+
+    // Bulk delete selected products
+    const handleBulkDelete = async () => {
+        const token = localStorage.getItem('auth-token');
+        if (!token) {
+            setError('No authorization token found');
+            return;
+        }
+
+        try {
+            await axios.delete('http://localhost:5001/api/auth/products/bulk-delete', {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                data: {
+                    productIds: selectedProducts,
+                },
+            });
+
+            setSuccess('Products deleted successfully!');
+            fetchProducts();
+            setSelectedProducts([]); // Clear selected products after successful delete
+        } catch (err) {
+            console.error('Error deleting products:', err);
+            setError('Failed to delete products');
+        }
     };
 
     return (
@@ -284,12 +340,36 @@ const ManufacturerProductCRUD = () => {
             </div>
 
             <div className="product-card">
-                <h2>Your Products</h2>
-                {products.length > 0 ? (
+            <h2>Your Products</h2>
+
+            {products.length > 0 ? (
+                <>
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={handleBulkDelete}
+                        disabled={selectedProducts.length === 0}
+                    >
+                        Delete Selected Products
+                    </Button>
+
                     <TableContainer component={Paper}>
                         <Table>
                             <TableHead>
                                 <TableRow>
+                                    <TableCell>
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedProducts.length === products.length}
+                                            onChange={() => {
+                                                if (selectedProducts.length === products.length) {
+                                                    setSelectedProducts([]);
+                                                } else {
+                                                    setSelectedProducts(products.map((product) => product._id));
+                                                }
+                                            }}
+                                        />
+                                    </TableCell>
                                     <TableCell>Name</TableCell>
                                     <TableCell>Description</TableCell>
                                     <TableCell>Price</TableCell>
@@ -301,49 +381,109 @@ const ManufacturerProductCRUD = () => {
                             </TableHead>
                             <TableBody>
                                 {products.map((product) => (
-                                    <TableRow key={product._id}>
-                                        <TableCell>{product.name}</TableCell>
-                                        <TableCell>{product.description}</TableCell>
-                                        <TableCell>{product.price}</TableCell>
-                                        <TableCell>{product.stock}</TableCell>
-                                        <TableCell>{product.category}</TableCell>
-                                        <TableCell>
-                                            {product.image && (
-                                                <img src={`http://localhost:5001/${product.image}`} alt="Product" width="50" />
-                                            )}
-                                        </TableCell>
-                                        <TableCell>
-                                            <Button
-                                                variant="outlined"
-                                                onClick={() => handleEdit(product._id)}
-                                            >
-                                                Edit
-                                            </Button>
-                                            <Button
-                                                variant="outlined"
-                                                color="secondary"
-                                                onClick={() => handleDelete(product._id)}
-                                            >
-                                                Delete
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
+                                    <React.Fragment key={product._id}>
+                                        <TableRow>
+                                            <TableCell>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedProducts.includes(product._id)}
+                                                    onChange={() => handleSelectProduct(product._id)}
+                                                />
+                                            </TableCell>
+                                            <TableCell>{product.name}</TableCell>
+                                            <TableCell>{product.description}</TableCell>
+                                            <TableCell>{product.price}</TableCell>
+                                            <TableCell>{product.stock}</TableCell>
+                                            <TableCell>{product.category}</TableCell>
+                                            <TableCell>
+                                                <img
+                                                    src={`http://localhost:5001/${product.image}`}
+                                                    alt={product.name}
+                                                    style={{ width: '50px', height: '50px' }}
+                                                />
+                                            </TableCell>
+                                            <TableCell>
+                                                <Button onClick={() => handleEdit(product._id)}>Edit</Button>
+                                                <Button onClick={() => handleDelete(product._id)}>Delete</Button>
+                                                {/* Expand/Collapse Button */}
+                                                <IconButton onClick={() => handleExpandClick(product._id, product)}>
+                                                    {expandedRow === product._id ? <ExpandLess /> : <ExpandMore />}
+                                                </IconButton>
+                                            </TableCell>
+                                        </TableRow>
+
+                                        {/* Expanded Content Row */}
+                                        <TableRow>
+                                            <TableCell colSpan={8}>
+                                                <Collapse in={expandedRow === product._id} timeout="auto" unmountOnExit>
+                                                    {/* Expanded details */}
+                                                    <div>
+                                                        {isEditing ? (
+                                                            <div>
+                                                                <Typography variant="h6">Edit Product</Typography>
+                                                                <input
+                                                                    type="text"
+                                                                    value={name}
+                                                                    onChange={(e) => setName(e.target.value)}
+                                                                    placeholder="Product Name"
+                                                                />
+                                                                <input
+                                                                    type="text"
+                                                                    value={description}
+                                                                    onChange={(e) => setDescription(e.target.value)}
+                                                                    placeholder="Description"
+                                                                />
+                                                                <input
+                                                                    type="number"
+                                                                    value={price}
+                                                                    onChange={(e) => setPrice(e.target.value)}
+                                                                    placeholder="Price"
+                                                                />
+                                                                <input
+                                                                    type="number"
+                                                                    value={stock}
+                                                                    onChange={(e) => setStock(e.target.value)}
+                                                                    placeholder="Stock"
+                                                                />
+                                                                <input
+                                                                    type="text"
+                                                                    value={category}
+                                                                    onChange={(e) => setCategory(e.target.value)}
+                                                                    placeholder="Category"
+                                                                />
+                                                                {/* You can add a Save Button here to submit the changes */}
+                                                            </div>
+                                                        ) : (
+                                                            <div>
+                                                                <Typography variant="body1">Product Description: {product.description}</Typography>
+                                                                <Typography variant="body1">Product Price: {product.price}</Typography>
+                                                                {/* Display other details */}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </Collapse>
+                                            </TableCell>
+                                        </TableRow>
+                                    </React.Fragment>
                                 ))}
                             </TableBody>
                         </Table>
                     </TableContainer>
-                ) : (
-                    <Typography variant="body2">No products available</Typography>
-                )}
-            </div>
+                </>
+            ) : (
+                <Typography>No products available</Typography>
+            )}
+        </div>
 
             <Dialog open={showDeleteConfirm} onClose={cancelDelete}>
-                <DialogTitle>Confirm Deletion</DialogTitle>
+                <DialogTitle>Confirm Delete</DialogTitle>
                 <DialogContent>
-                    Are you sure you want to delete this product?
+                    <Typography>
+                        Are you sure you want to delete this product?
+                    </Typography>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={cancelDelete} color="primary">Cancel</Button>
+                    <Button onClick={cancelDelete}>Cancel</Button>
                     <Button onClick={confirmDelete} color="secondary">Delete</Button>
                 </DialogActions>
             </Dialog>
