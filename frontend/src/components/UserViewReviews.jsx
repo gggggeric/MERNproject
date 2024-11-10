@@ -11,7 +11,7 @@ const UserReviews = () => {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const response = await axios.get('http://localhost:5001/api/auth/user/reviews', {
+     const response =    await axios.get('http://localhost:5001/api/auth/user/reviews', {
           headers: {
             'Authorization': `Bearer ${token}`,
           },

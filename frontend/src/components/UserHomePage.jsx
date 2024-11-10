@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Typography, Grid, Card, CardContent, CardMedia, CircularProgress, Paper, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Select, MenuItem, InputLabel, FormControl, Box } from '@mui/material';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+
 import './UserHomePage.css';
 
 const UserHomePage = () => {
@@ -17,8 +17,9 @@ const UserHomePage = () => {
     const [ratingFilter, setRatingFilter] = useState(0);
     const [categoryFilter, setCategoryFilter] = useState(''); // State for category filter
     const [categories, setCategories] = useState([]); // New state for categories
-    const navigate = useNavigate();
-
+    const [priceSort, setPriceSort] = useState(''); // New state for price sorting
+  // Handle price filter search logic
+ 
     const renderStars = (rating) => {
         const totalStars = 5;
         let stars = [];
@@ -29,48 +30,79 @@ const UserHomePage = () => {
         }
         return stars;
     };
-
     const fetchProducts = useCallback(async () => {
         try {
+            setLoading(true);
             const token = localStorage.getItem('auth-token');
+    
+            // Fetch products with filters applied
             const res = await axios.get('http://localhost:5001/api/auth/user/products', {
                 headers: { 'Authorization': `Bearer ${token}` },
-                params: { page, limit: 10, rating: ratingFilter, category: categoryFilter }
+                params: { 
+                    page, 
+                    limit: 10, 
+                    rating: ratingFilter, 
+                    category: categoryFilter, 
+            
+                }
             });
-
+    
+            // Handle no more products case
             if (res.data.length === 0) {
                 setHasMore(false);
             } else {
-                setProducts(prevProducts => [...prevProducts, ...res.data]);
-                // Extract unique categories from the fetched products and update the categories state
-                const uniqueCategories = [...new Set(res.data.map(product => product.category))];
-                setCategories(uniqueCategories);
+                // Sort products based on priceSort state
+                if (priceSort === 'lowToHigh') {
+                    res.data.sort((a, b) => a.price - b.price);
+                } else if (priceSort === 'highToLow') {
+                    res.data.sort((a, b) => b.price - a.price);
+                }
+    
+                // If page === 1, replace products; otherwise, add to current list
+                setProducts(prevProducts => page === 1 ? res.data : [...prevProducts, ...res.data]);
+    
+                // Populate unique categories from the product list if not already set
+                if (categories.length === 0) {
+                    const uniqueCategories = [...new Set(res.data.map(product => product.category))];
+                    setCategories(uniqueCategories);
+                }
             }
             setLoading(false);
         } catch (err) {
             setError('Failed to load products. Please try again later.');
             setLoading(false);
         }
-    }, [page, ratingFilter, categoryFilter]);
+    }, [page, ratingFilter, categoryFilter, categories.length, priceSort]); 
+    
+    
 
     useEffect(() => {
+        setProducts([]); // Clear products when filters change
+        setPage(1); // Reset to page 1 when filters change
+        setHasMore(true); // Reset hasMore in case there are more products to load
         fetchProducts();
-    }, [fetchProducts]);
+    }, [fetchProducts, ratingFilter, categoryFilter, priceSort]); 
 
-    const handleScroll = useCallback(() => {
-        const bottom = window.innerHeight + document.documentElement.scrollTop === document.documentElement.offsetHeight;
+    const handleScroll = useCallback((e) => {
+        const bottom = window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 10;
+    
         if (bottom && hasMore && !loading) {
+            // Trigger data fetching only when you're at the bottom and there's more data
             setPage(prevPage => prevPage + 1);
             setLoading(true);
         }
     }, [loading, hasMore]);
+    
+useEffect(() => {
+    // Add scroll event listener
+    window.addEventListener('scroll', handleScroll);
 
-    useEffect(() => {
-        window.addEventListener('scroll', handleScroll);
-        return () => {
-            window.removeEventListener('scroll', handleScroll);
-        };
-    }, [handleScroll]);
+    return () => {
+        // Clean up event listener on component unmount
+        window.removeEventListener('scroll', handleScroll);
+    };
+}, [handleScroll]);
+
 
     const handlePlaceOrder = async (product) => {
         const token = localStorage.getItem('auth-token');
@@ -117,7 +149,7 @@ const UserHomePage = () => {
         setProducts([]);
         setPage(1);
     };
-
+    
     if (loading && page === 1) {
         return (
             <Paper elevation={3} sx={{ padding: 4, borderRadius: 2, backgroundColor: '#f0f0f0', mb: 4 }}>
@@ -126,7 +158,7 @@ const UserHomePage = () => {
             </Paper>
         );
     }
-
+    
     if (error) {
         return (
             <Paper elevation={3} sx={{ padding: 4, borderRadius: 2, backgroundColor: '#f0f0f0', mb: 4 }}>
@@ -183,6 +215,21 @@ const UserHomePage = () => {
                         ))}
                     </Select>
                 </FormControl>
+                <FormControl fullWidth sx={{ width: '250px', backgroundColor: 'white', borderRadius: 2, marginLeft: 2 }}>
+                <InputLabel id="price-sort-label">Sort by Price</InputLabel>
+                <Select
+                    labelId="price-sort-label"
+                    value={priceSort}
+                    onChange={(event) => setPriceSort(event.target.value)}
+                    label="Sort by Price"
+                    sx={{ borderRadius: 2 }}
+                >
+                    <MenuItem value="">None</MenuItem>
+                    <MenuItem value="lowToHigh">Lowest to Highest</MenuItem>
+                    <MenuItem value="highToLow">Highest to Lowest</MenuItem>
+                </Select>
+            </FormControl>
+
             </Box>
 
             <Grid container spacing={4} justifyContent="center" sx={{ paddingTop: '20px', maxWidth: '1200px', margin: '0 auto' }}>
