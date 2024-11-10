@@ -7,17 +7,17 @@ import UserHomePage from './components/UserHomePage';
 import AdminHomePage from './components/AdminHomePage';
 import Home from './components/Home'; // Assuming you have a home page
 import Navbar from './components/Navbar';
-import UserCrud from './components/UserCrud';
+import UserCrud from './components/AdminUserCrud';
 import Register from './components/Register';
 import ManufacturerHomePage from './components/ManufacturerHomePage';
 import ManufacturerEditPassword from './components/ManufacturerEditPassword';
 import ManufacturerProfile from './components/ManufacturerProfile';
 import ManufacturerProductCRUD from './components/ManufacturerProductCRUD';
-import Cart from './components/Cart';
 import UserEditPassword from './components/UserEditPassword';
 import OrderList from './components/ManufacturersOrders';
 import UserViewOrders from './components/UserViewOrders';
 import UserReviews from './components/UserViewReviews';
+import AdminManageReviews from './components/AdminManageReviews';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import "slick-carousel/slick/slick-theme.css"; 
 
@@ -69,7 +69,7 @@ const App = () => {
                                 />
                             } 
                         />
-                        <Route 
+                        {/* <Route 
                             path="/userEditPassword" 
                             element={
                                 <ProtectedRoute 
@@ -77,7 +77,7 @@ const App = () => {
                                     allowedRoles={['user']}
                                 />
                             } 
-                        />
+                        /> */}
                         <Route 
                             path="/manufacturerEditPassword" 
                             element={
@@ -102,15 +102,6 @@ const App = () => {
                                 <ProtectedRoute 
                                     element={<ManufacturerProductCRUD />} 
                                     allowedRoles={['manufacturer']}
-                                />
-                            } 
-                        />
-                        <Route 
-                            path="/cart/user" 
-                            element={
-                                <ProtectedRoute 
-                                    element={<Cart />} 
-                                    allowedRoles={['user']}
                                 />
                             } 
                         />
@@ -141,12 +132,22 @@ const App = () => {
                         />
                      } 
                      />
-                        <Route 
+                    <Route 
                     path="/user/view/review" 
                     element={
                         <ProtectedRoute 
                             element={<UserReviews />} 
                             allowedRoles={['user']} // Allow users and admins to access the order page
+                        />
+                     } 
+                     />
+
+                    <Route 
+                    path="/admin/review" 
+                    element={
+                        <ProtectedRoute 
+                            element={<AdminManageReviews />} 
+                            allowedRoles={['admin']} // Allow users and admins to access the order page
                         />
                      } 
                      />

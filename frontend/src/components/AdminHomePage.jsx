@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Container, Typography, Grid, Card, CardContent, IconButton } from '@mui/material';
-import { FaUser, FaFileAlt, FaCog } from 'react-icons/fa'; // Importing icons
+import { FaUser, FaFileAlt, FaCog, FaStar } from 'react-icons/fa'; // Importing icons
 import { FaChevronRight } from 'react-icons/fa'; // Importing the Chevron icon
 
 const AdminHomePage = () => {
@@ -17,6 +17,10 @@ const AdminHomePage = () => {
 
     const handleRedirectToSettings = () => {
         navigate('/settings'); // Redirect to Settings page
+    };
+
+    const handleRedirectToManageReviews = () => {
+        navigate('/admin/review'); // Redirect to Manage Reviews page
     };
 
     return (
@@ -35,7 +39,7 @@ const AdminHomePage = () => {
 
             <Grid container spacing={4}>
                 {/* Manage Accounts Card */}
-                <Grid item md={4} xs={12}>
+                <Grid item md={3} xs={12}>
                     <Card variant="outlined" onClick={handleRedirectToUserCrud} sx={{ cursor: 'pointer', bgcolor: '#f3e5f5' }}>
                         <CardContent>
                             <Box display="flex" flexDirection="column" alignItems="center">
@@ -52,7 +56,7 @@ const AdminHomePage = () => {
                 </Grid>
 
                 {/* View Reports Card */}
-                <Grid item md={4} xs={12}>
+                <Grid item md={3} xs={12}>
                     <Card variant="outlined" onClick={handleRedirectToReports} sx={{ cursor: 'pointer', bgcolor: '#e8f5e9' }}>
                         <CardContent>
                             <Box display="flex" flexDirection="column" alignItems="center">
@@ -69,7 +73,7 @@ const AdminHomePage = () => {
                 </Grid>
 
                 {/* Settings Card */}
-                <Grid item md={4} xs={12}>
+                <Grid item md={3} xs={12}>
                     <Card variant="outlined" onClick={handleRedirectToSettings} sx={{ cursor: 'pointer', bgcolor: '#fff3e0' }}>
                         <CardContent>
                             <Box display="flex" flexDirection="column" alignItems="center">
@@ -77,6 +81,23 @@ const AdminHomePage = () => {
                                     <FaCog size={24} />
                                 </Box>
                                 <Typography variant="h6" fontWeight="bold">Settings</Typography>
+                                <IconButton>
+                                    <FaChevronRight size={16} />
+                                </IconButton>
+                            </Box>
+                        </CardContent>
+                    </Card>
+                </Grid>
+
+                {/* Manage Reviews Card */}
+                <Grid item md={3} xs={12}>
+                    <Card variant="outlined" onClick={handleRedirectToManageReviews} sx={{ cursor: 'pointer', bgcolor: '#e1f5fe' }}>
+                        <CardContent>
+                            <Box display="flex" flexDirection="column" alignItems="center">
+                                <Box sx={{ bgcolor: 'lightgray', borderRadius: '50%', p: 2, mb: 2 }}>
+                                    <FaStar size={24} />
+                                </Box>
+                                <Typography variant="h6" fontWeight="bold">Manage Reviews</Typography>
                                 <IconButton>
                                     <FaChevronRight size={16} />
                                 </IconButton>

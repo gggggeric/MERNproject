@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
-import './UserCrud.css';
+import './AdminUserCrud.css';
 
 const UserCrud = () => {
     const [users, setUsers] = useState([]);
@@ -48,23 +48,33 @@ const UserCrud = () => {
             }
         }
     };
-
     const handleCreateUser = async (e) => {
         e.preventDefault();
         setErrorMessage(''); // Clear previous error message
-
+    
+        const token = localStorage.getItem('auth-token');
+        console.log('Token from localStorage:', token);  // Debug log to check token
+    
+        if (!token) {
+            setErrorMessage('No token found in localStorage.');
+            return;
+        }
+    
         try {
-            const res = await axios.post('http://localhost:5001/api/auth/register', newUser, {
-                headers: { 'auth-token': localStorage.getItem('auth-token') }
+            const res = await axios.post('http://localhost:5001/api/auth/create', newUser, {
+                headers: { 'Authorization': `Bearer ${token}` }  // Ensure Bearer prefix is included
             });
-            setUsers([...users, res.data]);
+    
+            setUsers([...users, res.data.user]);
             setNewUser({ email: '', password: '', userType: 'user' });
-            alert('User created successfully!'); // Optional: notify user
+            alert('User created successfully!');
         } catch (err) {
             console.error('Error creating user:', err);
             setErrorMessage('Failed to create user. Please try again.');
         }
     };
+    
+    
 
     const handleEdit = (user) => {
         setEditingUser(user._id); // Set the editing user

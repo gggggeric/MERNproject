@@ -30,7 +30,7 @@ const UserReviews = () => {
     setLoading(true);
     try {
       const response = await axios.put(
-        `http://localhost:5001/api/auth/user/${reviewId}`,
+        `http://localhost:5001/api/auth/user/review/${reviewId}`,
         { rating: newRating },
         {
           headers: {

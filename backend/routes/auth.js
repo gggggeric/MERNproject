@@ -21,7 +21,85 @@ const storage = multer.diskStorage({
     },
 });
 const upload = multer({ storage });
-// Get reviews submitted by the authenticated user
+
+
+router.post('/create', authenticateUser, async (req, res) => {
+    if (req.user.userType !== 'admin') {
+        return res.status(403).json({ message: 'Access denied. You are not an admin.' });
+    }
+
+    const { email, password, userType } = req.body;
+
+    if (!email || !password || !userType) {
+        return res.status(400).json({ message: 'Email, password, and userType are required.' });
+    }
+
+    try {
+        // Hash the password before saving
+        const hashedPassword = bcrypt.hashSync(password, 10); // Hash with 10 rounds
+
+        // Create a new user with the hashed password, userType, and status set to true
+        const newUser = new User({
+            email,
+            password: hashedPassword,  // Use the hashed password
+            userType,
+            status: true // Set status to true
+        });
+
+        await newUser.save();
+        res.status(201).json({ message: 'User created successfully.', user: newUser });
+    } catch (error) {
+        console.error(error);
+        res.status(400).json({ message: 'Error creating user.' });
+    }
+});
+// Route to fetch all reviews for admins
+router.get('/reviews', authenticateUser, async (req, res) => {
+    try {
+        // Check if the user is an admin
+        if (req.user.userType !== 'admin') {
+            return res.status(403).json({ message: 'Forbidden! Only admins can view reviews.' });
+        }
+
+        // Fetch all reviews, you can also populate product and user if you need more details
+        const reviews = await Review.find()
+            .populate('product', 'name')  // Populate the product name, adjust fields as needed
+            .populate('user', 'name email');  // Populate the user info, adjust as necessary
+
+        res.status(200).json({ reviews });
+    } catch (error) {
+        console.error('Error fetching reviews:', error);
+        res.status(500).json({ message: 'Server error. Please try again later.' });
+    }
+});
+
+
+// Route to delete a single review (only for admin)
+router.delete('/reviews/:reviewId', authenticateUser, async (req, res) => {
+    try {
+        // Check if the user is an admin
+        if (req.user.userType !== 'admin') {
+            return res.status(403).json({ message: 'Forbidden! Only admins can delete reviews.' });
+        }
+
+        const { reviewId } = req.params;
+
+        // Find the review by its ID
+        const review = await Review.findById(reviewId);
+
+        if (!review) {
+            return res.status(404).json({ message: 'Review not found' });
+        }
+
+        // Perform the delete operation
+        await Review.findByIdAndDelete(reviewId);
+
+        res.status(200).json({ message: 'Review deleted successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error. Please try again later.' });
+    }
+});
 
 
 
@@ -167,10 +245,8 @@ router.get('/sales/monthly', authenticateUser, async (req, res) => {
 
 
 
-
-
 // PUT route to update the rating of a review
-router.put('/user/:reviewId', authenticateUser, async (req, res) => {
+router.put('/user/review/:reviewId', authenticateUser, async (req, res) => {
     const { reviewId } = req.params;
     const { rating } = req.body;
   
@@ -1087,42 +1163,6 @@ router.put('/user/password', authenticateUser, upload.single('profileImage'), as
 });
 
 
-
-
-// Update password route for seller
-router.put('/seller/password', authenticateUser, async (req, res) => {
-    console.log('Updating password for seller:', req.user._id); // req.user is populated by middleware
-    try {
-        const { oldPassword, password } = req.body;
-
-        // Find user by ID
-        const user = await User.findById(req.user._id);
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        // Check if the userType is seller
-        if (user.userType !== 'seller') {
-            return res.status(403).json({ message: 'Unauthorized: Only sellers can update their password' });
-        }
-
-        // Check if the old password matches the one in the database
-        const isMatch = await bcrypt.compare(oldPassword, user.password);
-        if (!isMatch) {
-            return res.status(400).json({ message: 'Incorrect old password' });
-        }
-
-        // Hash the new password before saving
-        const hashedPassword = await bcrypt.hash(password, 10);
-        user.password = hashedPassword;
-
-        await user.save();
-        res.json({ message: 'Password updated successfully!' });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: 'Server error' });
-    }
-});
 
 //update password for manufacturer
 router.put('/manufacturer/password', authenticateUser, async (req, res) => {
