@@ -29,6 +29,43 @@ const orderSchema = new mongoose.Schema({
         type: String,
         enum: ['Pending', 'Accepted'], // Limit to specific statuses
         default: 'Pending' // Set default status to 'Pending'
+    },
+    shippedToAddress: {
+        street: {
+            type: String,
+            required: true
+        },
+        city: {
+            type: String,
+            required: true
+        },
+        state: {
+            type: String,
+            required: true
+        },
+        postalCode: {
+            type: String,
+            required: true
+        },
+        country: {
+            type: String,
+            required: true
+        },
+    },
+    paymentMethod: {
+        type: String,
+        enum: ['Credit Card', 'G-cash', 'Bank Transfer', 'Cash On Delivery'], // Example payment methods
+        required: true
+    },
+    shippingMethod: {
+        type: String,
+        enum: ['Lalamove', 'Grab', 'Ali-Express'], // Example shipping methods
+        required: true // Set required to true
+    },
+    shippingStatus: {
+        type: String,
+        enum: ['Pending', 'Delivered'], // Example statuses
+        default: 'Pending' // Default to 'Pending'
     }
 }, { timestamps: true });
 

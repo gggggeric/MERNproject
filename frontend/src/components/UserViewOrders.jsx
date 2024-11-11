@@ -34,6 +34,7 @@ const UserViewOrders = () => {
   const [imagePreview, setImagePreview] = useState(null);
 
   const filter = new Filter();
+  const [isAddressExpanded, setIsAddressExpanded] = useState(false);
 
   const fetchOrders = async () => {
     try {
@@ -119,6 +120,46 @@ const UserViewOrders = () => {
     setImagePreview(null);
   };
 
+  const formatAddress = (order) => {
+    const { street, city, state, postalCode, country } = order.shippedToAddress;
+  
+    return (
+      <div className="address-container">
+        <p>{street}, {city}, {state}, {postalCode}, {country}</p>
+        {isAddressExpanded && (
+          <p>{country}</p>
+        )}
+      </div>
+    );
+  };
+
+  const markAsDelivered = async (orderId) => {
+    const token = localStorage.getItem('auth-token');
+    try {
+        // Make the PATCH request to mark the order as delivered
+        const response = await axios.patch(
+            `http://localhost:5001/api/auth/mark-delivered/${orderId}`,
+            {}, 
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
+
+        // Handle the response after marking as delivered
+        if (response.status === 200) {
+            console.log('Order marked as delivered:', response.data);
+            fetchOrders(); // Refresh the orders after marking as delivered
+            alert('Order has been successfully marked as delivered!');
+        }
+    } catch (err) {
+        console.error('Error marking order as delivered:', err);
+        // Show a more specific error message from the backend if available
+        alert(`Error: ${err.response?.data?.message || 'Please try again later.'}`);
+    }
+  };
+
   if (loading) {
     return <div className="loading">Loading...</div>;
   }
@@ -137,11 +178,16 @@ const UserViewOrders = () => {
           <thead>
             <tr>
               <th>Order ID</th>
-              <th>Status</th>
+              <th>Order Status</th>
               <th>Total</th>
               <th>Created At</th>
+              <th>Shipping Address</th>
               <th>Products</th>
+              <th>Payment Method</th>
+              <th>Shipping Method</th>
+              <th>Shipping Status</th>
               <th>Actions</th>
+              <th>Mark as Delivered</th>
             </tr>
           </thead>
           <tbody>
@@ -151,6 +197,7 @@ const UserViewOrders = () => {
                 <td>{order.orderStatus}</td>
                 <td>${order.totalPrice.toFixed(2)}</td>
                 <td>{new Date(order.createdAt).toLocaleDateString()}</td>
+                <td>{formatAddress(order)}</td>
                 <td>
                   <ul>
                     {order.products.map((item) => (
@@ -160,6 +207,9 @@ const UserViewOrders = () => {
                     ))}
                   </ul>
                 </td>
+                <td>{order.paymentMethod}</td>
+                <td>{order.shippingMethod}</td>
+                <td>{order.shippingStatus}</td>
                 <td>
                   {order.orderStatus === 'Accepted' && (
                     order.products.map((item) => (
@@ -175,6 +225,20 @@ const UserViewOrders = () => {
                         <span key={item.product._id}>Review Already Submitted</span>
                       )
                     ))
+                  )}
+                </td>
+                <td>
+                  {order.shippingStatus === 'Delivered' ? (
+                    <span>Already Delivered</span>  // Message when already delivered
+                  ) : (
+                    order.orderStatus === 'Accepted' && (
+                      <button
+                        className="mark-delivered-button"
+                        onClick={() => markAsDelivered(order._id)}
+                      >
+                        Mark as Delivered
+                      </button>
+                    )
                   )}
                 </td>
               </tr>

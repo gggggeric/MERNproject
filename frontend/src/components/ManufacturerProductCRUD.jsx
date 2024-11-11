@@ -513,4 +513,4 @@ const ManufacturerProductCRUD = () => {
     );
 };
 
-export default ManufacturerProductCRUD;
+export default ManufacturerProductCRUD; 

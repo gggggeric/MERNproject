@@ -1,141 +1,199 @@
-/* UserViewOrders.css */
-
 .orders-container {
-    padding: 20px;
-    font-family: Arial, sans-serif;
-    background-color: #f4f7f6;
-    max-width: 1200px;
-    margin: 0 auto;
-    box-sizing: border-box;
-  }
-  
-  h1 {
-    font-size: 2.5rem;
-    text-align: center;
-    margin-bottom: 20px;
-    color: #333;
-  }
-  
-  .loading,
-  .error {
-    font-size: 1.2rem;
-    text-align: center;
-    color: #ff0000;
-    margin-top: 50px;
-  }
-  
-  .orders-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  .orders-table th,
-  .orders-table td {
-    padding: 12px;
-    text-align: left;
-    font-size: 1rem;
-    color: #555;
-    border-bottom: 1px solid #ddd;
-  }
-  
-  .orders-table th {
-    background-color: #8e44ad;
-    color: white;
-    text-transform: uppercase;
-    letter-spacing: 0.1rem;
-  }
-  
-  .orders-table tr:nth-child(even) {
-    background-color: #f9f9f9;
-  }
-  
-  .orders-table tr:hover {
-    background-color: #f1f1f1;
-  }
-  
-  .orders-table ul {
-    list-style-type: none;
-    padding-left: 0;
-    margin: 0;
-  }
-  
-  .orders-table li {
-    font-size: 0.9rem;
-    color: #333;
-  }
-  
-  .orders-table td ul li {
-    padding: 5px 0;
-  }
-  
-  @media screen and (max-width: 768px) {
-    .orders-table {
-      font-size: 0.9rem;
-    }
-  
-    .orders-table th,
-    .orders-table td {
-      padding: 8px;
-    }
-  
-    .orders-table th {
-      font-size: 1rem;
-    }
-  }
-  /* Modal styles */
+  font-family: Arial, sans-serif;
+  max-width: 1300px; /* Increased the width to make the container wider */
+  margin: 20px auto;
+  padding: 30px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.orders-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 30px;
+  table-layout: fixed; /* Changed to fixed for more consistent column widths */
+}
+
+.orders-table th,
+.orders-table td {
+  padding: 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  word-wrap: break-word; /* Prevent text overflow */
+  overflow-wrap: break-word; /* Prevent text overflow */
+  box-sizing: border-box; /* Ensure padding is included in the total width */
+}
+
+.orders-table th {
+  background-color: #f1f1f1;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 14px;
+}
+
+.orders-table td {
+  background-color: #fff;
+  font-size: 13px;
+}
+
+.orders-table td.order-id {
+  width: 200px; /* Adjusted to make the order ID column wider */
+}
+
+.star-rating {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+}
+
+.star {
+  font-size: 20px;
+  color: #ddd;
+  cursor: pointer;
+}
+
+.star.filled {
+  color: gold;
+}
+
+.review-button {
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.review-button:hover {
+  background-color: #0056b3;
+}
+
 .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .modal-content {
-    background-color: white;
-    padding: 20px;
-    border-radius: 5px;
-    width: 400px;
-    max-width: 90%;
-  }
-  
-  .modal-actions {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-  }
-  
-  .image-preview {
-    max-width: 100%;
-    max-height: 200px;
-    margin-top: 10px;
-  }
-  .star-rating {
-    display: flex;
-    gap: 5px;
-  }
-  
-  .star {
-    font-size: 24px;
-    cursor: pointer;
-    color: #ccc;
-    transition: color 0.2s;
-  }
-  
-  .star.filled {
-    color: #ffd700; /* Gold color for filled stars */
-  }
-  
-  .star:hover,
-  .star:hover ~ .star {
-    color: #ffd700;
-  }
-    
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 30px;
+  border-radius: 8px;
+  width: 600px; /* Increased width of modal content */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+textarea {
+  width: 100%;
+  height: 120px;
+  padding: 12px;
+  font-size: 15px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  resize: vertical;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+button:hover {
+  background-color: #f1f1f1;
+}
+
+button[type="button"] {
+  background-color: #8e44ad;
+  color: white;
+}
+
+button[type="button"]:hover {
+  background-color: #8e44ad;
+}
+
+button[type="submit"] {
+  background-color: #007bff;
+  color: white;
+}
+
+button[type="submit"]:hover {
+  background-color: #0056b3;
+}
+
+.image-preview {
+  margin-top: 15px;
+  max-width: 80%; /* Limits the image width to 80% of modal width */
+  max-height: 300px; /* Limits the height to avoid overly large images */
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 5px;
+  object-fit: contain; /* Keeps image aspect ratio within bounds */
+}
+
+.address-container {
+  margin-top: 20px;
+}
+
+.address-container p {
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.address-container button {
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.address-container button:hover {
+  background-color: #0056b3;
+}
+
+.orders-table td ul {
+  padding-left: 20px;
+}
+
+.orders-table td ul li {
+  margin-bottom: 5px;
+}
+
+.update-status-button {
+  background-color: #8e44ad;
+  color: white;
+  border: none;
+  padding: 4px 8px;  /* Reduced padding */
+  font-size: 14px;    /* Smaller font size */
+  cursor: pointer;
+  margin-left: 10px;
+  border-radius: 4px; /* Slightly rounded corners */
+  transition: background-color 0.3s ease; /* Smooth transition */
+}
+
+.update-status-button:hover {
+  background-color: #8e44ad;
+}
+
+.update-status-button:focus {
+  outline: none; /* Remove default focus outline */
+}

@@ -12,7 +12,14 @@ const UserSchema = new mongoose.Schema({
     status: { type: Boolean, default: false }, // Indicates if the user is confirmed
     confirmationToken: { type: String }, // Token for email confirmation
     manufacturerProfile: { type: mongoose.Schema.Types.ObjectId, ref: 'ManufacturerProfile' }, // Reference to ManufacturerProfile
-    profileImage: { type: String, default: '' }// This will store the path or URL of the profile image
+    profileImage: { type: String, default: '' }, // This will store the path or URL of the profile image
+    address: {
+        street: { type: String, default: '' },
+        city: { type: String, default: '' },
+        state: { type: String, default: '' },
+        postalCode: { type: String, default: '' },
+        country: { type: String, default: '' }
+    }
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', UserSchema);

@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { Formik, Field, Form, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
 import './AdminUserCrud.css';
 
 const UserCrud = () => {
     const [users, setUsers] = useState([]);
-    const [newUser, setNewUser] = useState({ email: '', password: '', userType: 'user' });
     const [loading, setLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState('');
     const [editingUser, setEditingUser] = useState(null); // Store the user being edited
@@ -48,62 +49,73 @@ const UserCrud = () => {
             }
         }
     };
-    const handleCreateUser = async (e) => {
-        e.preventDefault();
+
+    // User creation form validation schema
+    const userCreationSchema = Yup.object({
+        email: Yup.string().email('Invalid email address').required('Email is required'),
+        password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
+        userType: Yup.string().oneOf(['user', 'admin', 'manufacturer'], 'Invalid user type').required('User type is required')
+    });
+
+    // Handle user creation submission
+    const handleCreateUser = async (values, { resetForm, setSubmitting }) => {
         setErrorMessage(''); // Clear previous error message
     
         const token = localStorage.getItem('auth-token');
-        console.log('Token from localStorage:', token);  // Debug log to check token
-    
         if (!token) {
             setErrorMessage('No token found in localStorage.');
+            setSubmitting(false);
             return;
         }
     
         try {
-            const res = await axios.post('http://localhost:5001/api/auth/create', newUser, {
-                headers: { 'Authorization': `Bearer ${token}` }  // Ensure Bearer prefix is included
+            const res = await axios.post('http://localhost:5001/api/auth/create', values, {
+                headers: { 'Authorization': `Bearer ${token}` }
             });
     
             setUsers([...users, res.data.user]);
-            setNewUser({ email: '', password: '', userType: 'user' });
+            resetForm(); // Reset form after successful submission
             alert('User created successfully!');
         } catch (err) {
             console.error('Error creating user:', err);
             setErrorMessage('Failed to create user. Please try again.');
+        } finally {
+            setSubmitting(false);
         }
     };
-    
-    
 
-    const handleEdit = (user) => {
-        setEditingUser(user._id); // Set the editing user
-        setEditForm({ userType: user.userType, status: user.status }); // Populate form
-        setShowEditModal(true); // Show floating edit modal
-    };
+    // User edit form validation schema
+    const userEditSchema = Yup.object({
+        userType: Yup.string().oneOf(['user', 'admin', 'manufacturer'], 'Invalid user type').required('User type is required'),
+        status: Yup.string().oneOf(['true', 'false'], 'Invalid status').required('Status is required')
+    });
 
-    const handleEditSubmit = async (e) => {
-        e.preventDefault();
-    
+    // Handle user edit form submission
+    const handleEditSubmit = async (values) => {
         try {
             await axios.put(
                 `http://localhost:5001/api/auth/users/${editingUser}`,
                 {
-                    userType: editForm.userType,
-                    status: editForm.status === 'true' // Ensure this is a boolean
+                    userType: values.userType,
+                    status: values.status === 'true' // Ensure this is a boolean
                 },
                 {
                     headers: { 'auth-token': localStorage.getItem('auth-token') }
                 }
             );
     
-            setUsers(users.map(user => user._id === editingUser ? { ...user, ...editForm } : user));
+            setUsers(users.map(user => user._id === editingUser ? { ...user, ...values } : user));
             setEditingUser(null);
-            setEditForm({ userType: '', status: '' });
             setShowEditModal(false);
         } catch (err) {
             console.error('Error updating user:', err);
         }
+    };
+
+    const handleEdit = (user) => {
+        setEditingUser(user._id); // Set the editing user
+        setEditForm({ userType: user.userType, status: user.status }); // Populate form
+        setShowEditModal(true); // Show floating edit modal
     };
 
     const handleCancelEdit = () => {
@@ -126,31 +138,34 @@ const UserCrud = () => {
                     <div className="user-crud-header">
                         <h2>User Management</h2>
                     </div>
-                    <form onSubmit={handleCreateUser} className="user-crud-form">
-                        <input 
-                            type="email" 
-                            placeholder="Email" 
-                            value={newUser.email} 
-                            onChange={e => setNewUser({ ...newUser, email: e.target.value })} 
-                            required 
-                        />
-                        <input 
-                            type="password" 
-                            placeholder="Password" 
-                            value={newUser.password} 
-                            onChange={e => setNewUser({ ...newUser, password: e.target.value })} 
-                            required 
-                        />
-                        <select 
-                            value={newUser.userType} 
-                            onChange={e => setNewUser({ ...newUser, userType: e.target.value })}
-                        >
-                            <option value="user">User</option>
-                            <option value="admin">Admin</option>
-                            <option value="manufacturer">Manufacturer</option>
-                        </select>
-                        <button type="submit" className="create-btn">Create User</button>
-                    </form>
+
+                    {/* User creation form */}
+                    <Formik
+                        initialValues={{ email: '', password: '', userType: 'user' }}
+                        validationSchema={userCreationSchema}
+                        onSubmit={handleCreateUser}
+                    >
+                        {({ isSubmitting }) => (
+                            <Form className="user-crud-form">
+                                <Field type="email" name="email" placeholder="Email" />
+                                <ErrorMessage name="email" component="div" className="error-message" />
+    
+                                <Field type="password" name="password" placeholder="Password" />
+                                <ErrorMessage name="password" component="div" className="error-message" />
+    
+                                <Field as="select" name="userType">
+                                    <option value="user">User</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="manufacturer">Manufacturer</option>
+                                </Field>
+                                <ErrorMessage name="userType" component="div" className="error-message" />
+    
+                                <button type="submit" disabled={isSubmitting} className="create-btn">
+                                    Create User
+                                </button>
+                            </Form>
+                        )}
+                    </Formik>
                     {errorMessage && <div className="error-message">{errorMessage}</div>}
                 </div>
 
@@ -202,27 +217,37 @@ const UserCrud = () => {
                 <div className="edit-modal">
                     <div className="edit-modal-content">
                         <h3>Edit User</h3>
-                        <form onSubmit={handleEditSubmit}>
-                            <label>User Type:</label>
-                            <select 
-                                value={editForm.userType} 
-                                onChange={e => setEditForm({ ...editForm, userType: e.target.value })}
-                            >
-                                <option value="user">User</option>
-                                <option value="admin">Admin</option>
-                                <option value="manufacturer">Manufacturer</option>
-                            </select>
-                            <label>Status:</label>
-                            <select 
-                                value={editForm.status} 
-                                onChange={e => setEditForm({ ...editForm, status: e.target.value })}
-                            >
-                                <option value="true">True</option>
-                                <option value="false">False</option>
-                            </select>
-                            <button type="submit" className="save-btn">Save Changes</button>
-                            <button type="button" className="delete-btn" onClick={handleCancelEdit}>Cancel</button>
-                        </form>
+                        <Formik
+                            initialValues={{ userType: editForm.userType, status: editForm.status }}
+                            validationSchema={userEditSchema}
+                            onSubmit={handleEditSubmit}
+                        >
+                            {({ isSubmitting }) => (
+                                <Form>
+                                    <label>User Type:</label>
+                                    <Field as="select" name="userType">
+                                        <option value="user">User</option>
+                                        <option value="admin">Admin</option>
+                                        <option value="manufacturer">Manufacturer</option>
+                                    </Field>
+                                    <ErrorMessage name="userType" component="div" className="error-message" />
+    
+                                    <label>Status:</label>
+                                    <Field as="select" name="status">
+                                        <option value="true">True</option>
+                                        <option value="false">False</option>
+                                    </Field>
+                                    <ErrorMessage name="status" component="div" className="error-message" />
+    
+                                    <button type="submit" disabled={isSubmitting} className="save-btn">
+                                        Save Changes
+                                    </button>
+                                    <button type="button" className="delete-btn" onClick={handleCancelEdit}>
+                                        Cancel
+                                    </button>
+                                </Form>
+                            )}
+                        </Formik>
                     </div>
                 </div>
             )}

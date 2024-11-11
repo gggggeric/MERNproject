@@ -14,7 +14,7 @@ const authenticateUser = (req, res, next) => {
             return res.status(403).json({ message: 'Unauthorized! Invalid token.' });
         }
 
-        console.log('Decoded user from token:', user); // Log the user object for debugging
+       // console.log('Decoded user from token:', user); // Log the user object for debugging
         req.user = user; // Ensure req.user is set properly
         next();
     });

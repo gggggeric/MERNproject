@@ -22,6 +22,39 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
+// Route to mark an order as delivered
+router.patch('/mark-delivered/:orderId', authenticateUser, async (req, res) => {
+    const { orderId } = req.params;
+    const userId = req.user._id; // Assuming user ID is available in req.user after JWT verification
+  
+    try {
+        // Find the order by its ID
+        const order = await Order.findById(orderId);
+
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        // Check if the authenticated user is the same as the order's user
+        if (order.user.toString() !== userId.toString()) {
+            return res.status(403).json({ message: 'You are not authorized to mark this order as delivered' });
+        }
+
+        // Only update the shippingStatus to 'Delivered'
+        order.shippingStatus = 'Delivered';
+
+        await order.save();
+
+        // Return a success response
+        res.status(200).json({ message: 'Order marked as delivered', order });
+    } catch (err) {
+        console.error('Error marking order as delivered:', err);
+        res.status(500).json({ message: 'An error occurred while marking the order as delivered' });
+    }
+});
+
+  
+  
 
 router.post('/create', authenticateUser, async (req, res) => {
     if (req.user.userType !== 'admin') {
@@ -359,62 +392,72 @@ router.post('/submit-review', authenticateUser, upload.single('image'), async (r
     }
 });
 
-
-// Route to view orders for a user with review status check
+// Route to view orders for a user with review status check and shipping address
 router.get('/view/orders', authenticateUser, async (req, res) => {
     try {
-      const userId = req.user._id; // Get the logged-in user's ID from the JWT token
-  
-      // Fetch the user's data from the database
-      const user = await User.findById(userId);
-  
-      // Check if the user is authenticated and if their type is 'user'
-      if (!user) {
-        return res.status(404).json({ message: 'User not found.' });
-      }
-  
-      if (user.userType !== 'user') {
-        return res.status(403).json({ message: 'You are not authorized to view orders.' });
-      }
-  
-      // Fetch the orders that belong to the authenticated user and populate product details
-      const orders = await Order.find({ user: userId }).populate('products.product', 'name price');
-  
-      // If no orders found, return a message
-      if (orders.length === 0) {
-        return res.status(404).json({ message: 'No orders found for this user.' });
-      }
-  
-      // Add reviewExists status for each product in each order
-      const ordersWithReviews = await Promise.all(
-        orders.map(async (order) => {
-          const productsWithReviewStatus = await Promise.all(
-            order.products.map(async (item) => {
-              const reviewExists = await Review.exists({
-                product: item.product._id,
-                user: userId
-              });
-              return {
-                ...item.toObject(),
-                reviewExists // Add review existence status for each product
-              };
+        const userId = req.user._id; // Get the logged-in user's ID from the JWT token
+
+        // Fetch the user's data from the database
+        const user = await User.findById(userId);
+
+        // Check if the user is authenticated and if their type is 'user'
+        if (!user) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        if (user.userType !== 'user') {
+            return res.status(403).json({ message: 'You are not authorized to view orders.' });
+        }
+
+        // Fetch the orders that belong to the authenticated user and populate product details
+        const orders = await Order.find({ user: userId }).populate('products.product', 'name price');
+
+        // If no orders found, return a message
+        if (orders.length === 0) {
+            return res.status(404).json({ message: 'No orders found for this user.' });
+        }
+
+        // Add reviewExists status for each product in each order and include shipping address
+        const ordersWithDetails = await Promise.all(
+            orders.map(async (order) => {
+                const productsWithReviewStatus = await Promise.all(
+                    order.products.map(async (item) => {
+                        const reviewExists = await Review.exists({
+                            product: item.product._id,
+                            user: userId
+                        });
+                        return {
+                            ...item.toObject(),
+                            reviewExists // Add review existence status for each product
+                        };
+                    })
+                );
+
+                // Ensure shippingAddress is included, even if it's missing
+                const shippingAddress = order.shippingAddress || {
+                    street: '',
+                    city: '',
+                    state: '',
+                    postalCode: '',
+                    country: ''
+                };
+
+                return {
+                    ...order.toObject(),
+                    products: productsWithReviewStatus,
+                    shippingAddress // Add shipping address details
+                };
             })
-          );
-          return {
-            ...order.toObject(),
-            products: productsWithReviewStatus
-          };
-        })
-      );
-  
-      res.json(ordersWithReviews); // Return the orders with review status as JSON
-  
+        );
+
+        res.json(ordersWithDetails); // Return the orders with review status and shipping address as JSON
+
     } catch (error) {
-      console.error('Error fetching orders:', error);
-      res.status(500).json({ message: 'Server error', error });
+        console.error('Error fetching orders:', error);
+        res.status(500).json({ message: 'Server error', error });
     }
-  });
-  
+});
+
   
 
 // Endpoint to update order status
@@ -500,16 +543,14 @@ router.get('/orders', authenticateUser, async (req, res) => {
         res.status(500).json({ msg: 'Server error', error: error.message });
     }
 });
-
-
- router.post('/order/place', authenticateUser, async (req, res) => {
+router.post('/order/place', authenticateUser, async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
         console.log('Order data received:', req.body);  // Log the incoming order data
 
-        const { products } = req.body;  // Get the products in the order
+        const { products, paymentMethod, shippingMethod, shippingStatus } = req.body;  // Get products, paymentMethod, shippingMethod, and shippingStatus
         const userId = req.user._id;  // Extract the user ID from the authenticated token
 
         console.log('User ID from token:', userId);
@@ -520,6 +561,26 @@ router.get('/orders', authenticateUser, async (req, res) => {
 
         if (!products || !Array.isArray(products) || products.length === 0) {
             return res.status(400).json({ error: 'Invalid products data.' });
+        }
+
+        if (!paymentMethod) {
+            return res.status(400).json({ error: 'Payment method is required.' });
+        }
+
+        if (!shippingMethod) {
+            return res.status(400).json({ error: 'Shipping method is required.' });
+        }
+
+        // Fetch the user to get the shipping address
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ error: 'User not found.' });
+        }
+
+        const { address } = user;  // Get the address from the User model
+
+        if (!address) {
+            return res.status(400).json({ error: 'Address is missing. Please configure it in your profile.' });
         }
 
         let totalPrice = 0;
@@ -557,11 +618,16 @@ router.get('/orders', authenticateUser, async (req, res) => {
             totalPrice += product.price * item.quantity;
         }
 
-        // Create a new order with the user ID
+        // Create a new order with the user ID, address, paymentMethod, shippingMethod, and shippingStatus
         const newOrder = new Order({
             user: userId,  // Attach the user ID from the authenticated token
             products: products,
             totalPrice: totalPrice,
+            shippedToAddress: address,  // Assign the address from the User model
+            paymentMethod: paymentMethod,  // Capture the payment method from the form
+            shippingMethod: shippingMethod,  // Capture the shipping method
+            orderStatus: 'Pending',  // Ensure order status is 'Pending' by default
+            shippingStatus: shippingStatus || 'Pending',  // Default to 'Pending' if no status is provided
         });
 
         // Save the new order in the database within the transaction session
@@ -583,6 +649,8 @@ router.get('/orders', authenticateUser, async (req, res) => {
         res.status(500).json({ error: 'Error placing the order. Please try again.' });
     }
 });
+
+
 router.get('/user/products', authenticateUser, async (req, res) => {
     try {
         // Extract pagination parameters from the query, set default values if not provided
@@ -1114,11 +1182,15 @@ router.get('/user/profile', authenticateUser, async (req, res) => {
         // If there's a profile image, prepend the server's base URL
         const profileImageUrl = user.profileImage ? `http://localhost:5001/${user.profileImage}` : null;
 
-        // Send back user profile information
+        // Check if the address exists
+        const address = user.address || 'Address not yet configured';  // If address is not set, show the default message
+
+        // Send back user profile information including the address
         res.json({
             name: user.name,
             email: user.email,
             profileImage: profileImageUrl,  // Include the full URL to the profile image
+            address: address,  // Include the address or the message if it's not set
         });
     } catch (err) {
         console.error('Error fetching user profile:', err); // Log any server error
@@ -1128,22 +1200,23 @@ router.get('/user/profile', authenticateUser, async (req, res) => {
 
 router.put('/user/password', authenticateUser, upload.single('profileImage'), async (req, res) => {
     try {
-        const { oldPassword, password } = req.body;
+        const { oldPassword, password, address } = req.body;
 
-        // Find user by ID
+        // Find user by ID (assumed that user ID is in req.user._id)
         const user = await User.findById(req.user._id);
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // Password update logic
-        if (user.password && oldPassword) {
+        // Handle password update logic if old password is provided
+        if (oldPassword && user.password) {
             const isMatch = await bcrypt.compare(oldPassword, user.password);
             if (!isMatch) {
                 return res.status(400).json({ message: 'Incorrect old password' });
             }
         }
 
+        // Update password if a new one is provided
         if (password) {
             const hashedPassword = await bcrypt.hash(password, 10);
             user.password = hashedPassword;
@@ -1151,18 +1224,40 @@ router.put('/user/password', authenticateUser, upload.single('profileImage'), as
 
         // Update profile image if a new one is provided
         if (req.file) {
-            user.profileImage = `uploads/${req.file.filename}`; // Save file path in DB
+            user.profileImage = `uploads/${req.file.filename}`;  // Store the file path in DB
         }
 
+        // Handle address update logic only if address is provided
+        if (address) {
+            try {
+                // Try parsing the address if it's a stringified JSON
+                const parsedAddress = typeof address === 'string' ? JSON.parse(address) : address;
+
+                // Destructure the parsed address
+                const { street, city, state, postalCode, country } = parsedAddress;
+
+                // Update address fields if they exist in the parsed JSON
+                if (street !== undefined) user.address.street = street;
+                if (city !== undefined) user.address.city = city;
+                if (state !== undefined) user.address.state = state;
+                if (postalCode !== undefined) user.address.postalCode = postalCode;
+                if (country !== undefined) user.address.country = country;
+            } catch (error) {
+                // If address is invalid JSON, return an error
+                return res.status(400).json({ message: 'Invalid address format. Ensure it is a valid JSON.' });
+            }
+        }
+
+        // Save the updated user document to the database
         await user.save();
+
+        // Return a success message
         res.json({ message: 'Profile updated successfully!' });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Server error. Please try again later.' });
     }
 });
-
-
 
 //update password for manufacturer
 router.put('/manufacturer/password', authenticateUser, async (req, res) => {

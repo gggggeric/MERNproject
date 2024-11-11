@@ -21,6 +21,9 @@ const UserHomePage = () => {
     const [categoryFilter, setCategoryFilter] = useState(''); // State for category filter
     const [categories, setCategories] = useState([]); // New state for categories
     const [priceSort, setPriceSort] = useState(''); // New state for price sorting
+    const [paymentMethod, setPaymentMethod] = useState('');  // Add state for paymentMethod
+    const [shippingStatus, setShippingStatus] = useState('');  // Add state for shippingStatus
+    const [shippingMethod, setShippingMethod] = useState('');
   // Handle price filter search logic
  
     const renderStars = (rating) => {
@@ -105,33 +108,48 @@ useEffect(() => {
         window.removeEventListener('scroll', handleScroll);
     };
 }, [handleScroll]);
+const handlePlaceOrder = async (product) => {
+    const token = localStorage.getItem('auth-token');
 
-
-    const handlePlaceOrder = async (product) => {
-        const token = localStorage.getItem('auth-token');
-        const orderDataToSend = {
-            products: [
-                { product: product._id, quantity: quantity }
-            ]
-        };
-
-        try {
-            await axios.post('http://localhost:5001/api/auth/order/place', orderDataToSend, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            setOrderSuccessModal(true);
-            setOpenModal(false);
-            setQuantity(1);
-        } catch (err) {
-            alert('Failed to place the order. Please try again.');
-        }
+    const orderDataToSend = {
+        products: [
+            { product: product._id, quantity: quantity }
+        ],
+        paymentMethod,
+        shippingMethod,
+        shippingStatus,
     };
 
-    const handleOpenModal = (product) => {
-        setSelectedProduct(product);
+    try {
+        await axios.post('http://localhost:5001/api/auth/order/place', orderDataToSend, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+
+        // If successful, show the success modal and reset the form
+        setOrderSuccessModal(true);
+        setOpenModal(false);
         setQuantity(1);
-        setOpenModal(true);
-    };
+        setPaymentMethod('');
+        setShippingMethod('');
+        setShippingStatus('');
+    } catch (err) {
+        // If there is an error, check for specific messages in the response
+        if (err.response && err.response.data && err.response.data.error) {
+            alert(`Error: ${err.response.data.error}, Double check you address in your profile!'`);
+        } else {
+            alert('Failed to place the order. Please try again, Double check you address in your profile!');
+        }
+    }
+};
+
+
+const handleOpenModal = (product) => {
+    setSelectedProduct(product);
+    setQuantity(1); // Reset quantity when opening the modal
+    setPaymentMethod(''); // Reset payment method when opening the modal
+    setShippingMethod(''); // Reset shipping method when opening the modal
+    setOpenModal(true); // Open the modal
+};
 
     const handleCloseModal = () => setOpenModal(false);
     const handleCloseOrderSuccessModal = () => setOrderSuccessModal(false);
@@ -304,31 +322,61 @@ useEffect(() => {
     ))}
 </Grid>
 
-            {/* Order Modal */}
-            <Dialog open={openModal} onClose={handleCloseModal}>
-                <DialogTitle>Place Order</DialogTitle>
-                <DialogContent>
-                    <TextField
-                        label="Quantity"
-                        type="number"
-                        value={quantity}
-                        onChange={handleQuantityChange}
-                        fullWidth
-                        margin="normal"
-                        inputProps={{ min: 1 }}
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseModal}>Cancel</Button>
-                    <Button
-                        onClick={() => handlePlaceOrder(selectedProduct)}
-                        variant="contained"
-                        color="primary"
-                    >
-                        Place Order
-                    </Button>
-                </DialogActions>
-            </Dialog>
+       {/* Order Modal */}
+{/* Order Modal */}
+<Dialog open={openModal} onClose={handleCloseModal}>
+    <DialogTitle>Place Order</DialogTitle>
+    <DialogContent>
+        {/* Quantity Field */}
+        <TextField
+            label="Quantity"
+            type="number"
+            value={quantity}
+            onChange={handleQuantityChange}
+            fullWidth
+            margin="normal"
+            inputProps={{ min: 1 }}
+        />
+
+        {/* Payment Method Dropdown */}
+        <FormControl fullWidth margin="normal">
+            <InputLabel>Payment Method</InputLabel>
+            <Select
+                value={paymentMethod}
+                onChange={(e) => setPaymentMethod(e.target.value)}
+            >
+                <MenuItem value="Credit Card">Credit Card</MenuItem>
+                <MenuItem value="G-cash">G-cash</MenuItem>
+                <MenuItem value="Bank Transfer">Bank Transfer</MenuItem>
+                <MenuItem value="Cash On Delivery">Cash On Delivery</MenuItem>
+            </Select>
+        </FormControl>
+
+        {/* Shipping Method Dropdown */}
+        <FormControl fullWidth margin="normal">
+            <InputLabel>Shipping Method</InputLabel>
+            <Select
+                value={shippingMethod}
+                onChange={(e) => setShippingMethod(e.target.value)}
+            >
+                <MenuItem value="Lalamove">Lalamove</MenuItem>
+                <MenuItem value="Grab">Grab</MenuItem>
+                <MenuItem value="Ali-Express">Ali-Express</MenuItem>
+            </Select>
+        </FormControl>
+    </DialogContent>
+    <DialogActions>
+        <Button onClick={handleCloseModal}>Cancel</Button>
+        <Button
+            onClick={() => handlePlaceOrder(selectedProduct)}
+            variant="contained"
+            color="primary"
+        >
+            Place Order
+        </Button>
+    </DialogActions>
+</Dialog>
+
 
             {/* Order Success Modal */}
             <Dialog open={orderSuccessModal} onClose={handleCloseOrderSuccessModal}>
