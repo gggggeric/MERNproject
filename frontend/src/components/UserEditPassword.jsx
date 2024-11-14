@@ -29,6 +29,7 @@ const UserEditPassword = () => {
                         'Authorization': `Bearer ${localStorage.getItem('auth-token')}`,
                     },
                 });
+                // If profile image exists, set it to Cloudinary URL or default placeholder
                 setCurrentProfileImageUrl(res.data.profileImage || '/placeholder.png');
                 setFormData((prevState) => ({
                     ...prevState,
@@ -105,7 +106,7 @@ const UserEditPassword = () => {
             }
 
             const res = await axios.put(
-                'http://localhost:5001/api/auth/user/password',
+                'http://localhost:5001/api/auth/user/password', // Your backend URL
                 formDataToSend,
                 {
                     headers: {
@@ -119,7 +120,7 @@ const UserEditPassword = () => {
 
             // Update profile image URL if the response contains the new image
             if (res.data.profileImage) {
-                setCurrentProfileImageUrl(res.data.profileImage);
+                setCurrentProfileImageUrl(res.data.profileImage);  // This should be the Cloudinary URL
             }
 
             // Reset form after successful update

@@ -394,101 +394,56 @@ const ManufacturerProductCRUD = () => {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {products.map((product) => (
-                                    <React.Fragment key={product._id}>
-                                        <TableRow>
-                                            <TableCell>
-                                                <input
-                                                    type="checkbox"
-                                                    checked={selectedProducts.includes(product._id)}
-                                                    onChange={() => handleSelectProduct(product._id)}
-                                                />
-                                            </TableCell>
-                                            <TableCell>{product.name}</TableCell>
-                                            <TableCell>{product.description}</TableCell>
-                                            <TableCell>{product.price}</TableCell>
-                                            <TableCell>{product.stock}</TableCell>
-                                            <TableCell>{product.category}</TableCell>
-                                            <TableCell>
-                                        {product.images && product.images.length > 0 ? (
-                                        product.images.map((image, index) => (
-                                            <img
-                                                key={index}
-                                                src={`http://localhost:5001/${image}`}
-                                                alt={`Product Image ${index + 1}`}
-                                                style={{ width: '50px', height: '50px', marginRight: '10px' }}
-                                            />
-                                        ))
-                                    ) : (
-                                        <p>No images available</p>
-)}
+    {products.map((product) => (
+        <React.Fragment key={product._id}>
+            <TableRow>
+                <TableCell>
+                    <input
+                        type="checkbox"
+                        checked={selectedProducts.includes(product._id)}
+                        onChange={() => handleSelectProduct(product._id)}
+                    />
+                </TableCell>
+                <TableCell>{product.name}</TableCell>
+                <TableCell>{product.description}</TableCell>
+                <TableCell>{product.price}</TableCell>
+                <TableCell>{product.stock}</TableCell>
+                <TableCell>{product.category}</TableCell>
+                <TableCell>
+                    {product.images && product.images.length > 0 ? (
+                        product.images.map((image, index) => (
+                            <img
+                                key={index}
+                                src={image} // The URL from Cloudinary
+                                alt={`Product Image ${index}`}
+                                style={{ width: '100px', height: '100px', margin: '5px' }}
+                            />
+                        ))
+                    ) : (
+                        <Typography variant="body2">No images</Typography>
+                    )}
+                </TableCell>
+                <TableCell>
+                    <Button
+                        onClick={() => handleEdit(product._id)}
+                        variant="contained"
+                        color="primary"
+                    >
+                        Edit
+                    </Button>
+                    <Button
+                        onClick={() => handleDelete(product._id)}
+                        variant="contained"
+                        color="secondary"
+                    >
+                        Delete
+                    </Button>
+                </TableCell>
+            </TableRow>
+        </React.Fragment>
+    ))}
+</TableBody>
 
-                                            </TableCell>
-                                            <TableCell>
-                                                <Button onClick={() => handleEdit(product._id)}>Edit</Button>
-                                                <Button onClick={() => handleDelete(product._id)}>Delete</Button>
-                                                {/* Expand/Collapse Button */}
-                                                <IconButton onClick={() => handleExpandClick(product._id, product)}>
-                                                    {expandedRow === product._id ? <ExpandLess /> : <ExpandMore />}
-                                                </IconButton>
-                                            </TableCell>
-                                        </TableRow>
-
-                                        {/* Expanded Content Row */}
-                                        <TableRow>
-                                            <TableCell colSpan={8}>
-                                                <Collapse in={expandedRow === product._id} timeout="auto" unmountOnExit>
-                                                    {/* Expanded details */}
-                                                    <div>
-                                                        {isEditing ? (
-                                                            <div>
-                                                                <Typography variant="h6">Edit Product</Typography>
-                                                                <input
-                                                                    type="text"
-                                                                    value={name}
-                                                                    onChange={(e) => setName(e.target.value)}
-                                                                    placeholder="Product Name"
-                                                                />
-                                                                <input
-                                                                    type="text"
-                                                                    value={description}
-                                                                    onChange={(e) => setDescription(e.target.value)}
-                                                                    placeholder="Description"
-                                                                />
-                                                                <input
-                                                                    type="number"
-                                                                    value={price}
-                                                                    onChange={(e) => setPrice(e.target.value)}
-                                                                    placeholder="Price"
-                                                                />
-                                                                <input
-                                                                    type="number"
-                                                                    value={stock}
-                                                                    onChange={(e) => setStock(e.target.value)}
-                                                                    placeholder="Stock"
-                                                                />
-                                                                <input
-                                                                    type="text"
-                                                                    value={category}
-                                                                    onChange={(e) => setCategory(e.target.value)}
-                                                                    placeholder="Category"
-                                                                />
-                                                                {/* You can add a Save Button here to submit the changes */}
-                                                            </div>
-                                                        ) : (
-                                                            <div>
-                                                                <Typography variant="body1">Product Description: {product.description}</Typography>
-                                                                <Typography variant="body1">Product Price: {product.price}</Typography>
-                                                                {/* Display other details */}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </Collapse>
-                                            </TableCell>
-                                        </TableRow>
-                                    </React.Fragment>
-                                ))}
-                            </TableBody>
                         </Table>
                     </TableContainer>
                 </>

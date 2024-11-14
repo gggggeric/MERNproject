@@ -63,36 +63,47 @@ const UserViewOrders = () => {
   useEffect(() => {
     fetchOrders();
   }, []);
-
   const handleReviewSubmit = async () => {
     const cleanDescription = filter.clean(review.description);
-
     const token = localStorage.getItem('auth-token');
-    const formData = new FormData();
-    formData.append('productId', review.productId);
-    formData.append('rating', review.rating);
-    formData.append('description', cleanDescription);
-    if (review.image) formData.append('image', review.image);
-
+    
     try {
+      const formData = new FormData();
+      formData.append('productId', review.productId);
+      formData.append('rating', review.rating);
+      formData.append('description', cleanDescription);
+      
+      // Append the image to the FormData if it exists
+      if (review.image) {
+        formData.append('image', review.image);  // 'image' is the key for the file in the FormData
+      }
+  
+      // Determine the endpoint for submitting or updating the review
       const endpoint = review.reviewId
         ? `http://localhost:5001/api/auth/update-review/${review.reviewId}`
         : 'http://localhost:5001/api/auth/submit-review';
-
-      const response = await axios.post(endpoint, formData, {
+      
+      // Send the review data to the backend
+      const method = review.reviewId ? axios.put : axios.post;
+      
+      await method(endpoint, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data', // Ensure the correct content type is set
         },
       });
-
-      console.log('Review submitted:', response.data);
+      
+      // Close the modal and refresh orders after submission
       setModalVisible(false);
-      fetchOrders();  // Refresh orders after submitting the review
+      fetchOrders();  // Refresh the orders after submitting the review
     } catch (error) {
+      // Handle any errors that occur during the submission process
       console.error('Error submitting review:', error);
       alert(`Error: ${error.response?.data?.message || error.response?.statusText || 'Please try again later.'}`);
     }
   };
+  
+  
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];

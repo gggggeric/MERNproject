@@ -129,27 +129,29 @@ const OrderList = () => {
                   product ? (
                     <Card key={product._id} sx={{ display: 'flex', mb: 2 }}>
                       <CardContent sx={{ flex: 1 }}>
-                        <Carousel>
-                          {product.images && product.images.length > 0 ? (
-                            product.images.map((image, index) => (
-                              <div key={index}>
-                                <img
-                                  src={`http://localhost:5001/${image}`}
-                                  alt={`${product.name} - Image ${index + 1}`}
-                                  style={{ width: '100%', height: 'auto', objectFit: 'cover' }}
-                                />
-                              </div>
-                            ))
-                          ) : (
-                            <div>
-                              <img
-                                src="/path/to/fallback-image.jpg"
-                                alt="Fallback"
-                                style={{ width: '100%', height: 'auto', objectFit: 'cover' }}
-                              />
-                            </div>
-                          )}
-                        </Carousel>
+                      <Carousel>
+  {product.images && product.images.length > 0 ? (
+    product.images.map((image, index) => (
+      <div key={index}>
+        <img
+          src={image} // Assuming `image` is the Cloudinary URL
+          alt={`${product.name} - Image ${index + 1}`}
+          style={{ width: '100%', height: 'auto', objectFit: 'cover' }}
+        />
+      </div>
+    ))
+  ) : (
+    <div>
+      <img
+        src="/path/to/fallback-image.jpg"
+        alt="Fallback"
+        style={{ width: '100%', height: 'auto', objectFit: 'cover' }}
+      />
+    </div>
+  )}
+</Carousel>
+
+
                         <Typography variant="body2" sx={{ mt: 2 }}>
                           <strong>Product Name:</strong> {product.name}
                         </Typography>

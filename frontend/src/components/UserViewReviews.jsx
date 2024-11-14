@@ -72,11 +72,12 @@ const UserReviews = () => {
             <h3 className="product-name">{review.product.name}</h3>
             {/* Display image if available */}
             {review.photo ? (
-              <img
-                src={`http://localhost:5001/${review.photo}`} // Updated image URL
-                alt={review.product.name}
-                className="review-image"
-              />
+            <img
+            src={review.photo} // Directly use the Cloudinary URL
+            alt={review.product.name}
+            className="review-image"
+          />
+          
             ) : (
               <p>No image available</p>
             )}

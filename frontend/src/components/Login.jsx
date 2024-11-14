@@ -53,6 +53,8 @@ const Login = () => {
             window.location.href = '/adminHomePage';
           } else if (user.userType === 'manufacturer') {
             window.location.href = '/manufacturerHomePage';
+          } else if (user.userType === 'seller') {
+            window.location.href = '/sellerHomePage';
           } else {
             window.location.href = '/userHomePage';
           }
@@ -85,10 +87,10 @@ const Login = () => {
       });
       console.log('Google login response:', res.data);
 
-      const { token, user } = res.data;
+      const { token, userType, message } = res.data;
 
-      if (!token) {
-        throw new Error('No token received from Google login.');
+      if (!token || !userType) {
+        throw new Error('User data is incomplete or missing userType.');
       }
 
       // Store the token and user information in localStorage
@@ -99,15 +101,15 @@ const Login = () => {
       console.log('Decoded User:', decodedUser);
 
       localStorage.setItem('user-email', decodedUser.email);
-      localStorage.setItem('user-type', user.userType);
+      localStorage.setItem('user-type', userType); // Ensure `userType` is set
 
       // Redirect the user based on their type
-      redirectUser(user.userType);
+      redirectUser(userType);
 
       alert('Logged in successfully with Google!');
     } catch (err) {
       console.error('Google login error:', err);
-      setError('Google login failed! Please try again.');
+      setError(err.message || 'Google login failed! Please try again.');
     }
   };
 

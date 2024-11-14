@@ -260,18 +260,19 @@ const handleOpenModal = (product) => {
                 <div style={{ position: 'relative' }}>
                     {/* Check if there are multiple images, use a Carousel */}
                     {product.images && product.images.length > 0 ? (
-                        <Carousel>
-                            {product.images.map((image, index) => (
-                                <CardMedia
-                                    key={index}
-                                    component="img"
-                                    alt={product.name}
-                                    height="200"
-                                    image={`http://localhost:5001/${image}`} // Use multiple images here
-                                    sx={{ borderTopLeftRadius: 2, borderTopRightRadius: 2 }}
-                                />
-                            ))}
-                        </Carousel>
+                     <Carousel>
+                     {product.images.map((image, index) => (
+                       <CardMedia
+                         key={index}
+                         component="img"
+                         alt={product.name}
+                         height="200"
+                         image={image} // Use the Cloudinary URL directly
+                         sx={{ borderTopLeftRadius: 2, borderTopRightRadius: 2 }}
+                       />
+                     ))}
+                   </Carousel>
+                   
                     ) : (
                         <CardMedia
                             component="img"

@@ -94,12 +94,11 @@ const AdminManageReviews = () => {
                                     
                                     {/* Update review photo path */}
                                     {review.photo && (
-                                        <img 
-                                            src={`http://localhost:5001/${review.photo}`} 
-                                            alt="review" 
-                                            width="100%" 
-                                            style={{ borderRadius: '8px', marginBottom: '16px' }} 
-                                        />
+                                         <img
+                                         src={review.photo} // Directly use the Cloudinary URL
+                                         alt={review.product.name}
+                                         className="review-image"
+                                       />
                                     )}
                                     
                                     <Box display="flex" justifyContent="flex-end">

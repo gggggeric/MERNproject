@@ -12,13 +12,27 @@ const { OAuth2Client } = require('google-auth-library');
 const Review = require('../models/Review');
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID); // Use environment variable\
 const mongoose = require('mongoose');
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/'); // Specify the directory to save the uploaded files
-    },
-    filename: (req, file, cb) => {
-        cb(null, `${Date.now()}-${file.originalname}`); // Create a unique filename
-    },
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,  // Use cloud name from .env
+    api_key: process.env.CLOUDINARY_API_KEY,      // Use API key from .env
+    api_secret: process.env.CLOUDINARY_API_SECRET // Use API secret from .env
+});
+
+// Set up Cloudinary storage
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,  // Pass the configured Cloudinary instance
+    params: {
+        folder: 'uploads',          // Folder in Cloudinary where images will be saved
+        allowed_formats: ['jpg', 'jpeg', 'png', 'gif'],  // Allowed image formats
+        transformation: [{         // Optional: Apply transformations (resize, crop, etc.)
+            width: 500,
+            height: 500,
+            crop: 'limit',
+        }]
+    }
 });
 const upload = multer({ storage });
 
@@ -340,13 +354,14 @@ router.get('/user/reviews', authenticateUser, async (req, res) => {
     }
   });
   
+// Review submission route with Cloudinary integration
 router.post('/submit-review', authenticateUser, upload.single('image'), async (req, res) => {
-    const { productId, rating, description } = req.body; // User's review data
-    const userId = req.user._id; // Get the userId from the JWT token
-    const image = req.file ? req.file.path : null; // Save image path if uploaded
+    const { productId, rating, description } = req.body; // Get review data from request body
+    const userId = req.user._id;  // Get userId from JWT token
+    const image = req.file;  // Retrieve uploaded image if exists
 
     try {
-        // Check if the user has 'user' as their userType
+        // Check if the user is allowed to submit a review (userType = 'user')
         if (req.user.userType !== 'user') {
             return res.status(403).json({ message: 'Only users are allowed to submit reviews.' });
         }
@@ -360,13 +375,20 @@ router.post('/submit-review', authenticateUser, upload.single('image'), async (r
         const product = await Product.findById(productId);
         if (!product) return res.status(404).json({ message: 'Product not found.' });
 
-        // Create a new review with the image URL if it's available
+        // Upload image to Cloudinary if an image file is provided
+        let imageUrl = null;
+        if (image) {
+            // Cloudinary upload URL will be set automatically by the multer-storage-cloudinary
+            imageUrl = image.path; // The path provided by Cloudinary after uploading
+        }
+
+        // Create a new review with the Cloudinary image URL if available
         const newReview = new Review({
             user: userId,
             product: productId,
             rating,
             description,
-            photo: image ? image : null, // Only store image path if available
+            photo: imageUrl, // Store the Cloudinary image URL
         });
 
         // Save the review to the database
@@ -849,7 +871,7 @@ router.post('/register', upload.single('profileImage'), async (req, res) => {
         }
 
         // Handle profile image upload (if any)
-        const profileImagePath = req.file ? `uploads/${req.file.filename}` : null;
+        const profileImagePath = req.file ? req.file.path : null; // Get Cloudinary URL if the image is uploaded
 
         // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -865,7 +887,7 @@ router.post('/register', upload.single('profileImage'), async (req, res) => {
             userType,
             status: false, // Indicating the user is not confirmed yet
             confirmationToken, // Confirmation token
-            profileImage: profileImagePath // Save image path if available
+            profileImage: profileImagePath // Save Cloudinary image URL (if available)
         });
 
         // Save user to the database
@@ -881,7 +903,6 @@ router.post('/register', upload.single('profileImage'), async (req, res) => {
         res.status(500).json({ message: 'Registration failed!', error: error.message });
     }
 });
-
 
 router.get('/manufacturer-profile/me', authenticateUser, async (req, res) => {
     try {
@@ -949,7 +970,7 @@ router.delete('/product/:id', authenticateUser, async (req, res) => {
         return res.status(500).json({ msg: 'Server error', error: error.message });
     }
 });
-// Route to create a product with multiple images
+// POST route to create a product
 router.post('/product/create', authenticateUser, upload.array('images', 5), async (req, res) => {
     const { name, description, price, stock, category } = req.body;
     const userId = req.user._id; // Get user ID from authenticated request
@@ -989,10 +1010,18 @@ router.post('/product/create', authenticateUser, upload.array('images', 5), asyn
         const companyName = manufacturerProfile.companyName;
         console.log('Company Name:', companyName);
 
-        // Prepare an array of image paths
-        const imagePaths = req.files ? req.files.map(file => file.path) : [];
+        // Prepare an array of image URLs
+        let imageUrls = [];
 
-        // Create new product with category and multiple images
+        // Upload images to Cloudinary
+        if (req.files) {
+            for (let file of req.files) {
+                const uploadResponse = await cloudinary.uploader.upload(file.path);
+                imageUrls.push(uploadResponse.secure_url); // Store the Cloudinary URL
+            }
+        }
+
+        // Create new product with category and multiple images (URLs from Cloudinary)
         const newProduct = new Product({
             name,
             description,
@@ -1001,7 +1030,7 @@ router.post('/product/create', authenticateUser, upload.array('images', 5), asyn
             category,
             user: userId,
             companyName,
-            images: imagePaths, // Save multiple image paths
+            images: imageUrls, // Save Cloudinary image URLs
         });
 
         // Log the product details being saved
@@ -1013,7 +1042,7 @@ router.post('/product/create', authenticateUser, upload.array('images', 5), asyn
             category,
             user: userId,
             companyName,
-            images: imagePaths,
+            images: imageUrls,
         });
 
         // Save product to database
@@ -1030,7 +1059,6 @@ router.post('/product/create', authenticateUser, upload.array('images', 5), asyn
         return res.status(500).json({ msg: 'Server error', error: error.message });
     }
 });
-
 router.get('/products', authenticateUser, async (req, res) => {
     const userId = req.user._id; // Get the authenticated user's ID
 
@@ -1179,17 +1207,17 @@ router.get('/user/profile', authenticateUser, async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // If there's a profile image, prepend the server's base URL
-        const profileImageUrl = user.profileImage ? `http://localhost:5001/${user.profileImage}` : null;
+        // Check if the profile image is stored in Cloudinary
+        const profileImageUrl = user.profileImage ? user.profileImage : null;
 
         // Check if the address exists
         const address = user.address || 'Address not yet configured';  // If address is not set, show the default message
 
-        // Send back user profile information including the address
+        // Send back user profile information including the address and Cloudinary image URL
         res.json({
             name: user.name,
             email: user.email,
-            profileImage: profileImageUrl,  // Include the full URL to the profile image
+            profileImage: profileImageUrl,  // Cloudinary URL or null if no profile image
             address: address,  // Include the address or the message if it's not set
         });
     } catch (err) {
@@ -1197,6 +1225,7 @@ router.get('/user/profile', authenticateUser, async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 });
+
 
 router.put('/user/password', authenticateUser, upload.single('profileImage'), async (req, res) => {
     try {
@@ -1222,9 +1251,11 @@ router.put('/user/password', authenticateUser, upload.single('profileImage'), as
             user.password = hashedPassword;
         }
 
-        // Update profile image if a new one is provided
+        // Update profile image using Cloudinary if a new one is provided
         if (req.file) {
-            user.profileImage = `uploads/${req.file.filename}`;  // Store the file path in DB
+            // Upload the image to Cloudinary
+            const result = await cloudinary.uploader.upload(req.file.path);
+            user.profileImage = result.secure_url;  // Store the Cloudinary image URL in the DB
         }
 
         // Handle address update logic only if address is provided
