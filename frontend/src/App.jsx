@@ -17,6 +17,7 @@ import UserEditPassword from './components/UserEditPassword';
 import OrderList from './components/ManufacturersOrders';
 import UserViewOrders from './components/UserViewOrders';
 import UserReviews from './components/UserViewReviews';
+import UpdateOrderForm from './components/AdminUpdateOrder';
 import AdminManageReviews from './components/AdminManageReviews';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import "slick-carousel/slick/slick-theme.css"; 
@@ -147,6 +148,15 @@ const App = () => {
                     element={
                         <ProtectedRoute 
                             element={<AdminManageReviews />} 
+                            allowedRoles={['admin']} // Allow users and admins to access the order page
+                        />
+                     } 
+                     />
+                                         <Route 
+                    path="/admin/order/update" 
+                    element={
+                        <ProtectedRoute 
+                            element={<UpdateOrderForm />} 
                             allowedRoles={['admin']} // Allow users and admins to access the order page
                         />
                      } 

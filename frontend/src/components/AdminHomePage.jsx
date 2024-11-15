@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Container, Typography, Grid, Card, CardContent, IconButton } from '@mui/material';
-import { FaUser, FaFileAlt, FaCog, FaStar } from 'react-icons/fa'; // Importing icons
+import { FaUser, FaFileAlt, FaCog, FaStar, FaExchangeAlt } from 'react-icons/fa'; // Importing icons
 import { FaChevronRight } from 'react-icons/fa'; // Importing the Chevron icon
 
 const AdminHomePage = () => {
@@ -21,6 +21,10 @@ const AdminHomePage = () => {
 
     const handleRedirectToManageReviews = () => {
         navigate('/admin/review'); // Redirect to Manage Reviews page
+    };
+
+    const handleRedirectToUpdateTransaction = () => {
+        navigate('/admin/order/update'); // Redirect to Update Transaction page
     };
 
     return (
@@ -98,6 +102,23 @@ const AdminHomePage = () => {
                                     <FaStar size={24} />
                                 </Box>
                                 <Typography variant="h6" fontWeight="bold">Manage Reviews</Typography>
+                                <IconButton>
+                                    <FaChevronRight size={16} />
+                                </IconButton>
+                            </Box>
+                        </CardContent>
+                    </Card>
+                </Grid>
+
+                {/* Update Transaction Card */}
+                <Grid item md={3} xs={12}>
+                    <Card variant="outlined" onClick={handleRedirectToUpdateTransaction} sx={{ cursor: 'pointer', bgcolor: '#fce4ec' }}>
+                        <CardContent>
+                            <Box display="flex" flexDirection="column" alignItems="center">
+                                <Box sx={{ bgcolor: 'lightgray', borderRadius: '50%', p: 2, mb: 2 }}>
+                                    <FaExchangeAlt size={24} />
+                                </Box>
+                                <Typography variant="h6" fontWeight="bold">Update Transaction</Typography>
                                 <IconButton>
                                     <FaChevronRight size={16} />
                                 </IconButton>

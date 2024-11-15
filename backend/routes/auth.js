@@ -45,6 +45,87 @@ const storage = new CloudinaryStorage({
     }
 });
 const upload = multer({ storage });
+// Route to fetch all orders, only accessible by admins
+router.get('/admin/orders', authenticateUser, async (req, res) => {
+    try {
+        // Get the logged-in user from req.user (set by authenticateUser middleware)
+        const user = await User.findById(req.user._id); // Find the user by their _id
+
+        // Check if the user exists
+        if (!user) {
+            return res.status(401).json({ message: 'User not found or not authenticated.' });
+        }
+
+        // Check if the user is an admin
+        if (user.userType !== 'admin') {
+            return res.status(403).json({ message: 'Access denied. Admins only.' });
+        }
+
+        // Fetch all orders from the database and populate all fields
+        const orders = await Order.find()
+            .populate('user.email')  // Populate user details (email and name)
+            .populate('products.product', 'name price description')  // Populate product details (name, price, description)
+            .populate('shippedToAddress')  // Address is embedded, no need for populate (already in the schema)
+            .populate('paymentMethod')  // Populate paymentMethod (if it's a reference model)
+            .populate('shippingMethod')  // Populate shippingMethod (if it's a reference model)
+            .populate('shippingStatus')  // Populate shippingStatus (if it's a reference model)
+            .lean(); // Optional: If you want plain JS objects instead of Mongoose documents
+
+        // If no orders are found, return a 404
+        if (orders.length === 0) {
+            return res.status(404).json({ message: 'No orders found.' });
+        }
+
+        // Return the orders to the client
+        return res.status(200).json({ orders });
+
+    } catch (err) {
+        // Log error if something goes wrong
+        console.error('Error fetching orders:', err);
+        return res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Route to update the shipping status of an order
+router.put('/admin/updateTransaction/:orderId', authenticateUser, async (req, res) => {
+    const { orderId } = req.params;
+    const { shippingStatus } = req.body; // Only accepting shippingStatus for updates
+
+    try {
+        // Fetch the order based on the orderId
+        const order = await Order.findById(orderId);
+
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        // Check if the logged-in user is an admin
+        const user = await User.findById(req.user._id); // Assuming `req.user` contains user info from JWT
+
+        if (!user || user.userType !== 'admin') {
+            return res.status(403).json({ message: 'Access denied. Admins only.' });
+        }
+
+        // Validate shippingStatus
+        if (!['Pending', 'Delivered'].includes(shippingStatus)) {
+            return res.status(400).json({ message: 'Invalid shipping status. Choose either "Pending" or "Delivered".' });
+        }
+
+        // Update the shippingStatus field
+        order.shippingStatus = shippingStatus;
+
+        // Save the updated order
+        await order.save();
+
+        return res.status(200).json({ message: 'Shipping status updated successfully', order });
+    } catch (err) {
+        console.error('Error updating order:', err);
+        return res.status(500).json({ message: 'Server error' });
+    }
+});
+
+
+
 
 // Route to mark an order as delivered
 router.patch('/mark-delivered/:orderId', authenticateUser, async (req, res) => {
