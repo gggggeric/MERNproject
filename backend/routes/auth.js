@@ -14,6 +14,16 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID); // Use environmen
 const mongoose = require('mongoose');
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const nodemailer = require('nodemailer');
+// Create a transporter using Mailtrap SMTP credentials
+const transporter = nodemailer.createTransport({
+    host: process.env.MAILTRAP_HOST, // smtp.mailtrap.io
+    port: process.env.MAILTRAP_PORT, // 2525
+    auth: {
+      user: process.env.MAILTRAP_USER, // Your Mailtrap user
+      pass: process.env.MAILTRAP_PASS, // Your Mailtrap password
+    },
+  });
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,  // Use cloud name from .env
@@ -479,9 +489,6 @@ router.get('/view/orders', authenticateUser, async (req, res) => {
         res.status(500).json({ message: 'Server error', error });
     }
 });
-
-  
-
 // Endpoint to update order status
 router.patch('/orders/:id/status', authenticateUser, async (req, res) => {
     const userId = req.user._id;
@@ -490,19 +497,21 @@ router.patch('/orders/:id/status', authenticateUser, async (req, res) => {
     const { status } = req.body;
   
     try {
-      // Ensure the user is a manufacturer
       if (userType !== 'manufacturer') {
         return res.status(403).json({ msg: 'Access denied' });
       }
   
-      // Find the order by ID
-      const order = await Order.findById(id);
+      const order = await Order.findById(id).populate({
+        path: 'products.product',
+        select: 'name price', // Ensure you're fetching necessary fields
+      });
+  
       if (!order) return res.status(404).json({ msg: 'Order not found' });
   
-      // Get IDs of products in the order
-      const productIds = order.products.map(item => item.product);
+      const user = await User.findById(order.user);
+      if (!user) return res.status(404).json({ msg: 'User not found' });
   
-      // Verify that each product in the order belongs to the manufacturer
+      const productIds = order.products.map(item => item.product);
       const manufacturerProducts = await Product.find({
         _id: { $in: productIds },
         user: userId,
@@ -512,19 +521,139 @@ router.patch('/orders/:id/status', authenticateUser, async (req, res) => {
         return res.status(403).json({ msg: 'You can only accept orders for your own products.' });
       }
   
-      // Update order status
       order.orderStatus = status;
       await order.save();
   
-      res.status(200).json({ msg: 'Order status updated', order });
+      // Prepare the email content with order details
+      const productDetails = order.products.map(item => {
+        if (item.product) {
+          return `Product: ${item.product.name || 'Unknown Product'}, Quantity: ${item.quantity}, Price: $${item.product.price || 'N/A'}`;
+        }
+        return `Product: Unknown, Quantity: ${item.quantity}`;
+      }).join('\n');
+  
+      const mailOptions = {
+        from: process.env.MAILTRAP_USER,
+        to: user.email,
+        subject: `Your Order #${order._id} Has Been Accepted`,
+        html: `
+          <html>
+            <head>
+              <style>
+                body {
+                  font-family: Arial, sans-serif;
+                  color: #333;
+                  background-color: #f4f4f4;
+                  margin: 0;
+                  padding: 0;
+                }
+                .container {
+                  width: 100%;
+                  max-width: 600px;
+                  margin: 20px auto;
+                  background-color: #fff;
+                  padding: 20px;
+                  border-radius: 8px;
+                  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                }
+                h2 {
+                  color: #2a9d8f;
+                }
+                p {
+                  font-size: 16px;
+                  line-height: 1.5;
+                }
+                .order-details {
+                  margin-top: 20px;
+                  padding: 15px;
+                  background-color: #f0f0f0;
+                  border-radius: 5px;
+                  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                }
+                .order-details table {
+                  width: 100%;
+                  border-collapse: collapse;
+                  margin-top: 10px;
+                }
+                .order-details table, .order-details th, .order-details td {
+                  border: 1px solid #ddd;
+                }
+                .order-details th, .order-details td {
+                  padding: 10px;
+                  text-align: left;
+                }
+                .total-price {
+                  font-weight: bold;
+                  font-size: 18px;
+                  color: #2a9d8f;
+                }
+                .footer {
+                  margin-top: 20px;
+                  text-align: center;
+                  font-size: 14px;
+                  color: #777;
+                }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <h2>Hello ${user.name || 'Valued Customer'},</h2>
+                <p>Your order with ID <strong>${order._id}</strong> has been accepted. We are now processing it.</p>
+                
+                <div class="order-details">
+                  <h3>Order Details:</h3>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${order.products.map(item => {
+                        return `
+                          <tr>
+                            <td>${item.product.name || 'Unknown Product'}</td>
+                            <td>${item.quantity}</td>
+                            <td>$${item.product.price || 'N/A'}</td>
+                          </tr>
+                        `;
+                      }).join('')}
+                    </tbody>
+                  </table>
+                </div>
+      
+                <p class="total-price">Total Price: $${order.totalPrice}</p>
+      
+                <p>Thank you for your order! We will keep you updated on the status.</p>
+                <p>Best regards,</p>
+                <p>Your Company Name</p>
+              </div>
+              <div class="footer">
+                <p>&copy; ${new Date().getFullYear()} SofaSphere. All rights reserved.</p>
+              </div>
+            </body>
+          </html>
+        `,
+      };
+      
+  
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.error('Error sending email:', error);
+        } else {
+          console.log('Email sent:', info.response);
+        }
+      });
+  
+      res.status(200).json({ msg: 'Order status updated and email sent', order });
+  
     } catch (error) {
       console.error('Error updating order status:', error);
       res.status(500).json({ msg: 'Server error', error: error.message });
     }
   });
-  
-
-
 // GET all orders for a specific manufacturer
 router.get('/orders', authenticateUser, async (req, res) => {
     const userId = req.user._id;
