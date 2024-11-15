@@ -1,6 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, Typography, Button, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
+import { 
+  Card, 
+  CardContent, 
+  Typography, 
+  Button, 
+  Dialog, 
+  DialogActions, 
+  DialogContent, 
+  DialogTitle, 
+  MenuItem, 
+  Select, 
+  FormControl, 
+  InputLabel, 
+  Grid, 
+  CircularProgress, 
+  Paper 
+} from '@mui/material';
 
 const UpdateOrderForm = () => {
     const [orders, setOrders] = useState([]);
@@ -107,57 +123,67 @@ const UpdateOrderForm = () => {
             setError(err.response ? err.response.data.message : 'Failed to update the order.');
         }
     };
-    
+
     if (loading) {
-        return <CircularProgress />;
+        return <CircularProgress style={{ display: 'block', margin: 'auto' }} />;
     }
 
     if (error) {
         return (
-            <Typography color="error" variant="h6">
+            <Typography color="error" variant="h6" align="center" style={{ marginBottom: '20px' }}>
                 {error}
             </Typography>
         );
     }
 
     return (
-        <div>
-            <Typography variant="h4" gutterBottom>
-                All Orders
+        <div style={{ padding: '30px', maxWidth: '1200px', margin: '0 auto' }}>
+            <Typography variant="h4" gutterBottom align="center" color="textSecondary">
+                Manage Orders
             </Typography>
-            <TableContainer component={Paper}>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Order ID</TableCell>
-                            <TableCell>User</TableCell>
-                            <TableCell>Shipping Status</TableCell>
-                            <TableCell>Order Status</TableCell>
-                            <TableCell>Total Price</TableCell>
-                            <TableCell>Action</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {orders.map((order) => (
-                            <TableRow key={order._id}>
-                                <TableCell>{order._id}</TableCell>
-                                <TableCell>{order.user || 'Unknown'}</TableCell>
-                                <TableCell>{order.shippingStatus}</TableCell>
-                                <TableCell>{order.orderStatus}</TableCell>
-                                <TableCell>{order.totalPrice}</TableCell>
-                                <TableCell>
-                                    <Button variant="contained" color="primary" onClick={() => handleUpdateClick(order)}>
-                                        Update
-                                    </Button>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+
+            <Grid container spacing={3}>
+                {orders.map((order) => (
+                    <Grid item xs={12} sm={6} md={4} key={order._id}>
+                        <Card elevation={5} style={{ borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)' }}>
+                            <CardContent>
+                            <Typography 
+    variant="h6" 
+    gutterBottom 
+    style={{ 
+        fontWeight: '600', 
+        color: '#8e44ad', 
+        border: '2px solid #3498db',  // Border color
+        padding: '5px',               // Padding to give space inside the border
+        borderRadius: '4px',          // Rounded corners
+        display: 'inline-block'       // To prevent it from stretching full width
+    }}
+>
+    Order ID: {order._id}
+</Typography>
+
+                                <Typography variant="body1" color="textSecondary">User: {order.user || 'Unknown'}</Typography>
+                                <Typography variant="body1" color="textSecondary">Shipping Status: {order.shippingStatus}</Typography>
+                                <Typography variant="body1" color="textSecondary">Order Status: {order.orderStatus}</Typography>
+                                <Typography variant="body1" color="textSecondary">Total Price: ${order.totalPrice}</Typography>
+
+                                <Button 
+                                    variant="contained" 
+                                    color="primary" 
+                                    fullWidth 
+                                    style={{ marginTop: '15px', fontSize: '14px', fontWeight: '500' }}
+                                    onClick={() => handleUpdateClick(order)}
+                                >
+                                    Update Shipping Status
+                                </Button>
+                            </CardContent>
+                        </Card>
+                    </Grid>
+                ))}
+            </Grid>
 
             {/* Update Order Dialog */}
-            <Dialog open={openDialog} onClose={handleCloseDialog}>
+            <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
                 <DialogTitle>Update Shipping Status</DialogTitle>
                 <DialogContent>
                     <FormControl fullWidth margin="normal">
@@ -173,10 +199,10 @@ const UpdateOrderForm = () => {
                     </FormControl>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCloseDialog} color="secondary">
+                    <Button onClick={handleCloseDialog} color="secondary" variant="outlined">
                         Cancel
                     </Button>
-                    <Button onClick={handleUpdateOrder} color="primary">
+                    <Button onClick={handleUpdateOrder} color="primary" variant="contained">
                         Update
                     </Button>
                 </DialogActions>

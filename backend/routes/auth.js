@@ -45,6 +45,25 @@ const storage = new CloudinaryStorage({
     }
 });
 const upload = multer({ storage });
+// Route to get the user profile image
+router.get('/getUserProfileImage', authenticateUser, async (req, res) => {
+    try {
+        // Get user from the database based on the user ID stored in the JWT token
+        const user = await User.findById(req.user._id);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Send back the user's profile image URL or a placeholder if not set
+        const profileImageUrl = user.profileImage || '/placeholder.png';
+        return res.json({ profileImage: profileImageUrl });
+    } catch (error) {
+        console.error('Error fetching profile image:', error);
+        return res.status(500).json({ message: 'Server error' });
+    }
+});
+
 // Route to fetch all orders, only accessible by admins
 router.get('/admin/orders', authenticateUser, async (req, res) => {
     try {

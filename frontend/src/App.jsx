@@ -70,15 +70,6 @@ const App = () => {
                                 />
                             } 
                         />
-                        {/* <Route 
-                            path="/userEditPassword" 
-                            element={
-                                <ProtectedRoute 
-                                    element={<UserEditPassword />} 
-                                    allowedRoles={['user']}
-                                />
-                            } 
-                        /> */}
                         <Route 
                             path="/manufacturerEditPassword" 
                             element={

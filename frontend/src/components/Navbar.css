@@ -265,3 +265,24 @@
     margin: 0 12px; /* Space out the separator from the links */
     display: inline-block; /* Make the separator align next to the links */
 }
+/* Style the profile picture to be small and circular */
+.profile-info {
+    display: flex;
+    align-items: center;
+}
+
+.profile-pic {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.edit-profile-link {
+    font-size: 16px;
+    font-weight: bold;
+}
+.username {
+    color: #8e44ad; /* Set the default color to #8e44ad */
+    font-weight: bold; /* Make the text bold */
+}
