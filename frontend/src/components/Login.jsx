@@ -102,6 +102,7 @@ const Login = () => {
 
       localStorage.setItem('user-email', decodedUser.email);
       localStorage.setItem('user-type', userType); // Ensure `userType` is set
+      console.log(userType)
 
       // Redirect the user based on their type
       redirectUser(userType);

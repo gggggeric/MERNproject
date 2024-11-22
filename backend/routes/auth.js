@@ -15,7 +15,7 @@ const mongoose = require('mongoose');
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const nodemailer = require('nodemailer');
-// Create a transporter using Mailtrap SMTP credentials
+// Create a transporter using Mailtrap SMTP credentialsz
 const transporter = nodemailer.createTransport({
     host: process.env.MAILTRAP_HOST, // smtp.mailtrap.io
     port: process.env.MAILTRAP_PORT, // 2525
@@ -948,9 +948,6 @@ router.get('/user/products', authenticateUser, async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
-
-
-
 // Function to generate a JWT token
 const generateToken = (user) => {
     return jwt.sign(
@@ -959,92 +956,65 @@ const generateToken = (user) => {
         { expiresIn: '1h' }  // Token expiration
     );
 };
+
 // Google login endpoint
 router.post('/google/login', async (req, res) => {
-    console.log(req.body); // Check if the idToken is received correctly
     const { idToken } = req.body;
 
     try {
         // Verify the ID token with Google
         const ticket = await client.verifyIdToken({
             idToken,
-            audience: process.env.GOOGLE_CLIENT_ID,
+            audience: process.env.GOOGLE_CLIENT_ID,  // Your Google Client ID
         });
 
         const payload = ticket.getPayload();
         const userId = payload['sub'];
         const email = payload['email'];
+        const name = payload['name'];  // Extract user's name
+        const picture = payload['picture'];  // Extract user's profile picture (optional)
 
         // Check if the user exists in your database
         let user = await User.findOne({ $or: [{ email }, { googleId: userId }] });
 
         if (!user) {
             // If the user doesn't exist, create a new user record
-            console.log('Creating new user:', email); // Debugging statement
             user = new User({
                 email,
                 googleId: userId,
-                status: true, // Set the status to true for new users
-                userType: 'user', // Set default user type
+                name,  // Store the name from the Google payload
+                profilePicture: picture,  // Optionally store profile picture URL
+                status: true,  // Set the status to true for new users
+                userType: 'user',  // Default user type
             });
             await user.save(); // Save the new user in the database
         } else {
             // If user exists, check if the user account is active
-            console.log('User found:', user.email, 'Status:', user.status); // Debugging statement
             if (!user.status) {
                 return res.status(403).json({ message: 'User account is inactive. Please contact support.' });
             }
         }
 
-        // Generate the JWT token using the generateToken function
-        const token = generateToken(user);  // Use the defined function
+        // Generate JWT token using the same method as the normal login
+        const token = jwt.sign(
+            { _id: user._id, userType: user.userType, name: user.name, email: user.email },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        );
 
-        // Send the token in the response header and response body, similar to normal login route
+        // Send the token in the response header and body
         res.header('auth-token', token).json({
-            token,  // Send the token
+            token,  // Send the JWT token
             userType: user.userType,  // Send userType as part of the response
-            message: 'Login successful!' // Message to confirm login
+            name: user.name,  // Send name to the front end
+            email: user.email,  // Send email to the front end
+            profilePicture: user.profilePicture,  // Optionally send profile picture URL
+            message: 'Login successful!'  // Message to confirm login
         });
+
     } catch (error) {
         console.error('Error during Google login:', error);
         res.status(400).json({ message: 'Google login failed', error });
-    }
-});
-
-
-router.post('/google/register', async (req, res) => {
-    const { idToken } = req.body;
-
-    try {
-        const ticket = await client.verifyIdToken({
-            idToken,
-            audience: process.env.GOOGLE_CLIENT_ID, // Use the CLIENT_ID from the .env file
-        });
-
-        const payload = ticket.getPayload();
-        const userId = payload['sub']; // Google's unique ID for the user
-        const email = payload['email'];
-
-        // Check if the user already exists in your database by email or googleId
-        let user = await User.findOne({ $or: [{ email }, { googleId: userId }] });
-
-        if (!user) {
-            // If the user does not exist, create a new user in your database
-            user = await User.create({
-                googleId: userId,
-                email,
-                userType: 'user', // You can set the default user type here
-                status: true, // Set status to true for new users
-                // Add any additional fields as needed (e.g., name, profile picture)
-            });
-            res.status(201).json({ message: 'User created successfully', user });
-        } else {
-            // If the user already exists, return a message (or handle as needed)
-            res.status(200).json({ message: 'User already exists', user });
-        }
-    } catch (error) {
-        console.error('Error during Google registration:', error);
-        res.status(400).json({ message: 'Google registration failed', error });
     }
 });
 
@@ -1581,7 +1551,7 @@ router.get('/confirm/:token', async (req, res) => {
     }
 });
 
-    // Login route
+// Login route
     router.post('/login', async (req, res) => {
         try {
             const user = await User.findOne({ email: req.body.email });
