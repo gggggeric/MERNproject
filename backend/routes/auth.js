@@ -46,6 +46,7 @@ const storage = new CloudinaryStorage({
 });
 const upload = multer({ storage });
 
+//Route for getting the review for each product
 router.get('/user/product/:productId/reviews', authenticateUser, async (req, res) => {
     try {
         // Log the productId for debugging purposes

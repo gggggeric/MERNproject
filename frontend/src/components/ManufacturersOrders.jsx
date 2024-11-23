@@ -85,11 +85,11 @@ const OrderList = () => {
   }
 
   return (
-    <div className="order-list-container" style={{ maxWidth: '900px', margin: '0 auto', padding: '20px' }}>
+    <div className="order-list-container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '10px' }}>
       <Typography variant="h4" gutterBottom sx={{ fontSize: '1.5rem' }}>
         Orders
       </Typography>
-    
+
       {/* Filter Dropdown */}
       <FormControl sx={{ mb: 2 }}>
         <InputLabel id="filter-label">Filter</InputLabel>
@@ -110,83 +110,86 @@ const OrderList = () => {
       {filteredOrders.length === 0 ? (
         <Typography variant="body1" color="textSecondary">No orders available for the selected filter.</Typography>
       ) : (
-        filteredOrders.map((order) => (
-          <Card key={order._id} sx={{ mb: 3, p: 1 }}>
-            <CardContent>
-              <Typography variant="h6" sx={{ fontSize: '1rem' }}>Order ID: {order._id}</Typography>
-              <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
-                <strong>Customer:</strong> ({order.user?.email || 'N/A'})
-              </Typography>
-              <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
-                <strong>Total Price:</strong> ${order.totalPrice.toFixed(2)}
-              </Typography>
-              <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
-                <strong>Status:</strong> {order.orderStatus}
-              </Typography>
-              <Typography variant="h6" sx={{ mt: 2, fontSize: '1rem' }}>Products Ordered:</Typography>
-              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                {order.products.map(({ product, quantity }) =>
-                  product ? (
-                    <Card key={product._id} sx={{ display: 'flex', mb: 2 }}>
-                      <CardContent sx={{ flex: 1 }}>
-                      <Carousel>
-  {product.images && product.images.length > 0 ? (
-    product.images.map((image, index) => (
-      <div key={index}>
-        <img
-          src={image} // Assuming `image` is the Cloudinary URL
-          alt={`${product.name} - Image ${index + 1}`}
-          style={{ width: '100%', height: 'auto', objectFit: 'cover' }}
-        />
-      </div>
-    ))
-  ) : (
-    <div>
-      <img
-        src="/path/to/fallback-image.jpg"
-        alt="Fallback"
-        style={{ width: '100%', height: 'auto', objectFit: 'cover' }}
-      />
-    </div>
-  )}
-</Carousel>
+        <div className="order-cards-container" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '20px' }}>
+          {filteredOrders.map((order) => (
+            <div key={order._id} className="order-container" style={{ flex: '1 1 300px', maxWidth: '350px', display: 'flex', justifyContent: 'center' }}>
+              <Card sx={{ p: 1 }}>
+                <CardContent>
+                  <Typography variant="h6" sx={{ fontSize: '1rem' }}>Order ID: {order._id}</Typography>
+                  <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+                    <strong>Customer:</strong> ({order.user?.email || 'N/A'})
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+                    <strong>Total Price:</strong> ${order.totalPrice.toFixed(2)}
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+                    <strong>Status:</strong> {order.orderStatus}
+                  </Typography>
+                  <Typography variant="h6" sx={{ mt: 2, fontSize: '1rem' }}>Products Ordered:</Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                    {order.products.map(({ product, quantity }) =>
+                      product ? (
+                        <Card key={product._id} sx={{ display: 'flex', mb: 2, flexDirection: 'column', alignItems: 'center', padding: '10px' }}>
+                          <CardContent sx={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                            <Carousel>
+                              {product.images && product.images.length > 0 ? (
+                                product.images.map((image, index) => (
+                                  <div key={index}>
+                                    <img
+                                      src={image} // Assuming `image` is the Cloudinary URL
+                                      alt={`${product.name} - Image ${index + 1}`}
+                                      style={{ width: '150px', height: '150px', objectFit: 'cover', borderRadius: '8px', marginBottom: '10px' }}
+                                    />
+                                  </div>
+                                ))
+                              ) : (
+                                <div>
+                                  <img
+                                    src="/path/to/fallback-image.jpg"
+                                    alt="Fallback"
+                                    style={{ width: '150px', height: '150px', objectFit: 'cover', borderRadius: '8px', marginBottom: '10px' }}
+                                  />
+                                </div>
+                              )}
+                            </Carousel>
 
+                            <Typography variant="body2" sx={{ mt: 2, fontSize: '0.9rem' }}>
+                              <strong>Product Name:</strong> {product.name}
+                            </Typography>
+                            <Typography variant="body2" sx={{ fontSize: '0.85rem', marginBottom: '8px' }}>
+                              <strong>Description:</strong> {product.description}
+                            </Typography>
+                            <Typography variant="body2" sx={{ fontSize: '0.875rem', marginBottom: '8px' }}>
+                              <strong>Price:</strong> ${product.price.toFixed(2)}
+                            </Typography>
+                            <Typography variant="body2" sx={{ fontSize: '0.875rem', marginBottom: '8px' }}>
+                              <strong>Quantity:</strong> {quantity}
+                            </Typography>
+                          </CardContent>
+                        </Card>
+                      ) : null
+                    )}
+                  </Box>
+                  <Typography variant="body2" sx={{ mt: 1 }}>
+                    <small>Order Date: {new Date(order.createdAt).toLocaleString()}</small>
+                  </Typography>
 
-                        <Typography variant="body2" sx={{ mt: 2 }}>
-                          <strong>Product Name:</strong> {product.name}
-                        </Typography>
-                        <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
-                          <strong>Description:</strong> {product.description}
-                        </Typography>
-                        <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
-                          <strong>Price:</strong> ${product.price.toFixed(2)}
-                        </Typography>
-                        <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
-                          <strong>Quantity:</strong> {quantity}
-                        </Typography>
-                      </CardContent>
-                    </Card>
-                  ) : null
-                )}
-              </Box>
-              <Typography variant="body2" sx={{ mt: 1 }}>
-                <small>Order Date: {new Date(order.createdAt).toLocaleString()}</small>
-              </Typography>
-
-              {order.orderStatus === 'Pending' && (
-                <Button
-                  onClick={() => acceptOrder(order._id)}
-                  disabled={accepting === order._id}
-                  variant="contained"
-                  color="primary"
-                  sx={{ mt: 2 }}
-                >
-                  {accepting === order._id ? 'Accepting...' : 'Accept Order'}
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-        ))
+                  {order.orderStatus === 'Pending' && (
+                    <Button
+                      onClick={() => acceptOrder(order._id)}
+                      disabled={accepting === order._id}
+                      variant="contained"
+                      color="primary"
+                      sx={{ mt: 2 }}
+                    >
+                      {accepting === order._id ? 'Accepting...' : 'Accept Order'}
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );
