@@ -46,6 +46,38 @@ const storage = new CloudinaryStorage({
 });
 const upload = multer({ storage });
 
+router.get('/user/product/:productId/reviews', authenticateUser, async (req, res) => {
+    try {
+        // Log the productId for debugging purposes
+        console.log('Product ID from request:', req.params.productId);
+
+        // Convert the productId to an ObjectId (in case it's passed as a string)
+        const productId = new mongoose.Types.ObjectId(req.params.productId);
+
+        // Query the Review collection based on the productId
+        const reviews = await Review.find({ product: productId })
+            .populate('user', 'email') // Populate user fields like name and email
+            .populate('product', 'name description price') // Optionally populate product fields like name, description, and price
+            .select('description photo rating createdAt') // Select all fields you want to include in the response
+            .exec();  // Execute the query
+
+        // Log reviews to check if any reviews are found
+        console.log('Reviews found:', reviews);
+
+        // If no reviews are found, return a 404 response
+        if (reviews.length === 0) {
+            return res.status(404).json({ message: 'No reviews found for this product' });
+        }
+
+        // Return the reviews if found
+        return res.json(reviews);
+
+    } catch (error) {
+        // Log the error and return a 500 status if something goes wrong
+        console.error('Error fetching reviews:', error);
+        return res.status(500).json({ message: 'Server error' });
+    }
+});
 
 // Route to get all users (only accessible by admins)
 router.get('/admin/users', authenticateUser, async (req, res) => {

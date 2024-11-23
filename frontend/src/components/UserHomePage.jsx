@@ -24,8 +24,61 @@ const UserHomePage = () => {
     const [paymentMethod, setPaymentMethod] = useState('');  // Add state for paymentMethod
     const [shippingStatus, setShippingStatus] = useState('');  // Add state for shippingStatus
     const [shippingMethod, setShippingMethod] = useState('');
+    const [reviews, setReviews] = useState([]); // Store reviews for the selected product
+    const [openReviewModal, setOpenReviewModal] = useState(false); // To control the modal visibility
+    const [reviewsList, setReviewsList] = useState([]); // Store reviews for the selected product
+
+    
+    const fetchProductReviews = async (productId) => {
+        try {
+            // Retrieve the auth token from localStorage
+            const token = localStorage.getItem('auth-token');
+            
+            // If the token is not available, handle this scenario
+            if (!token) {
+                console.error('No authentication token found');
+                return;
+            }
+    
+            // Make the request to fetch the reviews, including the token in the headers
+            const res = await axios.get(`http://localhost:5001/api/auth/user/product/${productId}/reviews`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+    
+            // Set the reviews in state
+            setReviews(res.data);
+    
+        } catch (err) {
+            // Handle different error cases
+            if (err.response) {
+                const { status, data } = err.response;
+                if (status === 401) {
+                    console.error('Authentication failed. Please log in again.', data.message);
+                } else if (status === 403) {
+                    console.error('You are not authorized to view these reviews.', data.message);
+                } else if (status === 404) {
+                    console.error('No reviews found for this product.', data.message);
+                } else {
+                    console.error('An unexpected error occurred:', data.message);
+                }
+            } else {
+                console.error('Network error or server is down.', err.message);
+            }
+        }
+    };
+    
+    const handleViewReviews = async (product) => {
+        setSelectedProduct(product);  // Store the selected product
+        setReviews([]);  // Clear previous reviews if any
+        setOpenReviewModal(true);  // Open the review modal
+    
+        // Fetch reviews for the selected product
+        await fetchProductReviews(product._id);
+    };
+    
   // Handle price filter search logic
- 
     const renderStars = (rating) => {
         const totalStars = 5;
         let stars = [];
@@ -317,13 +370,60 @@ const handleOpenModal = (product) => {
                     >
                         Place Order
                     </Button>
+                    <Button variant="contained" color="primary" onClick={() => handleViewReviews(product)}>
+                    View Comments
+                </Button>
                 </CardContent>
             </Card>
         </Grid>
     ))}
-</Grid>
+            </Grid>
 
-       {/* Order Modal */}
+<Dialog open={openReviewModal} onClose={() => setOpenReviewModal(false)}>
+    <DialogTitle>Product Reviews</DialogTitle>
+    <DialogContent>
+        {reviews.length === 0 ? (
+            <Typography>No reviews available for this product.</Typography>
+        ) : (
+            reviews.map((review, index) => (
+                <Card key={index} sx={{ marginBottom: 2, padding: 2 }}>
+                    {/* Display the user's name */}
+                    <Typography variant="h6">{review.user.name}</Typography>
+
+                    {/* Display the description of the review */}
+                    <Typography variant="body1" sx={{ marginBottom: 1 }}>
+                        {review.description}
+                    </Typography>
+
+                    {/* Display the photo (if available) */}
+                    {review.photo && (
+                        <img
+                            src={review.photo}
+                            alt="Review photo"
+                            style={{ width: '100%', borderRadius: '8px', marginBottom: '8px' }}
+                        />
+                    )}
+
+                    {/* Render the stars for the rating */}
+                    <div>{renderStars(review.rating)}</div>
+
+                    {/* Display the creation date */}
+                    <Typography variant="caption" color="textSecondary">
+                        {new Date(review.createdAt).toLocaleDateString()}
+                    </Typography>
+                </Card>
+            ))
+        )}
+    </DialogContent>
+    <DialogActions>
+        <Button onClick={() => setOpenReviewModal(false)} color="primary">
+            Close
+        </Button>
+    </DialogActions>
+</Dialog>
+
+
+
 {/* Order Modal */}
 <Dialog open={openModal} onClose={handleCloseModal}>
     <DialogTitle>Place Order</DialogTitle>
@@ -374,9 +474,9 @@ const handleOpenModal = (product) => {
             color="primary"
         >
             Place Order
-        </Button>
-    </DialogActions>
-</Dialog>
+           </Button>
+            </DialogActions>
+            </Dialog>
 
 
             {/* Order Success Modal */}
@@ -392,6 +492,8 @@ const handleOpenModal = (product) => {
                 </DialogActions>
             </Dialog>
         </div>
+
+        
     );
 };
 
