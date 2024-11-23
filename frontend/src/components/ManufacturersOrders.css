@@ -49,13 +49,13 @@ p {
     gap: 15px;
     margin-top: 10px;
     justify-content: center; /* Center align product cards */
-    padding: 0 15px; /* Ensure there's some space on the sides */
 }
+
 
 /* Style for individual product card */
 .product-card {
     background-color: #fafafa;
-    padding: 15px;
+    padding: 10px;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s ease-in-out;
@@ -63,9 +63,6 @@ p {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    width: 45%; /* Adjust width to fit within the container */
-    max-width: 300px; /* Max width to avoid excessive stretching */
-    margin: 0 auto; /* Ensure it is centered */
 }
 
 /* Hover effect for product cards */
@@ -75,17 +72,16 @@ p {
 
 /* Image within the product card */
 .product-image img {
-    max-width: 100%;
-    height: 150px; /* Uniform height for images */
+    max-width: 80px;
+    max-height: 80px;
     border-radius: 5px;
-    object-fit: contain; /* Keep the aspect ratio */
+    object-fit: cover;
 }
 
 /* Product details section */
 .product-details {
-    margin-top: 12px;
+    margin-top: 8px;
     text-align: center;
-    flex-grow: 1; /* Make sure the content stretches to take available space */
 }
 
 /* Product detail paragraph */
@@ -133,7 +129,7 @@ small {
     }
 
     .product-card {
-        width: 100%; /* Full width on smaller screens */
+        width: 100%;
     }
 
     h3 {
