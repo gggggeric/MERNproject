@@ -104,3 +104,19 @@
     justify-content: center;
     align-items: center;
 }
+
+.user-email {
+    text-align: center; /* Horizontally centers the text */
+    font-size: 18px;    /* Adjust font size as needed */
+    color: #333;        /* Optional: Set a text color */
+    margin: 10px 0;     /* Add some spacing */
+}
+
+/* Optional: Centering vertically within a parent container */
+.parent-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centers horizontally */
+    justify-content: center; /* Centers vertically */
+    height: 100%; /* Adjust this to your container's height */
+}

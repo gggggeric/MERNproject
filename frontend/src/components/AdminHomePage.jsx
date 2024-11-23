@@ -63,11 +63,6 @@ const AdminHomePage = () => {
     const handleRedirectToReports = () => {
         navigate('/reports'); // Redirect to Reports page
     };
-
-    const handleRedirectToSettings = () => {
-        navigate('/settings'); // Redirect to Settings page
-    };
-
     const handleRedirectToManageReviews = () => {
         navigate('/admin/review'); // Redirect to Manage Reviews page
     };
@@ -82,9 +77,6 @@ const AdminHomePage = () => {
             <Box textAlign="center" mb={6}>
                 <Typography variant="h5" color="primary" fontWeight="bold" letterSpacing={1}>
                     Admin Dashboard
-                </Typography>
-                <Typography variant="h4" fontWeight="bold" mt={2}>
-                    Welcome to Your Admin Dashboard!
                 </Typography>
                 <Typography variant="h6" mt={1}>
                     Use the following options to manage the system.
@@ -162,25 +154,6 @@ const AdminHomePage = () => {
                         </CardContent>
                     </Card>
                 </Grid>
-
-                {/* Settings Card */}
-                <Grid item md={3} xs={12}>
-                    <Card variant="outlined" onClick={handleRedirectToSettings} sx={{ cursor: 'pointer', bgcolor: '#fff3e0' }}>
-                        <CardHeader
-                            title="Settings"
-                            subheader="System preferences"
-                            sx={{ textAlign: 'center', bgcolor: '#ffe0b2' }}
-                        />
-                        <CardContent>
-                            <Box display="flex" flexDirection="column" alignItems="center">
-                                <Box sx={{ bgcolor: 'lightgray', borderRadius: '50%', p: 2, mb: 2 }}>
-                                    <FaCog size={24} />
-                                </Box>
-                            </Box>
-                        </CardContent>
-                    </Card>
-                </Grid>
-
                 {/* Manage Reviews Card */}
                 <Grid item md={3} xs={12}>
                     <Card variant="outlined" onClick={handleRedirectToManageReviews} sx={{ cursor: 'pointer', bgcolor: '#e1f5fe' }}>

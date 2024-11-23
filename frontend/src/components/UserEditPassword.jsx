@@ -17,6 +17,7 @@ const UserEditPassword = () => {
         }
     });
     const [currentProfileImageUrl, setCurrentProfileImageUrl] = useState('/placeholder.png');
+    const [email, setEmail] = useState(''); // State to hold the logged user's email
     const [showAddressFields, setShowAddressFields] = useState(false);
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
@@ -29,7 +30,8 @@ const UserEditPassword = () => {
                         'Authorization': `Bearer ${localStorage.getItem('auth-token')}`,
                     },
                 });
-                // If profile image exists, set it to Cloudinary URL or default placeholder
+                // Set email and other profile data
+                setEmail(res.data.email || ''); // Ensure email is retrieved
                 setCurrentProfileImageUrl(res.data.profileImage || '/placeholder.png');
                 setFormData((prevState) => ({
                     ...prevState,
@@ -158,6 +160,12 @@ const UserEditPassword = () => {
                         onError={(e) => e.target.src = '/placeholder.png'}
                     />
                 </div>
+
+                {/* Display Email */}
+                <div className="parent-container">
+                    <p className="user-email">{email}</p>
+                </div>
+
 
                 <form onSubmit={handleUpdateProfile}>
                     {/* Password Fields (only included if password is being updated) */}
