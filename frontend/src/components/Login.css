@@ -4,7 +4,7 @@
     justify-content: center; /* Center horizontally */
     align-items: flex-start; /* Align items to the top */
     height: 100vh; /* Full viewport height */
-    background-color: #535C91; /* Darker background color */
+  background-color: transparent !important;
     padding-top: 50px; /* Padding at the top to give space for the card */
 }
 
