@@ -2,7 +2,7 @@
 
 .user-home-page {
     padding: 20px;
-    background-color: #ffffff; /* White background */
+    background-color: #D9A7FF; /* Light violet background */
     border-radius: 8px; /* Rounded corners */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow */
 }
@@ -36,6 +36,7 @@
 .action-btn:hover {
     background-color: #732d91; /* Darker purple on hover */
 }
+
 .receipt-modal {
     font-family: 'Roboto', sans-serif;
     width: 80%; /* Make the modal wider */

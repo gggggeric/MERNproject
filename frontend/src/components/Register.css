@@ -1,64 +1,97 @@
-/* src/components/Register.css */
+/* Page Container */
 .page-container {
-    display: flex; /* Use flexbox to center the content */
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
+    display: flex;
+    justify-content: center;
+    align-items: center;
     height: 100vh; /* Full viewport height */
-    background-color: #f4f4f4; /* Light background */
+    background: linear-gradient(135deg, #f4f4f4, #eaeaea); /* Subtle gradient background */
+    font-family: 'Roboto', sans-serif; /* Modern font */
 }
 
+/* Form Container */
 .form-container {
     max-width: 400px; /* Set a max width for the form */
-    width: 100%; /* Full width up to the max width */
-    padding: 2rem; /* Padding around the form */
-    border: 1px solid #8e44ad; /* Border with purple color */
-    border-radius: 10px; /* Rounded corners */
+    width: 100%;
+    padding: 2rem;
+    border: none; /* Removed solid border for minimalistic look */
+    border-radius: 15px; /* More rounded corners for a softer design */
     background-color: #ffffff; /* White background */
-    box-shadow: 0 4px 10px rgba(142, 68, 173, 0.5); /* Darker purple shadow */
+    box-shadow: 0 6px 20px rgba(142, 68, 173, 0.2); /* Softer purple shadow */
+    transition: transform 0.3s, box-shadow 0.3s; /* Smooth hover effects */
 }
 
+.form-container:hover {
+    transform: translateY(-5px); /* Slight hover lift */
+    box-shadow: 0 8px 25px rgba(142, 68, 173, 0.3); /* Enhanced shadow on hover */
+}
+
+/* Title Styling */
 .form-container h2 {
-    text-align: center; /* Center the title */
-    margin-bottom: 1.5rem; /* Space below the title */
-    color: #8e44ad; /* Title color */
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #8e44ad;
+    font-size: 1.8rem; /* Increased title size */
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(142, 68, 173, 0.2); /* Subtle shadow for emphasis */
 }
 
+/* Form Group */
 .form-group {
-    margin-bottom: 1rem; /* Space between form groups */
+    margin-bottom: 1.2rem; /* Slightly more space between fields */
 }
 
 .form-group label {
-    display: block; /* Block display for labels */
-    margin-bottom: 0.5rem; /* Space below labels */
-    color: #8e44ad; /* Label color */
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #732d91; /* Slightly darker purple for labels */
+    font-size: 0.9rem; /* Slightly smaller label size */
+    font-weight: bold;
 }
 
 .form-group input {
-    width: 100%; /* Full width input */
-    padding: 0.5rem; /* Padding inside input */
-    border: 1px solid #8e44ad; /* Border color */
-    border-radius: 5px; /* Rounded corners */
+    width: 100%;
+    padding: 0.75rem; /* Increased padding for better usability */
+    border: 1px solid #8e44ad;
+    border-radius: 8px; /* Slightly more rounded corners */
+    font-size: 1rem;
+    transition: border-color 0.3s, box-shadow 0.3s; /* Smooth focus effects */
 }
 
+.form-group input:focus {
+    border-color: #732d91; /* Darker purple on focus */
+    box-shadow: 0 0 5px rgba(142, 68, 173, 0.5); /* Purple glow on focus */
+    outline: none; /* Remove default outline */
+}
+
+/* Submit Button */
 .submit-btn {
-    width: 100%; /* Full width button */
-    padding: 0.5rem; /* Padding inside button */
-    background-color: #8e44ad; /* Button color */
-    color: white; /* Text color */
-    border: none; /* No border */
-    border-radius: 5px; /* Rounded corners */
-    font-size: 1rem; /* Font size */
-    cursor: pointer; /* Pointer on hover */
+    width: 100%;
+    padding: 0.75rem;
+    background: linear-gradient(135deg, #8e44ad, #732d91); /* Gradient button */
+    color: white;
+    border: none;
+    border-radius: 25px; /* Fully rounded button */
+    font-size: 1.1rem; /* Slightly larger font */
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s; /* Smooth hover effects */
+    box-shadow: 0 4px 10px rgba(142, 68, 173, 0.2); /* Add depth */
 }
 
 .submit-btn:hover {
-    background-color: #732d91; /* Darker purple on hover */
+    background: linear-gradient(135deg, #732d91, #8e44ad); /* Reverse gradient on hover */
+    transform: scale(1.05); /* Slight zoom effect */
+    box-shadow: 0 6px 15px rgba(142, 68, 173, 0.3); /* Enhanced shadow */
 }
 
+/* Error Message */
 .error-message {
-    color: red;
+    color: #e74c3c; /* Bright red for visibility */
     margin-top: 10px;
-    font-size: 14px;
+    font-size: 0.9rem; /* Slightly smaller font size */
     text-align: center;
+    background-color: #fbe3e4; /* Light red background for visibility */
+    border: 1px solid #e74c3c;
+    border-radius: 5px;
+    padding: 0.5rem;
 }
-
