@@ -1,77 +1,144 @@
 /* ManufacturerHomePage.css */
 
+/* Container styling */
 .manufacturer-dashboard-container {
-    max-width: 600px; /* Max width of the dashboard */
-    margin: 50px auto; /* Center the dashboard */
-    padding: 20px; /* Padding around the container */
-    background-color: #ffffff; /* White background */
-    border-radius: 8px; /* Rounded corners */
-    border: 1px solid #8e44ad; /* Purple border surrounding the container */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow */
-    text-align: center; /* Center text in the container */
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #f9f9f9; /* Light grey background */
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); /* Elevated shadow */
+    text-align: center;
 }
 
-.dashboard-card {
-    background-color: #fff; /* White background for the card */
-    padding: 20px; /* Padding inside the card */
-    border-radius: 8px; /* Rounded corners for the card */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for the card */
-    margin-top: 20px; /* Space above the card */
-}
-
+/* Heading styles */
 h2 {
-    color: #8e44ad; /* Dark text color for the heading */
-    margin-bottom: 20px; /* Space below the heading */
+    color: #333; /* Neutral dark color for better readability */
+    font-family: 'Roboto', sans-serif;
+    font-weight: bold;
+    margin-bottom: 20px;
 }
 
 h3 {
-    color: #8e44ad; /* Color for the card title */
-    margin-bottom: 15px; /* Space below the card title */
+    color: #555;
+    font-family: 'Roboto', sans-serif;
+    font-weight: normal;
+    margin-bottom: 15px;
 }
 
+/* Card styling */
+.dashboard-card {
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    margin-top: 20px;
+    border: 1px solid #eee;
+}
+
+/* Chart container */
+.chart-container {
+    margin: 30px auto;
+    padding: 20px;
+    border-radius: 12px;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Button container styles */
 .button-container {
-    display: flex; /* Flex layout for button container */
-    flex-direction: column; /* Stack buttons vertically */
-    gap: 15px; /* Space between buttons */
+    display: flex;
+    justify-content: space-around; /* Align buttons horizontally */
+    flex-wrap: wrap; /* Wrap buttons to next row if needed */
+    gap: 20px;
+    margin-top: 20px;
 }
 
-/* Button styles */
+/* Button styling */
 .action-btn {
-    padding: 10px; /* Padding inside the button */
-    color: white; /* Text color for the button */
-    border: none; /* No border */
-    border-radius: 4px; /* Rounded corners for the button */
-    cursor: pointer; /* Pointer cursor on hover */
-    transition: background-color 0.3s, transform 0.2s; /* Transition for hover effect */
-    font-size: 1rem; /* Font size for buttons */
+    padding: 12px 20px;
+    font-size: 1rem;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.3s, background-color 0.3s;
+    text-transform: uppercase;
+    font-weight: 500;
+    letter-spacing: 1px;
 }
 
-/* Different button colors */
+/* Button colors */
 .action-btn.post-product {
-    background-color: #8e44ad; /* Purple */
+    background-color: #6c5ce7; /* Vibrant purple */
 }
 
 .action-btn.manage-reviews {
-    background-color: #3498db; /* Blue */
+    background-color: #0984e3; /* Bright blue */
 }
 
 .action-btn.view-orders {
-    background-color: #2ecc71; /* Green */
+    background-color: #00b894; /* Fresh green */
 }
 
-/* Hover effects */
+/* Button hover effects */
 .action-btn:hover {
-    transform: scale(1.05); /* Slightly enlarge button on hover */
+    transform: scale(1.05); /* Slight enlargement */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
 .action-btn.post-product:hover {
-    background-color: #5e3370; /* Darker purple on hover */
+    background-color: #5a4dc6;
 }
 
 .action-btn.manage-reviews:hover {
-    background-color: #2980b9; /* Darker blue on hover */
+    background-color: #086bb1;
 }
 
 .action-btn.view-orders:hover {
-    background-color: #27ae60; /* Darker green on hover */
+    background-color: #009f76;
+}
+
+/* Date picker styling */
+.date-picker-container {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e0e0e0;
+}
+
+/* Typography for date picker */
+.date-picker-container h6 {
+    font-family: 'Roboto', sans-serif;
+    color: #333;
+    font-weight: bold;
+}
+
+/* Alert box styling */
+.alert-box {
+    margin: 20px auto;
+    max-width: 600px;
+    text-align: center;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1rem;
+    color: #b71c1c; /* Red for errors */
+    background-color: #ffebee; /* Light red background */
+    border: 1px solid #f44336; /* Border for error box */
+    padding: 15px;
+    border-radius: 8px;
+}
+
+/* Circular progress loader */
+.circular-loader {
+    margin: 20px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

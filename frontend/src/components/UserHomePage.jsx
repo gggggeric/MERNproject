@@ -3,9 +3,8 @@ import { Typography, Grid, Card, CardContent, CardMedia, CircularProgress, Paper
 import axios from 'axios';
 import { Carousel } from 'react-responsive-carousel'; // Import Carousel component
 import 'react-responsive-carousel/lib/styles/carousel.min.css'; // Import carousel styles
-
-
-import './UserHomePage.css';
+import { IconButton } from '@mui/material';
+import CommentIcon from '@mui/icons-material/Comment'; 
 
 const UserHomePage = () => {
     const [products, setProducts] = useState([]);
@@ -338,42 +337,48 @@ const handleOpenModal = (product) => {
                 </div>
 
                 <CardContent sx={{ backgroundColor: '#f9f9f9' }}>
-                    <Typography variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
-                        {product.name}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                        {product.description}
-                    </Typography>
-                    <Typography variant="h6" sx={{ mt: 2, color: '#1976d2' }}>
-                        Price: ₱{product.price}
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: '#666' }}>
-                        Stock: {product.stock}
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: '#666' }}>
-                        Company: {product.companyName}
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: '#666' }}>
-                        Category: {product.category}
-                    </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-                        <Typography variant="body2" sx={{ color: '#666' }}>Rating: </Typography>
-                        <Box sx={{ ml: 1, display: 'flex' }}>
-                            {renderStars(product.averageRating || 0)} {/* Default rating to 0 if not available */}
-                        </Box>
-                    </Box>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        sx={{ width: '100%', marginTop: 2 }}
-                        onClick={() => handleOpenModal(product)}
-                    >
-                        Place Order
-                    </Button>
-                    <Button variant="contained" color="primary" onClick={() => handleViewReviews(product)}>
-                    View Comments
-                </Button>
-                </CardContent>
+    <Typography variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
+        {product.name}
+    </Typography>
+    <Typography variant="body2" color="text.secondary">
+        {product.description}
+    </Typography>
+    <Typography variant="h6" sx={{ mt: 2, color: '#1976d2' }}>
+        Price: ₱{product.price}
+    </Typography>
+    <Typography variant="body2" sx={{ color: '#666' }}>
+        Stock: {product.stock}
+    </Typography>
+    <Typography variant="body2" sx={{ color: '#666' }}>
+        Company: {product.companyName}
+    </Typography>
+    <Typography variant="body2" sx={{ color: '#666' }}>
+        Category: {product.category}
+    </Typography>
+    <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
+        <Typography variant="body2" sx={{ color: '#666' }}>Rating: </Typography>
+        <Box sx={{ ml: 1, display: 'flex' }}>
+            {renderStars(product.averageRating || 0)} {/* Default rating to 0 if not available */}
+        </Box>
+    </Box>
+    <Button
+        variant="contained"
+        color="primary"
+        sx={{ width: '100%', marginTop: 2 }}
+        onClick={() => handleOpenModal(product)}
+    >
+        Place Order
+    </Button>
+    {/* Replace View Comments button with an icon */}
+    <Button
+        variant="contained"
+        color="primary"
+        sx={{ marginTop: 1 }}
+        onClick={() => handleViewReviews(product)}
+    >
+        <CommentIcon /> {/* Display the comment icon */}
+    </Button>
+</CardContent>
             </Card>
         </Grid>
     ))}

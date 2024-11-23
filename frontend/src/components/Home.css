@@ -6,6 +6,7 @@
     margin: 1rem; /* Match the navbar margin */
 }
 
+/* Carousel Styles */
 .carousel-image {
     display: flex; /* Use flexbox to center the image */
     justify-content: center; /* Center the image horizontally */
@@ -44,4 +45,75 @@
 /* Optional: Add some styling for the dots */
 .slick-dots li button:before {
     color: #8e44ad; /* Color for dots */
+}
+
+/* About Section Styles */
+.about-container {
+    padding: 2rem 1.5rem; /* Add some padding around the about section */
+    background-color: #f4f4f9; /* Light background color for the about section */
+    color: #333; /* Dark text for readability */
+    border-radius: 10px;
+    margin: 2rem 0; /* Space above and below */
+}
+
+.about-container h2 {
+    font-size: 2rem; /* Larger font for title */
+    color: #8e44ad; /* Purple color for the title */
+    margin-bottom: 1rem;
+}
+
+.about-container p {
+    font-size: 1.1rem; /* Slightly larger text for the description */
+    line-height: 1.6; /* Increased line height for readability */
+    margin-bottom: 1.5rem;
+}
+
+.about-images {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.5rem;
+}
+
+.about-image {
+    width: 48%; /* Image takes up about half the space */
+    border-radius: 10px; /* Rounded corners for the image */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
+}
+
+.about-text {
+    width: 48%; /* Take up the remaining space */
+    text-align: left; /* Align text to the left */
+}
+
+.about-text h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #8e44ad;
+}
+
+.about-text ul {
+    list-style-type: disc;
+    margin-left: 20px;
+}
+
+.about-text li {
+    margin-bottom: 0.8rem; /* Space between list items */
+    font-size: 1.1rem;
+}
+
+@media (max-width: 768px) {
+    .about-images {
+        flex-direction: column; /* Stack the image and text on small screens */
+        align-items: center;
+    }
+
+    .about-image {
+        width: 80%; /* Make the image smaller on mobile */
+        margin-bottom: 1rem;
+    }
+
+    .about-text {
+        width: 80%; /* Make text take up more space on mobile */
+    }
 }

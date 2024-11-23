@@ -1,56 +1,74 @@
 /* src/components/Login.css */
 .page-container {
-    display: flex; /* Use flexbox to center the content */
-    justify-content: center; /* Center horizontally */
-    align-items: flex-start; /* Align items to the top */
+    display: flex;
+    justify-content: center; /* Center the content horizontally */
+    align-items: center; /* Center vertically */
     height: 100vh; /* Full viewport height */
     background-color: #535C91; /* Darker background color */
-    padding-top: 50px; /* Padding at the top to give space for the card */
+    padding: 0 20px; /* Add padding to prevent overflow */
 }
 
 .form-container {
-    max-width: 400px; /* Set a max width for the form */
-    width: 100%; /* Full width up to the max width */
-    padding: 2rem; /* Padding around the form */
-    border: 1px solid #8e44ad; /* Border with purple color */
-    border-radius: 10px; /* Rounded corners */
-    background-color: #9290C3; /* Card background color */
-    box-shadow: 0 4px 10px rgba(142, 68, 173, 0.5); /* Darker purple shadow */
-    margin: 0; /* Remove any margin for consistent positioning */
+    max-width: 450px; /* Slightly increased width */
+    width: 100%;
+    padding: 2rem 2.5rem; /* Add more padding for spaciousness */
+    border: 2px solid #8e44ad; /* Purple border */
+    border-radius: 15px; /* More rounded corners */
+    background-color: #9290C3; /* Soft purple background */
+    box-shadow: 0 6px 15px rgba(142, 68, 173, 0.5); /* Stronger shadow for depth */
+    margin: 0;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-container:hover {
+    transform: translateY(-10px); /* Slightly lift the form on hover */
+    box-shadow: 0 10px 20px rgba(142, 68, 173, 0.7); /* Enhance shadow on hover */
 }
 
 .form-container h2 {
-    text-align: center; /* Center the title */
-    margin-bottom: 1.5rem; /* Space below the title */
-    color: white; /* Title color for contrast */
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: white;
+    font-family: 'Roboto', sans-serif; /* Use a cleaner font */
+    font-size: 1.75rem; /* Larger title */
 }
 
 .form-group {
-    margin-bottom: 1rem; /* Space between form groups */
+    margin-bottom: 1.5rem; /* Increased space between form groups */
 }
 
 .form-group label {
-    display: block; /* Block display for labels */
-    margin-bottom: 0.5rem; /* Space below labels */
-    color: white; /* Label color for contrast */
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #ffffff;
+    font-weight: 600; /* Bolder text for labels */
 }
 
 .form-group input {
-    width: 100%; /* Full width input */
-    padding: 0.5rem; /* Padding inside input */
-    border: 1px solid #8e44ad; /* Border color */
-    border-radius: 5px; /* Rounded corners */
+    width: 100%;
+    padding: 0.75rem; /* Increased padding for input fields */
+    border: 1px solid #8e44ad; /* Purple border */
+    border-radius: 10px; /* More rounded corners for inputs */
+    font-size: 1rem;
+    color: #333; /* Darker text color */
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus {
+    border-color: #732d91; /* Change border color on focus */
+    outline: none; /* Remove default outline */
 }
 
 .submit-btn {
-    width: 100%; /* Full width button */
-    padding: 0.5rem; /* Padding inside button */
-    background-color: #8e44ad; /* Button color */
-    color: white; /* Text color */
-    border: none; /* No border */
-    border-radius: 5px; /* Rounded corners */
-    font-size: 1rem; /* Font size */
-    cursor: pointer; /* Pointer on hover */
+    width: 100%;
+    padding: 0.75rem; /* Increased padding for button */
+    background-color: #8e44ad;
+    color: white;
+    border: none;
+    border-radius: 10px; /* Rounded button corners */
+    font-size: 1.1rem; /* Slightly larger button text */
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
 .submit-btn:hover {
@@ -59,7 +77,14 @@
 
 .error-message {
     color: red;
-    margin-top: 10px;
+    margin-top: 15px;
     font-size: 14px;
     text-align: center;
+    font-style: italic; /* Add some style to the error message */
+}
+
+@media (max-width: 500px) {
+    .form-container {
+        padding: 1.5rem 1.5rem; /* Reduced padding for small screens */
+    }
 }
