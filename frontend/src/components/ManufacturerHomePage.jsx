@@ -25,7 +25,7 @@ const ManufacturerHomePage = () => {
     };
 
     const handleManageReviewsClick = () => {
-        // Add functionality for Manage Reviews if needed
+        navigate('/manufacturer/view/reviews'); // Redirects to the product creation page
     };
 
     const handleViewOrdersClick = () => {

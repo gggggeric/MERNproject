@@ -46,6 +46,33 @@ const storage = new CloudinaryStorage({
 });
 const upload = multer({ storage });
 
+router.get('/manufacturer/reviews', authenticateUser, async (req, res) => {
+    try {
+        if (req.user.userType !== 'manufacturer') {
+            return res.status(403).json({ message: 'Access denied! You are not authorized.' });
+        }
+
+        // Step 1: Fetch all products for this manufacturer
+        const products = await Product.find({ user: req.user._id });
+
+        // Step 2: Extract product IDs
+        const productIds = products.map(product => product._id);
+
+        // Step 3: Fetch all reviews for these products, populate product name and user email
+        const reviews = await Review.find({ product: { $in: productIds } })
+            .populate('user', 'email')  // Populate the user email
+            .populate('product', 'name');  // Populate the product name
+
+        // Step 4: Return the reviews
+        return res.json(reviews);
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: 'Something went wrong. Please try again later.' });
+    }
+});
+
+
+
 //Route for getting the review for each product
 router.get('/user/product/:productId/reviews', authenticateUser, async (req, res) => {
     try {
@@ -373,8 +400,6 @@ router.delete('/products/bulk-delete', authenticateUser, async (req, res) => {
 
 router.get('/sales/monthly', authenticateUser, async (req, res) => {
     const userId = req.user._id; // Get the logged-in user's ID
-    console.log('Logged-in manufacturer userId:', userId);
-
     // Check if the user is a manufacturer
     if (req.user.userType !== 'manufacturer') {
         return res.status(403).json({ message: 'Forbidden! You must be a manufacturer to access this resource.' });
@@ -446,10 +471,6 @@ router.get('/sales/monthly', authenticateUser, async (req, res) => {
                 totalSales: salesMap[month] || 0 // If no sales for this month, set totalSales to 0
             });
         }
-
-        // Log the sales data to check if it's mapped correctly
-        console.log('Sales Data:', allMonthsData);
-
         // Send the data to the frontend
         res.json(allMonthsData);
     } catch (err) {
