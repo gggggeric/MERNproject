@@ -77,8 +77,6 @@ const Navbar = () => {
             return "/adminEditPassword"; // Admin password edit link
         } else if (userType === 'seller') {
             return "/sellerEditPassword"; // Seller password edit link
-        } else if (userType === 'user') {
-            return "/userEditPassword"; // User password edit link
         } else if (userType === 'manufacturer') {
             return "/manufacturerEditPassword"; // Manufacturer password edit link
         }
@@ -135,9 +133,12 @@ const Navbar = () => {
                                 <Link to={getProfileLink()} className="dropdown-item">
                                     <BiEdit className="icon" /> Edit Profile
                                 </Link>
-                                <Link to={getPasswordEditLink()} className="dropdown-item">
-                                    <BiEdit className="icon" /> Edit Password
-                                </Link>
+                                {/* Only show "Edit Password" link if userType is not 'user' */}
+                                {userType !== 'user' && (
+                                    <Link to={getPasswordEditLink()} className="dropdown-item">
+                                        <BiEdit className="icon" /> Edit Password
+                                    </Link>
+                                )}
                                 <Link to="#" className="dropdown-item logout-btn" onClick={handleLogout}>
                                     <BiLogOut className="icon" /> Logout
                                 </Link>

@@ -45,6 +45,31 @@ const storage = new CloudinaryStorage({
     }
 });
 const upload = multer({ storage });
+
+
+// Route to get all users (only accessible by admins)
+router.get('/admin/users', authenticateUser, async (req, res) => {
+    try {
+        // Check if the authenticated user is an admin
+        if (req.user.userType !== 'admin') {
+            return res.status(403).json({ message: 'Access denied. You are not an admin.' });
+        }
+
+        // Fetch all users from the database
+        const users = await User.find();
+
+        if (!users) {
+            return res.status(404).json({ message: 'No users found.' });
+        }
+
+        res.status(200).json({ users });
+    } catch (err) {
+        console.error('Error fetching users:', err);
+        res.status(500).json({ message: 'Server error while fetching users.' });
+    }
+});
+
+
 // Route to get the user profile image
 router.get('/getUserProfileImage', authenticateUser, async (req, res) => {
     try {
@@ -948,14 +973,6 @@ router.get('/user/products', authenticateUser, async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
-// Function to generate a JWT token
-const generateToken = (user) => {
-    return jwt.sign(
-        { userId: user._id, email: user.email, userType: user.userType },  // Include userType here
-        process.env.JWT_SECRET,  // Your secret from environment variables
-        { expiresIn: '1h' }  // Token expiration
-    );
-};
 
 // Google login endpoint
 router.post('/google/login', async (req, res) => {
